@@ -16,21 +16,15 @@ export default function HomePage() {
   const { products, loading } = useProducts(category === 'all' ? undefined : category);
 
   return (
-    <div className="min-h-screen bg-ink">
+    <div className="min-h-screen bg-black">
       <Header />
 
-      {/* Hero — ballenacabo-inspired */}
-      <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-b from-secondary/40 via-ink to-ink" />
-        <div className="absolute inset-0 opacity-20"
-          style={{ backgroundImage: 'radial-gradient(circle at 30% 50%, #E07856 0%, transparent 50%), radial-gradient(circle at 70% 30%, #D4AF37 0%, transparent 40%)' }}
-        />
+      <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-black">
         <div className="relative text-center px-6 max-w-4xl mx-auto pt-24">
-          <p className="label-luxury mb-8 animate-fade-up">North Coast · Egypt</p>
-          <div className="mb-8 flex justify-center">
+          <div className="mb-4 flex justify-center">
             <AnimatedLogo size="hero" animate />
           </div>
-          <p className="text-white/60 text-lg md:text-xl font-light tracking-wide max-w-xl mx-auto mb-12 animate-fade-up-delay">
+          <p className="text-white/55 text-lg md:text-xl font-light tracking-wide max-w-xl mx-auto mb-12 animate-fade-up-delay">
             {t('hero.subtitle', lang)}
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center animate-fade-up-delay">
@@ -43,25 +37,23 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* About strip */}
-      <section className="py-24 border-y border-white/5">
+      <section className="py-24 border-y border-white/5 bg-black">
         <div className="max-w-5xl mx-auto px-6 text-center">
           <p className="label-luxury mb-4">Sea &amp; Craft</p>
-          <h2 className="font-display text-4xl md:text-5xl text-white mb-6">
+          <h2 className="text-4xl md:text-5xl text-white mb-6 uppercase tracking-[0.08em]">
             Where gathering comes naturally
           </h2>
-          <p className="text-white/50 leading-relaxed max-w-2xl mx-auto font-light">
+          <p className="text-white/50 leading-relaxed max-w-2xl mx-auto font-light normal-case tracking-normal">
             An Asian kitchen rooted in the Mediterranean coast. Guided by time, light, and the finest ingredients — made to be shared.
           </p>
         </div>
       </section>
 
-      {/* Menu */}
-      <section id="menu" className="py-24">
+      <section id="menu" className="py-24 bg-black">
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-16">
             <p className="label-luxury mb-3">Menu</p>
-            <h2 className="font-display text-4xl md:text-5xl text-white">{t('nav.products', lang)}</h2>
+            <h2 className="text-4xl md:text-5xl text-white">{t('nav.products', lang)}</h2>
             <div className="divider-gold mt-6" />
           </div>
 

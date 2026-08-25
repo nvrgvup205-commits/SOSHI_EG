@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, type ReactNode } from 'react';
+import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
 import type { Language } from '../types';
 
 interface LanguageState {
@@ -9,16 +9,28 @@ interface LanguageState {
 
 const LanguageContext = createContext<LanguageState | null>(null);
 
+function readStoredLang(): Language {
+  const stored = localStorage.getItem('lang') as Language | null;
+  if (stored === 'ar' || stored === 'en' || stored === 'ru') return stored;
+  return 'en';
+}
+
 export function LanguageProvider({ children }: { children: ReactNode }) {
-  const [lang, setLangState] = useState<Language>(
-    () => (localStorage.getItem('lang') as Language) || 'ar',
-  );
+  const [lang, setLangState] = useState<Language>(readStoredLang);
+
+  const apply = (l: Language) => {
+    document.documentElement.dir = l === 'ar' ? 'rtl' : 'ltr';
+    document.documentElement.lang = l;
+  };
+
+  useEffect(() => {
+    apply(lang);
+  }, [lang]);
 
   const setLang = (l: Language) => {
     setLangState(l);
     localStorage.setItem('lang', l);
-    document.documentElement.dir = l === 'ar' ? 'rtl' : 'ltr';
-    document.documentElement.lang = l;
+    apply(l);
   };
 
   const dir = lang === 'ar' ? 'rtl' : 'ltr';
