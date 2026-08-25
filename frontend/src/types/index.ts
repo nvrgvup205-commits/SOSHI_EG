@@ -50,6 +50,7 @@ export interface Product {
   image_thumbnail_url: string | null;
   category: string;
   is_available: boolean;
+  sort_order?: number;
 }
 
 export interface Order {

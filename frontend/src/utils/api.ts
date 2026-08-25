@@ -62,6 +62,22 @@ class ApiClient {
     return this.request<{ products: import('../types').Product[] }>(`/api/products${q}`);
   }
 
+  getAllProducts() {
+    return this.request<{ products: import('../types').Product[] }>('/api/products?all=true');
+  }
+
+  createProduct(data: Record<string, unknown>) {
+    return this.request<{ product: import('../types').Product }>('/api/products', { method: 'POST', body: JSON.stringify(data) });
+  }
+
+  updateProduct(id: string, data: Record<string, unknown>) {
+    return this.request<{ product: import('../types').Product }>(`/api/products/${id}`, { method: 'PATCH', body: JSON.stringify(data) });
+  }
+
+  deleteProduct(id: string) {
+    return this.request(`/api/products/${id}`, { method: 'DELETE' });
+  }
+
   // Customers (admin)
   getCustomers(params?: { search?: string; page?: number }) {
     const q = new URLSearchParams();
@@ -105,6 +121,10 @@ class ApiClient {
 
   getStaff() {
     return this.request<{ staff: import('../types').StaffUser[] }>('/api/admin/staff');
+  }
+
+  createStaff(data: { email: string; full_name: string; phone?: string; role: string; password: string }) {
+    return this.request('/api/admin/staff', { method: 'POST', body: JSON.stringify(data) });
   }
 
   updateSettings(settings: Record<string, string>) {

@@ -26,28 +26,28 @@ export default function AdminLogin() {
   };
 
   return (
-    <div className="min-h-screen bg-secondary flex items-center justify-center px-4">
-      <div className="card w-full max-w-md p-8">
-        <div className="text-center mb-8">
-          <div className="text-4xl mb-3">🍣</div>
-          <h1 className="text-2xl font-heading font-bold text-secondary">Admin Login</h1>
-          <p className="text-gray-500 text-sm mt-2">Sushi Shop Egypt</p>
+    <div className="min-h-screen bg-ink flex items-center justify-center px-4">
+      <div className="w-full max-w-md">
+        <div className="text-center mb-10">
+          <p className="label-luxury mb-4">Administration</p>
+          <h1 className="font-display text-4xl text-white">Sushi Shop</h1>
+          <div className="divider-gold mt-6" />
         </div>
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="card p-8 space-y-5">
           <div>
-            <label className="block text-sm font-medium mb-1">
-              <Mail className="inline w-4 h-4 me-1" />Email
+            <label className="text-xs text-white/50 uppercase tracking-wider mb-2 flex items-center gap-2">
+              <Mail className="w-3 h-3" />Email
             </label>
-            <input type="email" required className="input-field" value={email} onChange={(e) => setEmail(e.target.value)} dir="ltr" />
+            <input type="email" required className="input-field" dir="ltr" value={email} onChange={(e) => setEmail(e.target.value)} />
           </div>
           <div>
-            <label className="block text-sm font-medium mb-1">
-              <Lock className="inline w-4 h-4 me-1" />Password
+            <label className="text-xs text-white/50 uppercase tracking-wider mb-2 flex items-center gap-2">
+              <Lock className="w-3 h-3" />Password
             </label>
             <input type="password" required className="input-field" value={password} onChange={(e) => setPassword(e.target.value)} />
           </div>
           {error && <p className="text-danger text-sm">{error}</p>}
-          <button type="submit" disabled={loading} className="btn-primary w-full">
+          <button type="submit" disabled={loading} className="btn-luxury-filled w-full">
             {loading ? '...' : 'Login'}
           </button>
         </form>

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Search } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import Header from '../components/Shared/Header';
 import Footer from '../components/Shared/Footer';
 import ProductCard from '../components/Products/ProductCard';
@@ -12,65 +12,87 @@ const categories = ['all', 'nigiri', 'rolls', 'special'] as const;
 export default function HomePage() {
   const { lang } = useLanguage();
   const [category, setCategory] = useState<string>('all');
-  const [search, setSearch] = useState('');
   const { products, loading } = useProducts(category === 'all' ? undefined : category);
 
-  const filtered = products.filter((p) => {
-    if (!search) return true;
-    const q = search.toLowerCase();
-    return p.name_ar.toLowerCase().includes(q) || p.name_en.toLowerCase().includes(q) || p.name_ru.toLowerCase().includes(q);
-  });
-
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen bg-ink">
       <Header />
 
-      <section className="relative bg-secondary text-white py-20 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-secondary via-secondary to-primary/30" />
-        <div className="absolute top-10 end-10 text-8xl opacity-20 animate-pulse">✨</div>
-        <div className="relative max-w-7xl mx-auto px-4 text-center">
-          <div className="text-6xl mb-4">🍣</div>
-          <h1 className="text-4xl md:text-5xl font-heading font-bold mb-4">{t('hero.title', lang)}</h1>
-          <p className="text-white/70 text-lg max-w-xl mx-auto">{t('hero.subtitle', lang)}</p>
+      {/* Hero — ballenacabo-inspired */}
+      <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-b from-secondary/40 via-ink to-ink" />
+        <div className="absolute inset-0 opacity-20"
+          style={{ backgroundImage: 'radial-gradient(circle at 30% 50%, #E07856 0%, transparent 50%), radial-gradient(circle at 70% 30%, #D4AF37 0%, transparent 40%)' }}
+        />
+        <div className="relative text-center px-6 max-w-4xl mx-auto pt-24">
+          <p className="label-luxury mb-6 animate-fade-up">North Coast · Egypt</p>
+          <h1 className="font-display text-5xl md:text-7xl lg:text-8xl text-white leading-[1.1] mb-6 animate-fade-up">
+            {t('hero.title', lang)}
+          </h1>
+          <div className="divider-gold mb-8 animate-fade-up-delay" />
+          <p className="text-white/60 text-lg md:text-xl font-light tracking-wide max-w-xl mx-auto mb-12 animate-fade-up-delay">
+            {t('hero.subtitle', lang)}
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center animate-fade-up-delay">
+            <a href="#menu" className="btn-luxury">{t('nav.products', lang)}</a>
+            <Link to="/login" className="btn-luxury-filled">{t('btn.order_now', lang)}</Link>
+          </div>
+        </div>
+        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 text-white/30 text-xs tracking-[0.3em] uppercase animate-pulse">
+          Scroll
         </div>
       </section>
 
-      <section id="products" className="max-w-7xl mx-auto px-4 py-12 flex-1">
-        <div className="flex flex-col md:flex-row gap-4 mb-8">
-          <div className="relative flex-1">
-            <Search className="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-            <input
-              type="text"
-              className="input-field ps-10"
-              placeholder={t('search.placeholder', lang)}
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-            />
+      {/* About strip */}
+      <section className="py-24 border-y border-white/5">
+        <div className="max-w-5xl mx-auto px-6 text-center">
+          <p className="label-luxury mb-4">Sea &amp; Craft</p>
+          <h2 className="font-display text-4xl md:text-5xl text-white mb-6">
+            Where gathering comes naturally
+          </h2>
+          <p className="text-white/50 leading-relaxed max-w-2xl mx-auto font-light">
+            An Asian kitchen rooted in the Mediterranean coast. Guided by time, light, and the finest ingredients — made to be shared.
+          </p>
+        </div>
+      </section>
+
+      {/* Menu */}
+      <section id="menu" className="py-24">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="text-center mb-16">
+            <p className="label-luxury mb-3">Menu</p>
+            <h2 className="font-display text-4xl md:text-5xl text-white">{t('nav.products', lang)}</h2>
+            <div className="divider-gold mt-6" />
           </div>
-          <div className="flex gap-2 flex-wrap">
+
+          <div className="flex justify-center gap-3 mb-12 flex-wrap">
             {categories.map((cat) => (
               <button
                 key={cat}
                 onClick={() => setCategory(cat)}
-                className={`px-4 py-2 rounded-lg font-medium transition-all ${
-                  category === cat ? 'bg-primary text-white' : 'bg-white text-gray-600 hover:bg-cream'
+                className={`px-6 py-2 text-xs uppercase tracking-[0.2em] transition-all duration-300 border ${
+                  category === cat
+                    ? 'border-accent text-accent bg-accent/10'
+                    : 'border-white/10 text-white/50 hover:border-white/30 hover:text-white'
                 }`}
               >
                 {t(`category.${cat}`, lang)}
               </button>
             ))}
           </div>
-        </div>
 
-        {loading ? (
-          <div className="text-center py-20 text-gray-400">Loading...</div>
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filtered.map((product) => (
-              <ProductCard key={product.id} product={product} lang={lang} />
-            ))}
-          </div>
-        )}
+          {loading ? (
+            <div className="text-center py-20 text-white/30 tracking-widest uppercase text-sm">Loading...</div>
+          ) : products.length === 0 ? (
+            <div className="text-center py-20 text-white/30">No products available</div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+              {products.map((product, i) => (
+                <ProductCard key={product.id} product={product} lang={lang} delay={i * 0.1} />
+              ))}
+            </div>
+          )}
+        </div>
       </section>
 
       <Footer />

@@ -1,15 +1,15 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { Mail, Phone, User, MessageCircle } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
 import { useLanguage } from '../../hooks/useLanguage';
 import { t } from '../../utils/i18n';
 import { isValidEmail, isValidPhone, formatPhone } from '../../utils/validators';
+import Header from '../Shared/Header';
 
 export default function CustomerLogin() {
   const { loginCustomer } = useAuth();
   const { lang } = useLanguage();
-  const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [fullName, setFullName] = useState('');
@@ -19,14 +19,12 @@ export default function CustomerLogin() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-
     if (!isValidEmail(email)) return setError('Invalid email');
     if (!isValidPhone(phone)) return setError('Invalid phone');
-
     setLoading(true);
     try {
       await loginCustomer({ email, phone: formatPhone(phone), full_name: fullName || undefined });
-      navigate('/');
+      window.location.href = '/';
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Login failed');
     } finally {
@@ -35,76 +33,45 @@ export default function CustomerLogin() {
   };
 
   return (
-    <div className="min-h-[70vh] flex items-center justify-center px-4 py-12">
-      <div className="card w-full max-w-md p-8 animate-slide-up">
-        <div className="text-center mb-8">
-          <div className="text-4xl mb-3">🍣</div>
-          <h1 className="text-2xl font-heading font-bold text-secondary">{t('login.title', lang)}</h1>
-          <p className="text-gray-500 mt-2 text-sm">{t('login.subtitle', lang)}</p>
-        </div>
-
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              <User className="inline w-4 h-4 me-1" />
-              {t('login.name', lang)}
-            </label>
-            <input
-              type="text"
-              className="input-field"
-              value={fullName}
-              onChange={(e) => setFullName(e.target.value)}
-              placeholder={t('login.name', lang)}
-            />
+    <div className="min-h-screen bg-ink">
+      <Header />
+      <div className="min-h-screen flex items-center justify-center px-4 pt-20">
+        <div className="w-full max-w-md">
+          <div className="text-center mb-10">
+            <p className="label-luxury mb-4">{t('login.title', lang)}</p>
+            <h1 className="font-display text-4xl text-white">{t('login.subtitle', lang)}</h1>
+            <div className="divider-gold mt-6" />
           </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              <Mail className="inline w-4 h-4 me-1" />
-              {t('login.email', lang)} *
-            </label>
-            <input
-              type="email"
-              required
-              className="input-field"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="email@example.com"
-              dir="ltr"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              <Phone className="inline w-4 h-4 me-1" />
-              {t('login.phone', lang)} *
-            </label>
-            <input
-              type="tel"
-              required
-              className="input-field"
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-              placeholder="+201xxxxxxxxx"
-              dir="ltr"
-            />
-          </div>
-
-          {error && <p className="text-danger text-sm">{error}</p>}
-
-          <button type="submit" disabled={loading} className="btn-primary w-full">
-            {loading ? '...' : t('btn.login', lang)}
-          </button>
-        </form>
-
-        <div className="mt-6 pt-6 border-t border-gray-100 space-y-2">
-          <div className="flex items-center gap-2 text-xs text-gray-400">
-            <MessageCircle className="w-4 h-4" />
-            <span>{t('login.otp_soon', lang)}</span>
-          </div>
-          <div className="flex items-center gap-2 text-xs text-gray-400">
-            <span className="text-base">G</span>
-            <span>{t('login.google_soon', lang)}</span>
+          <form onSubmit={handleSubmit} className="card p-8 space-y-5">
+            <div>
+              <label className="text-xs text-white/50 uppercase tracking-wider mb-2 flex items-center gap-2">
+                <User className="w-3 h-3" />{t('login.name', lang)}
+              </label>
+              <input className="input-field" value={fullName} onChange={(e) => setFullName(e.target.value)} />
+            </div>
+            <div>
+              <label className="text-xs text-white/50 uppercase tracking-wider mb-2 flex items-center gap-2">
+                <Mail className="w-3 h-3" />{t('login.email', lang)} *
+              </label>
+              <input className="input-field" type="email" required dir="ltr" value={email} onChange={(e) => setEmail(e.target.value)} />
+            </div>
+            <div>
+              <label className="text-xs text-white/50 uppercase tracking-wider mb-2 flex items-center gap-2">
+                <Phone className="w-3 h-3" />{t('login.phone', lang)} *
+              </label>
+              <input className="input-field" type="tel" required dir="ltr" value={phone} onChange={(e) => setPhone(e.target.value)} />
+            </div>
+            {error && <p className="text-danger text-sm">{error}</p>}
+            <button type="submit" disabled={loading} className="btn-luxury-filled w-full">
+              {loading ? '...' : t('btn.login', lang)}
+            </button>
+            <div className="pt-4 border-t border-white/5 space-y-2">
+              <p className="text-white/30 text-xs flex items-center gap-2"><MessageCircle className="w-3 h-3" />{t('login.otp_soon', lang)}</p>
+              <p className="text-white/30 text-xs">{t('login.google_soon', lang)}</p>
+            </div>
+          </form>
+          <div className="text-center mt-6">
+            <Link to="/" className="text-xs text-white/40 hover:text-accent transition-colors uppercase tracking-wider">← Back</Link>
           </div>
         </div>
       </div>

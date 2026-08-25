@@ -2,7 +2,7 @@ import { Hono } from 'hono';
 import type { Env } from '../types';
 import { createSupabase } from '../lib/supabase';
 import { errorResponse, jsonResponse } from '../lib/auth';
-import { requireStaff, optionalAuth } from '../middleware/auth';
+import { requireStaff } from '../middleware/auth';
 
 type AppEnv = { Bindings: Env; Variables: { staff?: Record<string, unknown> } };
 
@@ -11,13 +11,22 @@ const products = new Hono<AppEnv>();
 products.get('/', async (c) => {
   const supabase = createSupabase(c.env);
   const category = c.req.query('category');
+  const all = c.req.query('all') === 'true';
 
-  let query = supabase
-    .from('products')
-    .select('*')
-    .eq('is_available', true)
-    .order('sort_order', { ascending: true });
+  if (all) {
+    const token = c.req.header('Authorization')?.replace('Bearer ', '');
+    if (!token) return errorResponse('Unauthorized', 401);
+    const { data } = await supabase
+      .from('staff_sessions')
+      .select('id')
+      .eq('session_token', token)
+      .gt('expires_at', new Date().toISOString())
+      .maybeSingle();
+    if (!data) return errorResponse('Unauthorized', 401);
+  }
 
+  let query = supabase.from('products').select('*').order('sort_order', { ascending: true });
+  if (!all) query = query.eq('is_available', true);
   if (category) query = query.eq('category', category);
 
   const { data, error } = await query;
