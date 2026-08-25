@@ -15,6 +15,7 @@ import {
   staffDashboardPath,
 } from '../utils/staffRoles';
 import type { Order, OrderStatus, Product, UserRole } from '../types';
+import { pickProductThumbnail } from '../utils/productImage';
 import AdminLogin from '../components/Admin/AdminLogin';
 import BrandName from '../components/Shared/BrandName';
 import ChatInbox from '../components/Admin/ChatInbox';
@@ -177,9 +178,14 @@ export default function StaffPortal() {
             ) : (
               products.map((p) => (
                 <div key={p.id} className="card p-4 flex justify-between items-center gap-3">
-                  <div className="min-w-0">
-                    <div className="text-white font-medium truncate">{lang === 'ar' ? p.name_ar : p.name_en}</div>
-                    <div className="text-white/40 text-xs capitalize mt-0.5">{p.category}</div>
+                  <div className="flex items-center gap-3 min-w-0">
+                    {pickProductThumbnail(p) ? (
+                      <img src={pickProductThumbnail(p)!} alt="" className="h-12 w-12 rounded object-cover shrink-0" />
+                    ) : null}
+                    <div className="min-w-0">
+                      <div className="text-white font-medium truncate">{lang === 'ar' ? p.name_ar : p.name_en}</div>
+                      <div className="text-white/40 text-xs capitalize mt-0.5">{p.category}</div>
+                    </div>
                   </div>
                   <div className="text-accent font-display shrink-0">{p.price} {t('currency', lang)}</div>
                 </div>

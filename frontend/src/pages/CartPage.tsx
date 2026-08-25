@@ -5,6 +5,7 @@ import Footer from '../components/Shared/Footer';
 import { useCart } from '../hooks/useCart';
 import { useLanguage } from '../hooks/useLanguage';
 import { t, getProductName, localizedName } from '../utils/i18n';
+import { pickProductThumbnail } from '../utils/productImage';
 
 export default function CartPage() {
   const { items, total, updateQuantity, removeItem, lineTotal } = useCart();
@@ -31,9 +32,9 @@ export default function CartPage() {
               <div key={`${item.product.id}-${index}`} className="card p-5 space-y-3">
                 <div className="flex items-center justify-between gap-4">
                   <div className="flex items-center gap-4 min-w-0">
-                    {(item.product.image_thumbnail_url || item.product.image_compressed_url) ? (
+                    {pickProductThumbnail(item.product) ? (
                       <img
-                        src={item.product.image_thumbnail_url || item.product.image_compressed_url || ''}
+                        src={pickProductThumbnail(item.product)!}
                         alt=""
                         className="w-16 h-16 object-cover"
                       />

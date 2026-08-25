@@ -1,5 +1,6 @@
 import type { Product, Language } from '../../types';
 import { getProductName, getProductDescription, t } from '../../utils/i18n';
+import { pickProductImage } from '../../utils/productImage';
 
 interface Props {
   product: Product;
@@ -11,7 +12,7 @@ interface Props {
 export default function ProductCard({ product, lang, delay = 0, onOpen }: Props) {
   const name = getProductName(product, lang);
   const desc = getProductDescription(product, lang);
-  const img = product.image_compressed_url || product.image_thumbnail_url || product.image_original_url;
+  const photo = pickProductImage(product);
 
   return (
     <button
@@ -21,8 +22,8 @@ export default function ProductCard({ product, lang, delay = 0, onOpen }: Props)
       style={{ animationDelay: `${delay}s` }}
     >
       <div className="relative aspect-[4/3] bg-gradient-to-br from-secondary/30 to-primary/10 flex items-center justify-center overflow-hidden">
-        {img ? (
-          <img src={img} alt={name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+        {photo ? (
+          <img src={photo} alt={name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
         ) : (
           <span className="text-7xl opacity-60">🍣</span>
         )}

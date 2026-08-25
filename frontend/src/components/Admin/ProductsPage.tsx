@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react';
-import { Plus, Pencil, Trash2, Package } from 'lucide-react';
+import { Plus, Pencil, Trash2, Package, ImagePlus } from 'lucide-react';
 import { api } from '../../utils/api';
 import { useLanguage } from '../../hooks/useLanguage';
 import { t } from '../../utils/i18n';
+import { compressProductImages } from '../../utils/compressImage';
+import { pickProductImage, pickProductThumbnail } from '../../utils/productImage';
 import type { Product } from '../../types';
 
 const emptyForm = {
@@ -21,6 +23,8 @@ export default function ProductsPage() {
   const [form, setForm] = useState(emptyForm);
   const [error, setError] = useState('');
   const [saving, setSaving] = useState(false);
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
 
   const load = () => {
     setLoading(true);
@@ -35,6 +39,8 @@ export default function ProductsPage() {
   const openCreate = () => {
     setEditing(null);
     setForm(emptyForm);
+    setImageFile(null);
+    setImagePreview(null);
     setShowForm(true);
     setError('');
   };
@@ -48,20 +54,40 @@ export default function ProductsPage() {
       is_available: p.is_available, sort_order: p.sort_order || 0,
       video_url: p.video_url || '', is_new: Boolean(p.is_new), is_popular: Boolean(p.is_popular), is_offer: Boolean(p.is_offer),
     });
+    setImageFile(null);
+    setImagePreview(pickProductImage(p));
     setShowForm(true);
     setError('');
+  };
+
+  const onPickImage = (file: File | undefined) => {
+    if (!file) return;
+    if (!file.type.startsWith('image/')) {
+      setError('Please choose an image file');
+      return;
+    }
+    setImageFile(file);
+    setImagePreview(URL.createObjectURL(file));
   };
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaving(true);
     setError('');
-    const payload = {
+    const payload: Record<string, unknown> = {
       ...form,
       price: parseFloat(form.price),
       sort_order: Number(form.sort_order),
     };
     try {
+      if (imageFile) {
+        const variants = await compressProductImages(imageFile);
+        const urls = await api.uploadProductImages({
+          ...variants,
+          folder: editing?.id,
+        });
+        Object.assign(payload, urls);
+      }
       if (editing) {
         await api.updateProduct(editing.id, payload);
       } else {
@@ -156,6 +182,28 @@ export default function ProductsPage() {
               <input type="checkbox" id="offer" checked={form.is_offer} onChange={(e) => setForm({ ...form, is_offer: e.target.checked })} />
               <label htmlFor="offer" className="text-white/70 text-sm">Offer</label>
             </div>
+            <div className="col-span-full">
+              <label className="text-xs text-white/50 uppercase tracking-wider mb-2 block">Product image</label>
+              <div className="flex flex-wrap items-center gap-4">
+                <label className="btn-luxury text-xs cursor-pointer inline-flex items-center gap-2">
+                  <ImagePlus className="w-4 h-4" />
+                  {imageFile ? 'Change image' : 'Upload image'}
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={(e) => {
+                      onPickImage(e.target.files?.[0]);
+                      e.currentTarget.value = '';
+                    }}
+                  />
+                </label>
+                {imagePreview && (
+                  <img src={imagePreview} alt="" className="h-16 w-16 rounded object-cover border border-white/10" />
+                )}
+                <p className="text-white/40 text-xs">Compressed automatically — same upload button</p>
+              </div>
+            </div>
             {error && <p className="text-danger text-sm col-span-full">{error}</p>}
             <div className="col-span-full flex gap-3 pt-4">
               <button type="submit" disabled={saving} className="btn-luxury-filled text-xs">{saving ? '...' : 'Save'}</button>
@@ -174,10 +222,17 @@ export default function ProductsPage() {
             {products.map((p) => (
               <div key={p.id} className="card p-4">
                 <div className="flex justify-between items-start gap-3">
-                  <div className="min-w-0">
-                    <div className="text-white font-medium truncate">{p.name_ar}</div>
-                    <div className="text-white/40 text-xs capitalize mt-0.5">{p.category}</div>
-                    <div className="text-accent font-display text-lg mt-2">{p.price} EGP</div>
+                  <div className="flex items-start gap-3 min-w-0">
+                    {pickProductThumbnail(p) ? (
+                      <img src={pickProductThumbnail(p)!} alt="" className="h-12 w-12 rounded object-cover shrink-0" />
+                    ) : (
+                      <div className="h-12 w-12 rounded bg-white/5 flex items-center justify-center text-lg shrink-0">🍣</div>
+                    )}
+                    <div className="min-w-0">
+                      <div className="text-white font-medium truncate">{p.name_ar}</div>
+                      <div className="text-white/40 text-xs capitalize mt-0.5">{p.category}</div>
+                      <div className="text-accent font-display text-lg mt-2">{p.price} EGP</div>
+                    </div>
                   </div>
                   <div className="flex flex-col items-end gap-2 shrink-0">
                     <button onClick={() => toggleAvailable(p)}
@@ -199,6 +254,7 @@ export default function ProductsPage() {
             <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-white/5 text-white/40 text-xs uppercase tracking-wider">
+                <th className="text-start p-4">Image</th>
                 <th className="text-start p-4">Name (AR)</th>
                 <th className="text-start p-4">Category</th>
                 <th className="text-start p-4">Price</th>
@@ -209,6 +265,13 @@ export default function ProductsPage() {
             <tbody>
               {products.map((p) => (
                 <tr key={p.id} className="border-b border-white/5 hover:bg-white/5 transition-colors">
+                  <td className="p-4">
+                    {pickProductThumbnail(p) ? (
+                      <img src={pickProductThumbnail(p)!} alt="" className="h-10 w-10 rounded object-cover" />
+                    ) : (
+                      <span className="text-white/30">—</span>
+                    )}
+                  </td>
                   <td className="p-4 text-white">{p.name_ar}</td>
                   <td className="p-4 text-white/50 capitalize">{p.category}</td>
                   <td className="p-4 text-accent font-display text-lg">{p.price} EGP</td>

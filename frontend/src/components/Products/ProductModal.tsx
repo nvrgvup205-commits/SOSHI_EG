@@ -5,6 +5,7 @@ import { useLanguage } from '../../hooks/useLanguage';
 import { useCart } from '../../hooks/useCart';
 import { getProductDescription, getProductName, localizedName, t } from '../../utils/i18n';
 import { api } from '../../utils/api';
+import { pickProductImage } from '../../utils/productImage';
 
 function youtubeId(url: string) {
   const m = url.match(/(?:youtu\.be\/|v=|embed\/)([\w-]{6,})/);
@@ -34,7 +35,7 @@ export default function ProductModal({
   const availableAddons = full.addons?.length ? full.addons : addons;
   const name = getProductName(full, lang);
   const desc = getProductDescription(full, lang);
-  const img = full.image_original_url || full.image_compressed_url || full.image_thumbnail_url;
+  const img = pickProductImage(full);
   const extras = useMemo(
     () => availableAddons.filter((a) => selected.includes(a.id)).reduce((s, a) => s + Number(a.price), 0),
     [availableAddons, selected],
