@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
   LayoutDashboard, Users, Package, ShoppingBag, Settings, UserCog, LogOut, ChevronDown, Download,
+  Layers, Megaphone, MapPin, TicketPercent, BarChart3, MessageSquare,
 } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
 import { useLanguage } from '../../hooks/useLanguage';
@@ -14,6 +15,12 @@ const allNavItems = [
   { path: '/admin/orders', icon: ShoppingBag, labelKey: 'admin.orders', roles: ['admin', 'staff_supervisor', 'order_handler'] as UserRole[] },
   { path: '/admin/customers', icon: Users, labelKey: 'admin.customers', roles: ['admin', 'staff_supervisor'] as UserRole[] },
   { path: '/admin/products', icon: Package, labelKey: 'admin.products', roles: ['admin', 'staff_supervisor', 'product_viewer'] as UserRole[] },
+  { path: '/admin/categories', icon: Layers, labelKey: 'admin.categories', roles: ['admin', 'staff_supervisor'] as UserRole[] },
+  { path: '/admin/banners', icon: Megaphone, labelKey: 'admin.banners', roles: ['admin'] as UserRole[] },
+  { path: '/admin/zones', icon: MapPin, labelKey: 'admin.zones', roles: ['admin'] as UserRole[] },
+  { path: '/admin/coupons', icon: TicketPercent, labelKey: 'admin.coupons', roles: ['admin'] as UserRole[] },
+  { path: '/admin/chat', icon: MessageSquare, labelKey: 'admin.chat', roles: ['admin', 'staff_supervisor', 'chat_handler'] as UserRole[] },
+  { path: '/admin/reports', icon: BarChart3, labelKey: 'admin.reports', roles: ['admin', 'staff_supervisor'] as UserRole[] },
   { path: '/admin/staff', icon: UserCog, labelKey: 'admin.staff', roles: ['admin'] as UserRole[] },
   { path: '/admin/settings', icon: Settings, labelKey: 'admin.settings', roles: ['admin'] as UserRole[] },
 ];

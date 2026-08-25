@@ -65,13 +65,18 @@ npm run dev
 
 ### 3. Default Admin
 
-- **Email:** admin@sushishop-egypt.com
-- **Password:** Admin@2026
+The admin form accepts **email or phone**.
+
+- **Email:** `admin@sushishop-egypt.com`
+- **Phone:** `01000000001` or `+201000000001`
+- **Password:** `Admin@2026`
+- **URL:** `/admin/login`
 
 ## Customer Login (Current)
 
-Email + phone number only — no OTP verification yet.
-Prepared for WhatsApp OTP and Google login in future.
+First visit: language picker with flags (🇪🇬 Arabic / 🇬🇧 English / 🇷🇺 Russian).
+Then login (existing phone + Gmail) or register (name + phone + Gmail + address).
+Checkout is cash on delivery. Chat translates between Arabic (staff) and the customer language.
 
 ## API Endpoints
 

@@ -17,68 +17,10 @@ type AppEnv = { Bindings: Env };
 
 const auth = new Hono<AppEnv>();
 
-// Customer login: email + phone only (no OTP yet)
-auth.post('/customer/login', async (c) => {
-  const body = await c.req.json<{
-    email?: string;
-    phone?: string;
-    full_name?: string;
-    preferred_language?: 'ar' | 'en' | 'ru';
-  }>();
-
-  const email = normalizeEmail(body.email || '');
-  const phone = normalizePhone(body.phone || '');
-
-  if (!isValidEmail(email)) return errorResponse('Invalid email address', 400);
-  if (!isValidPhone(phone)) return errorResponse('Invalid phone number', 400);
-
-  const supabase = createSupabase(c.env);
-  const now = new Date().toISOString();
-
-  const { data: existing } = await supabase
-    .from('customers')
-    .select('*')
-    .or(`email.eq.${email},phone.eq.${phone}`)
-    .maybeSingle();
-
-  let customer = existing;
-
-  if (customer) {
-    if (customer.email !== email && customer.phone !== phone) {
-      return errorResponse('Email and phone belong to different accounts', 409);
-    }
-    const { data: updated, error } = await supabase
-      .from('customers')
-      .update({
-        email,
-        phone,
-        full_name: body.full_name || customer.full_name,
-        preferred_language: body.preferred_language || customer.preferred_language,
-        last_login_at: now,
-        updated_at: now,
-      })
-      .eq('id', customer.id)
-      .select()
-      .single();
-    if (error) return errorResponse(error.message, 500);
-    customer = updated;
-  } else {
-    const { data: created, error } = await supabase
-      .from('customers')
-      .insert({
-        email,
-        phone,
-        full_name: body.full_name || null,
-        preferred_language: body.preferred_language || 'ar',
-        primary_auth_method: 'email_phone',
-        last_login_at: now,
-      })
-      .select()
-      .single();
-    if (error) return errorResponse(error.message, 500);
-    customer = created;
-  }
-
+async function createCustomerSession(
+  supabase: ReturnType<typeof createSupabase>,
+  customer: Record<string, unknown>,
+) {
   const token = generateToken();
   const { error: sessionError } = await supabase.from('customer_sessions').insert({
     customer_id: customer.id,
@@ -86,9 +28,8 @@ auth.post('/customer/login', async (c) => {
     auth_method: 'email_phone',
     expires_at: sessionExpiry(),
   });
-  if (sessionError) return errorResponse(sessionError.message, 500);
-
-  return jsonResponse({
+  if (sessionError) throw new Error(sessionError.message);
+  return {
     session_token: token,
     customer: {
       id: customer.id,
@@ -99,15 +40,126 @@ auth.post('/customer/login', async (c) => {
     },
     auth_method: 'email_phone',
     otp_required: false,
+  };
+}
+
+// Existing customer login: email + phone must match the same account
+auth.post('/customer/login', async (c) => {
+  const body = await c.req.json<{
+    email?: string;
+    phone?: string;
+    preferred_language?: 'ar' | 'en' | 'ru';
+  }>();
+
+  const email = normalizeEmail(body.email || '');
+  const phone = normalizePhone(body.phone || '');
+
+  if (!isValidEmail(email)) return errorResponse('Invalid email address', 400);
+  if (!isValidPhone(phone)) return errorResponse('Invalid phone number', 400);
+
+  const supabase = createSupabase(c.env);
+  const { data: customer } = await supabase
+    .from('customers')
+    .select('*')
+    .eq('email', email)
+    .eq('phone', phone)
+    .maybeSingle();
+
+  if (!customer) {
+    return errorResponse('No account found. Please register first.', 404);
+  }
+
+  const now = new Date().toISOString();
+  await supabase
+    .from('customers')
+    .update({
+      preferred_language: body.preferred_language || customer.preferred_language,
+      last_login_at: now,
+      updated_at: now,
+    })
+    .eq('id', customer.id);
+
+  try {
+    return jsonResponse(await createCustomerSession(supabase, customer));
+  } catch (err) {
+    return errorResponse(err instanceof Error ? err.message : 'Login failed', 500);
+  }
+});
+
+// New customer: phone + Gmail + address
+auth.post('/customer/register', async (c) => {
+  const body = await c.req.json<{
+    email?: string;
+    phone?: string;
+    full_name?: string;
+    preferred_language?: 'ar' | 'en' | 'ru';
+    area?: string;
+    address?: string;
+  }>();
+
+  const email = normalizeEmail(body.email || '');
+  const phone = normalizePhone(body.phone || '');
+  const fullName = (body.full_name || '').trim();
+  const address = (body.address || '').trim();
+
+  if (!fullName) return errorResponse('Full name required', 400);
+  if (!isValidEmail(email)) return errorResponse('Invalid Gmail / email address', 400);
+  if (!isValidPhone(phone)) return errorResponse('Invalid phone number', 400);
+  if (!address) return errorResponse('Address required', 400);
+
+  const supabase = createSupabase(c.env);
+  const { data: existing } = await supabase
+    .from('customers')
+    .select('id, email, phone')
+    .or(`email.eq.${email},phone.eq.${phone}`)
+    .maybeSingle();
+
+  if (existing) {
+    return errorResponse('An account with this phone or email already exists. Please login.', 409);
+  }
+
+  const now = new Date().toISOString();
+  const { data: customer, error } = await supabase
+    .from('customers')
+    .insert({
+      email,
+      phone,
+      full_name: fullName,
+      preferred_language: body.preferred_language || 'ar',
+      primary_auth_method: 'email_phone',
+      last_login_at: now,
+    })
+    .select()
+    .single();
+  if (error) return errorResponse(error.message, 500);
+
+  await supabase.from('addresses').insert({
+    customer_id: customer.id,
+    area: body.area || null,
+    address,
+    is_default: true,
   });
+
+  try {
+    return jsonResponse(await createCustomerSession(supabase, customer), 201);
+  } catch (err) {
+    return errorResponse(err instanceof Error ? err.message : 'Registration failed', 500);
+  }
 });
 
 // Staff/Admin login (email or phone + password)
 auth.post('/staff/login', async (c) => {
-  const body = await c.req.json<{ email?: string; phone?: string; password?: string }>();
+  const body = await c.req.json<{
+    email?: string;
+    phone?: string;
+    identifier?: string;
+    password?: string;
+  }>();
   const password = body.password || '';
-  const email = body.email ? normalizeEmail(body.email) : '';
-  const phone = body.phone ? normalizePhone(body.phone) : '';
+  const raw = (body.identifier || body.email || body.phone || '').trim();
+  const looksLikeEmail = raw.includes('@');
+  const email = looksLikeEmail || body.email ? normalizeEmail(body.email || raw) : '';
+  const phone = !looksLikeEmail && (body.phone || raw) ? normalizePhone(body.phone || raw) : '';
 
   if ((!email && !phone) || !password) {
     return errorResponse('Phone/email and password required', 400);
@@ -141,6 +193,7 @@ auth.post('/staff/login', async (c) => {
     user: {
       id: staff.id,
       email: staff.email,
+      phone: staff.phone,
       full_name: staff.full_name,
       role: staff.role,
     },

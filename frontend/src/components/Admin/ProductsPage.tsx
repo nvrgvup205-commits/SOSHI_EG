@@ -9,6 +9,7 @@ const emptyForm = {
   name_ar: '', name_en: '', name_ru: '',
   description_ar: '', description_en: '', description_ru: '',
   price: '', category: 'nigiri', is_available: true, sort_order: 0,
+  video_url: '', is_new: false, is_popular: false, is_offer: false,
 };
 
 export default function ProductsPage() {
@@ -45,6 +46,7 @@ export default function ProductsPage() {
       description_ar: p.description_ar || '', description_en: p.description_en || '', description_ru: p.description_ru || '',
       price: String(p.price), category: p.category,
       is_available: p.is_available, sort_order: p.sort_order || 0,
+      video_url: p.video_url || '', is_new: Boolean(p.is_new), is_popular: Boolean(p.is_popular), is_offer: Boolean(p.is_offer),
     });
     setShowForm(true);
     setError('');
@@ -134,9 +136,25 @@ export default function ProductsPage() {
               <label className="text-xs text-white/50 uppercase tracking-wider mb-1 block">Sort Order</label>
               <input className="input-field" type="number" value={form.sort_order} onChange={(e) => setForm({ ...form, sort_order: Number(e.target.value) })} />
             </div>
+            <div>
+              <label className="text-xs text-white/50 uppercase tracking-wider mb-1 block">Video URL</label>
+              <input className="input-field" dir="ltr" value={form.video_url} onChange={(e) => setForm({ ...form, video_url: e.target.value })} />
+            </div>
             <div className="flex items-center gap-3 pt-6">
               <input type="checkbox" id="avail" checked={form.is_available} onChange={(e) => setForm({ ...form, is_available: e.target.checked })} />
               <label htmlFor="avail" className="text-white/70 text-sm">Available</label>
+            </div>
+            <div className="flex items-center gap-3 pt-6">
+              <input type="checkbox" id="isnew" checked={form.is_new} onChange={(e) => setForm({ ...form, is_new: e.target.checked })} />
+              <label htmlFor="isnew" className="text-white/70 text-sm">New</label>
+            </div>
+            <div className="flex items-center gap-3 pt-6">
+              <input type="checkbox" id="popular" checked={form.is_popular} onChange={(e) => setForm({ ...form, is_popular: e.target.checked })} />
+              <label htmlFor="popular" className="text-white/70 text-sm">Popular</label>
+            </div>
+            <div className="flex items-center gap-3 pt-6">
+              <input type="checkbox" id="offer" checked={form.is_offer} onChange={(e) => setForm({ ...form, is_offer: e.target.checked })} />
+              <label htmlFor="offer" className="text-white/70 text-sm">Offer</label>
             </div>
             {error && <p className="text-danger text-sm col-span-full">{error}</p>}
             <div className="col-span-full flex gap-3 pt-4">

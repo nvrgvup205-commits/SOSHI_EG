@@ -35,4 +35,9 @@ CREATE SCHEMA IF NOT EXISTS soshi;
 
 -- Default admin:
 -- Email: admin@sushishop-egypt.com
+-- Phone: +201000000001 (01000000001)
 -- Password: Admin@2026
+
+-- Extra tables (customer app):
+-- soshi.categories, soshi.addresses, soshi.addons, soshi.product_addons
+-- soshi.banners, soshi.coupons, soshi.delivery_zones, soshi.notifications

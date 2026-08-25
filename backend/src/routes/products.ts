@@ -43,7 +43,18 @@ products.get('/:id', async (c) => {
     .single();
 
   if (error) return errorResponse('Product not found', 404);
-  return jsonResponse({ product: data });
+
+  const { data: links } = await supabase
+    .from('product_addons')
+    .select('addon_id, addons(*)')
+    .eq('product_id', data.id);
+
+  return jsonResponse({
+    product: {
+      ...data,
+      addons: (links || []).map((l) => l.addons).filter(Boolean),
+    },
+  });
 });
 
 products.post('/', requireStaff, async (c) => {

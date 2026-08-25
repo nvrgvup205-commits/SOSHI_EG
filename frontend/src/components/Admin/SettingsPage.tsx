@@ -48,6 +48,14 @@ export default function SettingsPage() {
       ) : (
         <form onSubmit={handleSave} className="card p-6 max-w-2xl">
           <div className="space-y-4">
+            <label className="flex items-center justify-between card p-4">
+              <span className="text-white">{settings.restaurant_open === 'false' ? t('admin.closed', lang) : t('admin.open', lang)}</span>
+              <input
+                type="checkbox"
+                checked={settings.restaurant_open !== 'false'}
+                onChange={(e) => setSettings({ ...settings, restaurant_open: e.target.checked ? 'true' : 'false' })}
+              />
+            </label>
             {fields.map((f) => (
               <div key={f.key}>
                 <label className="text-xs text-white/50 uppercase tracking-wider mb-1 block">{f.label}</label>

@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { ShoppingBag } from 'lucide-react';
+import { ShoppingBag, MessageSquare, User } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
 import { useCart } from '../../hooks/useCart';
 import { useLanguage } from '../../hooks/useLanguage';
@@ -17,13 +17,24 @@ export default function Header() {
       <div className="max-w-7xl mx-auto px-6 py-3 flex items-center justify-between">
         <SiteLogo to="/" size="sm" />
 
-        <nav className="hidden md:flex items-center gap-10">
-          <Link to="/#menu" className="text-xs uppercase tracking-[0.2em] text-white/70 hover:text-accent transition-colors">
-            {t('nav.products', lang)}
+        <nav className="hidden md:flex items-center gap-8">
+          <Link to="/" className="text-xs uppercase tracking-[0.2em] text-white/70 hover:text-accent transition-colors">
+            {t('nav.home', lang)}
           </Link>
-          {type === 'customer' ? (
-            <span className="text-xs text-white/50">{(user as { full_name?: string })?.full_name}</span>
-          ) : (
+          {type === 'customer' && (
+            <>
+              <Link to="/orders" className="text-xs uppercase tracking-[0.2em] text-white/70 hover:text-accent transition-colors">
+                {t('nav.orders', lang)}
+              </Link>
+              <Link to="/chat" className="text-xs uppercase tracking-[0.2em] text-white/70 hover:text-accent transition-colors">
+                {t('nav.chat', lang)}
+              </Link>
+              <Link to="/profile" className="text-xs uppercase tracking-[0.2em] text-white/70 hover:text-accent transition-colors">
+                {(user as { full_name?: string })?.full_name || t('nav.profile', lang)}
+              </Link>
+            </>
+          )}
+          {type !== 'customer' && (
             <Link to="/login" className="text-xs uppercase tracking-[0.2em] text-white/70 hover:text-accent transition-colors">
               {t('nav.login', lang)}
             </Link>
@@ -39,6 +50,9 @@ export default function Header() {
                 {count}
               </span>
             )}
+          </Link>
+          <Link to={type === 'customer' ? '/profile' : '/login'} className="md:hidden text-white/80 hover:text-accent">
+            {type === 'customer' ? <User className="w-5 h-5" /> : <MessageSquare className="w-5 h-5 hidden" />}
           </Link>
         </div>
       </div>
