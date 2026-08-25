@@ -1,6 +1,12 @@
 name = "soshi-eg"
-pages_build_output_dir = "frontend/dist"
 compatibility_date = "2025-08-25"
+pages_build_output_dir = "frontend/dist"
 
-[env.production.vars]
-VITE_API_URL = "https://soshi-eg-api.nvrgvup205.workers.dev"
+# Build frontend before deploy (runs automatically with `wrangler deploy`)
+[build]
+command = "npm run build --prefix frontend"
+
+# Static assets for Cloudflare Pages (React SPA)
+[assets]
+directory = "./frontend/dist"
+not_found_handling = "single-page-application"

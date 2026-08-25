@@ -87,11 +87,35 @@ GET  /api/admin/analytics        # Admin: dashboard stats
 
 ## Deployment
 
-```bash
-# Backend → Cloudflare Workers
-cd backend && npm run deploy
+### Frontend → Cloudflare Pages (`soshi-eg`)
 
-# Frontend → Cloudflare Pages
-cd frontend && npm run build
-# Deploy dist/ to Cloudflare Pages (soshi-eg)
+**Build command** (in Cloudflare dashboard):
+```bash
+npm run build --prefix frontend
+```
+
+**Build output directory:**
+```
+frontend/dist
+```
+
+**Deploy command:** leave empty (default) **OR** use:
+```bash
+npx wrangler deploy --env=""
+```
+
+> Do **not** use `wrangler deploy` without the `[build]` + `[assets]` config in root `wrangler.toml`.
+> The previous error happened because deploy ran without building `frontend/dist` first.
+
+**Environment variables** (Cloudflare Pages → Settings → Variables):
+- `VITE_API_URL` = your Workers API URL
+- `VITE_SUPABASE_URL` = `https://khzrapojrkhxjsjgnflr.supabase.co`
+- `VITE_SUPABASE_ANON_KEY` = your anon key
+
+### Backend → Cloudflare Workers (`soshi-eg-api`)
+
+```bash
+cd backend
+npx wrangler secret put SUPABASE_SERVICE_ROLE_KEY
+npm run deploy
 ```

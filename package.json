@@ -3,10 +3,12 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "dev:frontend": "cd frontend && npm run dev",
-    "dev:backend": "cd backend && npm run dev",
-    "build:frontend": "cd frontend && npm run build",
-    "deploy:backend": "cd backend && npm run deploy",
-    "typecheck": "cd frontend && npx tsc --noEmit && cd ../backend && npm run typecheck"
+    "build": "npm run build --prefix frontend",
+    "dev:frontend": "npm run dev --prefix frontend",
+    "dev:backend": "npm run dev --prefix backend",
+    "build:frontend": "npm run build --prefix frontend",
+    "deploy:pages": "npm run build:frontend && wrangler deploy",
+    "deploy:backend": "npm run deploy --prefix backend",
+    "typecheck": "npm run typecheck --prefix backend && npx tsc --noEmit --project frontend/tsconfig.app.json"
   }
 }
