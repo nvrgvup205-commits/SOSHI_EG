@@ -7,6 +7,9 @@ import productRoutes from './routes/products';
 import orderRoutes from './routes/orders';
 import adminRoutes from './routes/admin';
 import settingsRoutes from './routes/settings';
+import catalogRoutes from './routes/catalog';
+import addressRoutes from './routes/addresses';
+import chatRoutes from './routes/chat';
 
 type AppEnv = { Bindings: Env };
 
@@ -33,5 +36,8 @@ app.route('/api/products', productRoutes);
 app.route('/api/orders', orderRoutes);
 app.route('/api/admin', adminRoutes);
 app.route('/api/settings', settingsRoutes);
+app.route('/api/catalog', catalogRoutes);
+app.route('/api/addresses', addressRoutes);
+app.route('/api/chat', chatRoutes);
 
 export default app;

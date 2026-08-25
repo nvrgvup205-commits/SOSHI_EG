@@ -15,7 +15,7 @@ admin.get('/analytics', async (c) => {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
-  const [ordersRes, customersRes, messagesRes, staffRes] = await Promise.all([
+  const [ordersRes, customersRes, messagesRes, staffRes, todayOrdersRes, settingsRes] = await Promise.all([
     supabase
       .from('orders')
       .select('id', { count: 'exact', head: true })
@@ -26,13 +26,44 @@ admin.get('/analytics', async (c) => {
       .select('id', { count: 'exact', head: true })
       .gte('created_at', today.toISOString()),
     supabase.from('staff_users').select('id', { count: 'exact', head: true }).eq('is_active', true),
+    supabase.from('orders').select('total_price, status').gte('created_at', today.toISOString()),
+    supabase.from('site_settings').select('setting_key, setting_value'),
   ]);
+
+  const settingsMap: Record<string, string> = {};
+  for (const s of settingsRes.data || []) settingsMap[s.setting_key] = s.setting_value;
 
   return jsonResponse({
     today_orders: ordersRes.count || 0,
     total_customers: customersRes.count || 0,
     today_messages: messagesRes.count || 0,
     active_staff: staffRes.count || 0,
+    today_revenue: Number((todayOrdersRes.data || []).reduce((sum, o) => sum + Number(o.total_price || 0), 0)),
+    restaurant_open: settingsMap.restaurant_open !== 'false',
+  });
+});
+
+admin.get('/reports', async (c) => {
+  const supabase = createSupabase(c.env);
+  const since = new Date();
+  since.setDate(since.getDate() - 30);
+
+  const { data: orders, error } = await supabase
+    .from('orders')
+    .select('id, status, total_price, created_at, payment_method')
+    .gte('created_at', since.toISOString());
+  if (error) return errorResponse(error.message, 500);
+
+  const list = orders || [];
+  const byStatus: Record<string, number> = {};
+  for (const o of list) byStatus[o.status] = (byStatus[o.status] || 0) + 1;
+
+  return jsonResponse({
+    period_days: 30,
+    orders_count: list.length,
+    revenue: list.reduce((sum, o) => sum + Number(o.total_price || 0), 0),
+    by_status: byStatus,
+    cash_orders: list.filter((o) => o.payment_method === 'cash').length,
   });
 });
 

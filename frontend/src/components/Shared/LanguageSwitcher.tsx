@@ -1,10 +1,10 @@
 import { useLanguage } from '../../hooks/useLanguage';
 import type { Language } from '../../types';
 
-const langs: { code: Language; label: string }[] = [
-  { code: 'ar', label: 'AR' },
-  { code: 'en', label: 'EN' },
-  { code: 'ru', label: 'RU' },
+const langs: { code: Language; flag: string; label: string }[] = [
+  { code: 'ar', flag: '🇪🇬', label: 'AR' },
+  { code: 'en', flag: '🇬🇧', label: 'EN' },
+  { code: 'ru', flag: '🇷🇺', label: 'RU' },
 ];
 
 export default function LanguageSwitcher({ dark = false }: { dark?: boolean }) {
@@ -16,12 +16,13 @@ export default function LanguageSwitcher({ dark = false }: { dark?: boolean }) {
         <button
           key={l.code}
           onClick={() => setLang(l.code)}
-          className={`px-2 py-1 text-[10px] font-medium tracking-wider transition-all ${
+          className={`px-2 py-1 text-[10px] font-medium tracking-wider transition-all flex items-center gap-1 ${
             lang === l.code
               ? dark ? 'text-accent border-b border-accent' : 'bg-secondary text-white'
               : dark ? 'text-white/40 hover:text-white/70' : 'text-gray-400 hover:text-secondary'
           }`}
         >
+          <span aria-hidden>{l.flag}</span>
           {l.label}
         </button>
       ))}

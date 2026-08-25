@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Lock, Phone } from 'lucide-react';
+import { Lock, User } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
 import { useLanguage } from '../../hooks/useLanguage';
 import { t } from '../../utils/i18n';
@@ -12,7 +12,7 @@ export default function AdminLogin() {
   const { loginStaff } = useAuth();
   const navigate = useNavigate();
   const { lang } = useLanguage();
-  const [phone, setPhone] = useState('');
+  const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -22,7 +22,11 @@ export default function AdminLogin() {
     setError('');
     setLoading(true);
     try {
-      const user = await loginStaff({ phone, password });
+      const user = await loginStaff(
+        identifier.includes('@')
+          ? { identifier, email: identifier, password }
+          : { identifier, phone: identifier, password },
+      );
       const role = (user as { role?: UserRole }).role || 'order_handler';
       navigate(staffDashboardPath(role));
     } catch (err) {
@@ -45,16 +49,16 @@ export default function AdminLogin() {
         <form onSubmit={handleSubmit} className="card p-6 sm:p-8 space-y-5">
           <div>
             <label className="text-xs text-white/50 uppercase tracking-wider mb-2 flex items-center gap-2">
-              <Phone className="w-3 h-3" />{t('login.phone', lang)}
+              <User className="w-3 h-3" />{t('login.identifier', lang)}
             </label>
             <input
-              type="tel"
+              type="text"
               required
               className="input-field"
               dir="ltr"
-              placeholder="01xxxxxxxxx"
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
+              placeholder="admin@sushishop-egypt.com"
+              value={identifier}
+              onChange={(e) => setIdentifier(e.target.value)}
             />
           </div>
           <div>
@@ -73,7 +77,9 @@ export default function AdminLogin() {
           <button type="submit" disabled={loading} className="btn-luxury-filled w-full">
             {loading ? '...' : t('btn.login', lang)}
           </button>
-          <p className="text-white/30 text-xs text-center">{t('admin.login_hint', lang)}</p>
+          <div className="text-white/40 text-xs leading-relaxed space-y-1 border-t border-white/10 pt-4">
+            <p>{t('admin.login_hint', lang)}</p>
+          </div>
         </form>
       </div>
     </div>

@@ -8,15 +8,29 @@ import { t } from '../../utils/i18n';
 export default function AdminDashboard() {
   const { user } = useAuth();
   const { lang } = useLanguage();
-  const [stats, setStats] = useState({ today_orders: 0, total_customers: 0, today_messages: 0, active_staff: 0 });
+  const [stats, setStats] = useState({
+    today_orders: 0, total_customers: 0, today_messages: 0, active_staff: 0, today_revenue: 0, restaurant_open: true,
+  });
 
-  useEffect(() => { api.getAnalytics().then(setStats).catch(console.error); }, []);
+  useEffect(() => {
+    api.getAnalytics()
+      .then((r) => setStats({
+        today_orders: r.today_orders,
+        total_customers: r.total_customers,
+        today_messages: r.today_messages,
+        active_staff: r.active_staff,
+        today_revenue: r.today_revenue || 0,
+        restaurant_open: r.restaurant_open !== false,
+      }))
+      .catch(console.error);
+  }, []);
 
   const cards = [
     { icon: ShoppingBag, label: t('admin.today_orders', lang), value: stats.today_orders },
     { icon: Users, label: t('admin.total_customers', lang), value: stats.total_customers },
     { icon: MessageSquare, label: t('admin.today_messages', lang), value: stats.today_messages },
     { icon: UserCheck, label: t('admin.active_staff', lang), value: stats.active_staff },
+    { icon: ShoppingBag, label: t('admin.today_revenue', lang), value: `${stats.today_revenue || 0}` },
   ];
 
   return (

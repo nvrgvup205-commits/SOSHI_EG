@@ -6,8 +6,16 @@ interface AuthState {
   type: 'customer' | 'staff' | null;
   user: Customer | StaffUser | null;
   loading: boolean;
-  loginCustomer: (data: { email: string; phone: string; full_name?: string }) => Promise<void>;
-  loginStaff: (data: { phone?: string; email?: string; password: string }) => Promise<StaffUser>;
+  loginCustomer: (data: { email: string; phone: string; preferred_language?: string }) => Promise<void>;
+  registerCustomer: (data: {
+    email: string;
+    phone: string;
+    full_name: string;
+    address: string;
+    area?: string;
+    preferred_language?: string;
+  }) => Promise<void>;
+  loginStaff: (data: { phone?: string; email?: string; identifier?: string; password: string }) => Promise<StaffUser>;
   logout: () => Promise<void>;
 }
 
@@ -33,14 +41,28 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       .finally(() => setLoading(false));
   }, []);
 
-  const loginCustomer = async (data: { email: string; phone: string; full_name?: string }) => {
+  const loginCustomer = async (data: { email: string; phone: string; preferred_language?: string }) => {
     const res = await api.customerLogin(data);
     api.setToken(res.session_token);
     setType('customer');
     setUser(res.customer as unknown as Customer);
   };
 
-  const loginStaff = async (data: { phone?: string; email?: string; password: string }) => {
+  const registerCustomer = async (data: {
+    email: string;
+    phone: string;
+    full_name: string;
+    address: string;
+    area?: string;
+    preferred_language?: string;
+  }) => {
+    const res = await api.customerRegister(data);
+    api.setToken(res.session_token);
+    setType('customer');
+    setUser(res.customer as unknown as Customer);
+  };
+
+  const loginStaff = async (data: { phone?: string; email?: string; identifier?: string; password: string }) => {
     const res = await api.staffLogin(data);
     api.setToken(res.session_token);
     setType('staff');
@@ -57,7 +79,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ type, user, loading, loginCustomer, loginStaff, logout }}>
+    <AuthContext.Provider value={{ type, user, loading, loginCustomer, registerCustomer, loginStaff, logout }}>
       {children}
     </AuthContext.Provider>
   );

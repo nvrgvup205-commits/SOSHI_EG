@@ -18,6 +18,7 @@ import type { Order, OrderStatus, Product, UserRole } from '../types';
 import { pickProductThumbnail } from '../utils/productImage';
 import AdminLogin from '../components/Admin/AdminLogin';
 import BrandName from '../components/Shared/BrandName';
+import ChatInbox from '../components/Admin/ChatInbox';
 
 const statuses: OrderStatus[] = ['pending', 'processing', 'ready', 'delivered'];
 
@@ -193,12 +194,7 @@ export default function StaffPortal() {
           </div>
         )}
 
-        {tab === 'chat' && showChat && (
-          <div className="card p-12 text-center text-white/30">
-            <MessageSquare className="w-10 h-10 mx-auto mb-3 opacity-30" />
-            <p>{t('staff.chat_soon', lang)}</p>
-          </div>
-        )}
+        {tab === 'chat' && showChat && <ChatInbox />}
       </main>
     </div>
   );
