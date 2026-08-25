@@ -78,6 +78,36 @@ class ApiClient {
     return this.request(`/api/products/${id}`, { method: 'DELETE' });
   }
 
+  async uploadProductImages(files: {
+    original: File;
+    compressed: File;
+    thumbnail: File;
+    folder?: string;
+  }) {
+    const form = new FormData();
+    form.append('original', files.original);
+    form.append('compressed', files.compressed);
+    form.append('thumbnail', files.thumbnail);
+    if (files.folder) form.append('folder', files.folder);
+
+    const headers: Record<string, string> = {};
+    const token = this.getToken();
+    if (token) headers.Authorization = `Bearer ${token}`;
+
+    const res = await fetch(`${API_BASE}/api/products/images`, {
+      method: 'POST',
+      headers,
+      body: form,
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Image upload failed');
+    return data as {
+      image_original_url: string;
+      image_compressed_url: string;
+      image_thumbnail_url: string;
+    };
+  }
+
   // Customers (admin)
   getCustomers(params?: { search?: string; page?: number }) {
     const q = new URLSearchParams();

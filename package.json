@@ -12,7 +12,8 @@
     "deploy:worker": "npx wrangler deploy",
     "deploy:pages": "npm run build:frontend && npm run deploy:worker",
     "deploy:backend": "npm run deploy --prefix backend",
-    "typecheck": "npm run typecheck --prefix backend && npx tsc --noEmit --project frontend/tsconfig.app.json"
+    "typecheck": "npm run typecheck --prefix backend && npx tsc --noEmit --project frontend/tsconfig.app.json",
+    "test": "npm run test --prefix frontend && npm run test --prefix backend"
   },
   "devDependencies": {
     "wrangler": "^4.125.0"

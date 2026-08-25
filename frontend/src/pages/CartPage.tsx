@@ -7,6 +7,7 @@ import { useLanguage } from '../hooks/useLanguage';
 import { useAuth } from '../hooks/useAuth';
 import { t, getProductName } from '../utils/i18n';
 import { api } from '../utils/api';
+import { pickProductThumbnail } from '../utils/productImage';
 
 function QuantityControl({ productId, quantity }: { productId: string; quantity: number }) {
   const { updateQuantity, removeItem } = useCart();
@@ -76,7 +77,15 @@ export default function CartPage() {
             {items.map((item) => (
               <div key={item.product.id} className="card p-5 flex items-center justify-between gap-4">
                 <div className="flex items-center gap-5">
-                  <span className="text-4xl">🍣</span>
+                  {pickProductThumbnail(item.product) ? (
+                    <img
+                      src={pickProductThumbnail(item.product)!}
+                      alt=""
+                      className="h-14 w-14 rounded object-cover"
+                    />
+                  ) : (
+                    <span className="text-4xl">🍣</span>
+                  )}
                   <div>
                     <div className="font-display text-xl text-white">{getProductName(item.product, lang)}</div>
                     <div className="text-accent font-display text-lg mt-1">
