@@ -27,8 +27,8 @@ export default function HomePage() {
         />
         <div className="relative text-center px-6 max-w-4xl mx-auto pt-24">
           <p className="label-luxury mb-8 animate-fade-up">North Coast · Egypt</p>
-          <div className="mb-8 flex justify-center">
-            <AnimatedLogo size="hero" animate />
+          <div className="mb-8 flex justify-center animate-fade-up">
+            <AnimatedLogo size="hero" />
           </div>
           <p className="text-white/60 text-lg md:text-xl font-light tracking-wide max-w-xl mx-auto mb-12 animate-fade-up-delay">
             {t('hero.subtitle', lang)}

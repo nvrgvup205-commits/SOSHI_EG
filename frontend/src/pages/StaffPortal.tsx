@@ -30,7 +30,7 @@ export default function StaffPortal() {
   return (
     <div className="min-h-screen bg-ink">
       <div className="bg-charcoal border-b border-white/5 p-6 flex items-center gap-4">
-        <AnimatedLogo size="sm" animate={false} />
+        <AnimatedLogo size="sm" />
         <div>
           <p className="label-luxury mb-1">Staff Portal</p>
           <h1 className="font-display text-xl text-white">{t('nav.staff', lang)}</h1>

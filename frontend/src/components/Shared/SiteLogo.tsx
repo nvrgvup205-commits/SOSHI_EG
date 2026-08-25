@@ -4,12 +4,11 @@ import AnimatedLogo from './AnimatedLogo';
 interface Props {
   to?: string;
   size?: 'hero' | 'md' | 'sm';
-  animate?: boolean;
   className?: string;
 }
 
-export default function SiteLogo({ to = '/', size = 'sm', animate = false, className = '' }: Props) {
-  const logo = <AnimatedLogo size={size} animate={animate} className={className} />;
+export default function SiteLogo({ to = '/', size = 'sm', className = '' }: Props) {
+  const logo = <AnimatedLogo size={size} className={className} />;
 
   if (!to) return logo;
 

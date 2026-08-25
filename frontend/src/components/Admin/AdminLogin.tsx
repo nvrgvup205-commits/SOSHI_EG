@@ -31,7 +31,7 @@ export default function AdminLogin() {
       <div className="w-full max-w-md">
         <div className="text-center mb-10">
           <div className="flex justify-center mb-6">
-            <AnimatedLogo size="md" animate />
+            <AnimatedLogo size="md" />
           </div>
           <p className="label-luxury mb-2">Administration</p>
           <div className="divider-gold" />
