@@ -41,7 +41,7 @@ class ApiClient {
     );
   }
 
-  staffLogin(data: { email: string; password: string }) {
+  staffLogin(data: { phone?: string; email?: string; password: string }) {
     return this.request<{ session_token: string; user: Record<string, unknown> }>(
       '/api/auth/staff/login',
       { method: 'POST', body: JSON.stringify(data) },
@@ -123,8 +123,18 @@ class ApiClient {
     return this.request<{ staff: import('../types').StaffUser[] }>('/api/admin/staff');
   }
 
-  createStaff(data: { email: string; full_name: string; phone?: string; role: string; password: string }) {
-    return this.request('/api/admin/staff', { method: 'POST', body: JSON.stringify(data) });
+  createStaff(data: { full_name: string; phone: string; role: string; password?: string; email?: string }) {
+    return this.request<{ staff: import('../types').StaffUser; default_password?: string }>(
+      '/api/admin/staff',
+      { method: 'POST', body: JSON.stringify(data) },
+    );
+  }
+
+  updateStaff(id: string, data: { full_name?: string; phone?: string; role?: string; is_active?: boolean; password?: string }) {
+    return this.request<{ staff: import('../types').StaffUser }>(
+      `/api/admin/staff/${id}`,
+      { method: 'PATCH', body: JSON.stringify(data) },
+    );
   }
 
   updateSettings(settings: Record<string, string>) {

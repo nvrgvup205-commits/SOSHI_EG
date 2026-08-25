@@ -223,3 +223,11 @@ h1, h2, h3, h4 {
   .brand-lockup-hero .brand-shop { font-size: 1.45rem; }
   .brand-lockup-hero .brand-egypt { font-size: 4.6rem; }
 }
+
+.safe-area-top {
+  padding-top: env(safe-area-inset-top, 0);
+}
+
+.safe-area-bottom {
+  padding-bottom: env(safe-area-inset-bottom, 0);
+}

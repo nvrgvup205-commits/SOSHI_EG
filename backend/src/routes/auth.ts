@@ -102,21 +102,23 @@ auth.post('/customer/login', async (c) => {
   });
 });
 
-// Staff/Admin login
+// Staff/Admin login (email or phone + password)
 auth.post('/staff/login', async (c) => {
-  const body = await c.req.json<{ email?: string; password?: string }>();
-  const email = normalizeEmail(body.email || '');
+  const body = await c.req.json<{ email?: string; phone?: string; password?: string }>();
   const password = body.password || '';
+  const email = body.email ? normalizeEmail(body.email) : '';
+  const phone = body.phone ? normalizePhone(body.phone) : '';
 
-  if (!email || !password) return errorResponse('Email and password required', 400);
+  if ((!email && !phone) || !password) {
+    return errorResponse('Phone/email and password required', 400);
+  }
 
   const supabase = createSupabase(c.env);
-  const { data: staff, error } = await supabase
-    .from('staff_users')
-    .select('*')
-    .eq('email', email)
-    .eq('is_active', true)
-    .maybeSingle();
+  let query = supabase.from('staff_users').select('*').eq('is_active', true);
+  if (phone) query = query.eq('phone', phone);
+  else query = query.eq('email', email);
+
+  const { data: staff, error } = await query.maybeSingle();
 
   if (error || !staff) return errorResponse('Invalid credentials', 401);
 

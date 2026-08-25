@@ -14,12 +14,26 @@ import OrdersPage from './components/Admin/OrdersPage';
 import SettingsPage from './components/Admin/SettingsPage';
 import StaffPortal from './pages/StaffPortal';
 import InstallPrompt from './components/Shared/InstallPrompt';
+import { isAdminRole, staffDashboardPath } from './utils/staffRoles';
+import type { UserRole } from './types';
 
 function ProtectedAdmin({ children }: { children: React.ReactNode }) {
-  const { type, loading } = useAuth();
+  const { type, user, loading } = useAuth();
   if (loading) return <div className="min-h-screen flex items-center justify-center bg-black text-white">Loading...</div>;
   if (type !== 'staff') return <Navigate to="/admin/login" />;
+  const role = (user as { role?: UserRole }).role || 'order_handler';
+  if (!isAdminRole(role)) return <Navigate to="/staff" replace />;
   return <AdminLayout>{children}</AdminLayout>;
+}
+
+function StaffLoginRedirect() {
+  const { type, user, loading } = useAuth();
+  if (loading) return <div className="min-h-screen flex items-center justify-center bg-black text-white">Loading...</div>;
+  if (type === 'staff') {
+    const role = (user as { role?: UserRole }).role || 'order_handler';
+    return <Navigate to={staffDashboardPath(role)} replace />;
+  }
+  return <AdminLogin />;
 }
 
 function AppRoutes() {
@@ -28,7 +42,7 @@ function AppRoutes() {
       <Route path="/" element={<HomePage />} />
       <Route path="/login" element={<CustomerLogin />} />
       <Route path="/cart" element={<CartPage />} />
-      <Route path="/admin/login" element={<AdminLogin />} />
+      <Route path="/admin/login" element={<StaffLoginRedirect />} />
       <Route path="/admin" element={<ProtectedAdmin><AdminDashboard /></ProtectedAdmin>} />
       <Route path="/admin/customers" element={<ProtectedAdmin><CustomersPage /></ProtectedAdmin>} />
       <Route path="/admin/products" element={<ProtectedAdmin><ProductsPage /></ProtectedAdmin>} />

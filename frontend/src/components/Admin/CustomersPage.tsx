@@ -68,9 +68,37 @@ export default function CustomersPage() {
           <p>No customers yet</p>
         </div>
       ) : (
-        <div className="card overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
+        <>
+          {/* Mobile cards */}
+          <div className="space-y-3 lg:hidden">
+            {customers.map((c) => (
+              <div key={c.id} className="card p-4">
+                <div className="text-white font-medium mb-2">{c.full_name || '—'}</div>
+                <div className="space-y-1.5 text-sm">
+                  <div className="flex items-center gap-2 text-white/50" dir="ltr">
+                    <Mail className="w-3.5 h-3.5 shrink-0" /><span className="truncate">{c.email}</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-white/50" dir="ltr">
+                    <Phone className="w-3.5 h-3.5 shrink-0" />{c.phone}
+                  </div>
+                </div>
+                <div className="flex items-center justify-between mt-3 pt-3 border-t border-white/5">
+                  <div className="flex gap-4 text-xs text-white/50">
+                    <span className="flex items-center gap-1"><ShoppingBag className="w-3 h-3 text-accent" />{c.total_orders}</span>
+                    <span className="text-accent font-display">{Number(c.total_spent).toFixed(0)} {t('currency', lang)}</span>
+                  </div>
+                  <span className={`text-[10px] px-2 py-0.5 border ${c.is_active ? 'border-success/50 text-success' : 'border-white/20 text-white/40'}`}>
+                    {c.is_active ? t('customers.active', lang) : t('customers.inactive', lang)}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Desktop table */}
+          <div className="card overflow-hidden hidden lg:block">
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-white/5 text-white/40 text-xs uppercase tracking-wider">
                   <th className="text-start p-4">{t('customers.name', lang)}</th>
@@ -118,8 +146,9 @@ export default function CustomersPage() {
                 ))}
               </tbody>
             </table>
+            </div>
           </div>
-        </div>
+        </>
       )}
     </div>
   );

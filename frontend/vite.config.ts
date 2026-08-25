@@ -30,8 +30,8 @@ export default defineConfig({
         ],
         shortcuts: [
           { name: 'Menu', short_name: 'Menu', url: '/#menu', icons: [{ src: 'pwa-192.png', sizes: '192x192' }] },
-          { name: 'Admin', short_name: 'Admin', url: '/admin', icons: [{ src: 'pwa-192.png', sizes: '192x192' }] },
-          { name: 'Staff', short_name: 'Staff', url: '/staff', icons: [{ src: 'pwa-192.png', sizes: '192x192' }] },
+          { name: 'Admin Panel', short_name: 'Admin', url: '/admin/login', icons: [{ src: 'pwa-192.png', sizes: '192x192' }] },
+          { name: 'Staff Portal', short_name: 'Staff', url: '/staff', icons: [{ src: 'pwa-192.png', sizes: '192x192' }] },
           { name: 'Cart', short_name: 'Cart', url: '/cart', icons: [{ src: 'pwa-192.png', sizes: '192x192' }] },
         ],
       },

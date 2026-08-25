@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import { Download, X, Share } from 'lucide-react';
 import { useLanguage } from '../../hooks/useLanguage';
+import { t } from '../../utils/i18n';
 import type { Language } from '../../types';
 
 interface BeforeInstallPromptEvent extends Event {
@@ -41,35 +43,46 @@ function isStandalone() {
     || (navigator as unknown as { standalone?: boolean }).standalone === true;
 }
 
+function isAdminRoute(path: string) {
+  return path.startsWith('/admin') || path.startsWith('/staff');
+}
+
 export default function InstallPrompt() {
   const { lang } = useLanguage();
+  const location = useLocation();
   const [deferred, setDeferred] = useState<BeforeInstallPromptEvent | null>(null);
   const [visible, setVisible] = useState(false);
   const [showIOS, setShowIOS] = useState(false);
-  const t = texts[lang];
+
+  const adminMode = isAdminRoute(location.pathname);
+  const title = adminMode ? t('pwa.admin_title', lang) : texts[lang].title;
+  const body = adminMode ? t('pwa.admin_body', lang) : texts[lang].body;
+  const dismissKey = adminMode ? 'pwa-admin-dismissed' : 'pwa-dismissed';
 
   useEffect(() => {
     if (isStandalone()) return;
-    if (localStorage.getItem('pwa-dismissed')) return;
+    if (localStorage.getItem(dismissKey)) return;
 
     const onPrompt = (e: Event) => {
       e.preventDefault();
       setDeferred(e as BeforeInstallPromptEvent);
-      setTimeout(() => setVisible(true), 3000);
+      setTimeout(() => setVisible(true), adminMode ? 1500 : 3000);
     };
 
     window.addEventListener('beforeinstallprompt', onPrompt);
     window.addEventListener('appinstalled', () => setVisible(false));
 
-    if (isIOS()) {
+    if (isIOS() && adminMode) {
+      setTimeout(() => setShowIOS(true), 2000);
+    } else if (isIOS()) {
       setTimeout(() => setShowIOS(true), 4000);
     }
 
     return () => window.removeEventListener('beforeinstallprompt', onPrompt);
-  }, []);
+  }, [adminMode, dismissKey]);
 
   const dismiss = () => {
-    localStorage.setItem('pwa-dismissed', '1');
+    localStorage.setItem(dismissKey, '1');
     setVisible(false);
     setShowIOS(false);
   };
@@ -83,6 +96,7 @@ export default function InstallPrompt() {
   };
 
   if (isStandalone()) return null;
+  if (!isAdminRoute(location.pathname) && !visible && !showIOS) return null;
 
   const show = visible || showIOS;
   if (!show) return null;
@@ -101,9 +115,9 @@ export default function InstallPrompt() {
         <div className="flex items-start gap-4">
           <img src="/pwa-192.png" alt="" className="w-14 h-14 rounded-lg shrink-0" />
           <div className="flex-1 pe-6">
-            <p className="text-white font-medium text-sm mb-1">{t.title}</p>
+            <p className="text-white font-medium text-sm mb-1">{title}</p>
             <p className="text-white/50 text-xs leading-relaxed">
-              {showIOS ? t.ios : t.body}
+              {showIOS ? texts[lang].ios : body}
             </p>
           </div>
         </div>
@@ -112,17 +126,17 @@ export default function InstallPrompt() {
           {!showIOS && deferred && (
             <button onClick={install} className="btn-luxury-filled text-xs flex-1 py-2.5">
               <Download className="w-3.5 h-3.5" />
-              {t.install}
+              {texts[lang].install}
             </button>
           )}
           {showIOS && (
             <button onClick={dismiss} className="btn-luxury-filled text-xs flex-1 py-2.5">
               <Share className="w-3.5 h-3.5" />
-              {t.install}
+              {texts[lang].install}
             </button>
           )}
           <button onClick={dismiss} className="btn-luxury text-xs py-2.5 px-4">
-            {t.dismiss}
+            {texts[lang].dismiss}
           </button>
         </div>
       </div>

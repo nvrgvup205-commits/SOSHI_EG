@@ -7,7 +7,7 @@ interface AuthState {
   user: Customer | StaffUser | null;
   loading: boolean;
   loginCustomer: (data: { email: string; phone: string; full_name?: string }) => Promise<void>;
-  loginStaff: (data: { email: string; password: string }) => Promise<void>;
+  loginStaff: (data: { phone?: string; email?: string; password: string }) => Promise<StaffUser>;
   logout: () => Promise<void>;
 }
 
@@ -40,11 +40,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(res.customer as unknown as Customer);
   };
 
-  const loginStaff = async (data: { email: string; password: string }) => {
+  const loginStaff = async (data: { phone?: string; email?: string; password: string }) => {
     const res = await api.staffLogin(data);
     api.setToken(res.session_token);
     setType('staff');
-    setUser(res.user as unknown as StaffUser);
+    const staffUser = res.user as unknown as StaffUser;
+    setUser(staffUser);
+    return staffUser;
   };
 
   const logout = async () => {

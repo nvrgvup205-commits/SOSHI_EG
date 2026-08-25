@@ -49,35 +49,84 @@ admin.get('/staff', async (c) => {
 
 admin.post('/staff', async (c) => {
   const staff = c.get('staff');
-  if (staff.role !== 'admin' && staff.role !== 'staff_supervisor') {
-    return errorResponse('Insufficient permissions', 403);
+  if (staff.role !== 'admin') {
+    return errorResponse('Admin only', 403);
   }
 
   const body = await c.req.json<{
-    email: string;
+    email?: string;
     full_name: string;
-    phone?: string;
+    phone: string;
     role: string;
-    password: string;
+    password?: string;
   }>();
 
-  const { hashPassword } = await import('../lib/auth');
+  const { hashPassword, normalizePhone, isValidPhone } = await import('../lib/auth');
+  const phone = normalizePhone(body.phone || '');
+  if (!body.full_name?.trim()) return errorResponse('Full name required', 400);
+  if (!isValidPhone(phone)) return errorResponse('Invalid phone number', 400);
+
+  const email = body.email?.trim()
+    ? body.email.trim().toLowerCase()
+    : `${phone.replace(/\D/g, '')}@staff.soshi-eg.local`;
+  const password = body.password?.trim() || '1234';
+
   const supabase = createSupabase(c.env);
   const { data, error } = await supabase
     .from('staff_users')
     .insert({
-      email: body.email.toLowerCase(),
-      full_name: body.full_name,
-      phone: body.phone || null,
-      role: body.role,
-      password_hash: await hashPassword(body.password),
+      email,
+      full_name: body.full_name.trim(),
+      phone,
+      role: body.role || 'order_handler',
+      password_hash: await hashPassword(password),
       created_by: staff.id,
     })
     .select('id, email, phone, full_name, role, is_active')
     .single();
 
   if (error) return errorResponse(error.message, 500);
-  return jsonResponse({ staff: data }, 201);
+  return jsonResponse({ staff: data, default_password: password }, 201);
+});
+
+admin.patch('/staff/:id', async (c) => {
+  const staff = c.get('staff');
+  if (staff.role !== 'admin') return errorResponse('Admin only', 403);
+
+  const id = c.req.param('id');
+  const body = await c.req.json<{
+    full_name?: string;
+    phone?: string;
+    role?: string;
+    is_active?: boolean;
+    password?: string;
+  }>();
+
+  const updates: Record<string, unknown> = { updated_at: new Date().toISOString() };
+  if (body.full_name !== undefined) updates.full_name = body.full_name;
+  if (body.role !== undefined) updates.role = body.role;
+  if (body.is_active !== undefined) updates.is_active = body.is_active;
+  if (body.phone !== undefined) {
+    const { normalizePhone, isValidPhone } = await import('../lib/auth');
+    const phone = normalizePhone(body.phone);
+    if (!isValidPhone(phone)) return errorResponse('Invalid phone number', 400);
+    updates.phone = phone;
+  }
+  if (body.password) {
+    const { hashPassword } = await import('../lib/auth');
+    updates.password_hash = await hashPassword(body.password);
+  }
+
+  const supabase = createSupabase(c.env);
+  const { data, error } = await supabase
+    .from('staff_users')
+    .update(updates)
+    .eq('id', id)
+    .select('id, email, phone, full_name, role, is_active')
+    .single();
+
+  if (error) return errorResponse(error.message, 500);
+  return jsonResponse({ staff: data });
 });
 
 admin.patch('/settings', async (c) => {

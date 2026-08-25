@@ -1,13 +1,18 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Lock, Mail } from 'lucide-react';
+import { Lock, Phone } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
+import { useLanguage } from '../../hooks/useLanguage';
+import { t } from '../../utils/i18n';
+import { staffDashboardPath } from '../../utils/staffRoles';
+import type { UserRole } from '../../types';
 import AnimatedLogo from '../Shared/AnimatedLogo';
 
 export default function AdminLogin() {
   const { loginStaff } = useAuth();
   const navigate = useNavigate();
-  const [email, setEmail] = useState('');
+  const { lang } = useLanguage();
+  const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -17,8 +22,9 @@ export default function AdminLogin() {
     setError('');
     setLoading(true);
     try {
-      await loginStaff({ email, password });
-      navigate('/admin');
+      const user = await loginStaff({ phone, password });
+      const role = (user as { role?: UserRole }).role || 'order_handler';
+      navigate(staffDashboardPath(role));
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Login failed');
     } finally {
@@ -33,26 +39,41 @@ export default function AdminLogin() {
           <div className="flex justify-center mb-4">
             <AnimatedLogo size="md" animate />
           </div>
-          <p className="label-luxury mb-2">Administration</p>
+          <p className="label-luxury mb-2">{t('admin.panel', lang)}</p>
           <div className="divider-gold" />
         </div>
-        <form onSubmit={handleSubmit} className="card p-8 space-y-5">
+        <form onSubmit={handleSubmit} className="card p-6 sm:p-8 space-y-5">
           <div>
             <label className="text-xs text-white/50 uppercase tracking-wider mb-2 flex items-center gap-2">
-              <Mail className="w-3 h-3" />Email
+              <Phone className="w-3 h-3" />{t('login.phone', lang)}
             </label>
-            <input type="email" required className="input-field" dir="ltr" value={email} onChange={(e) => setEmail(e.target.value)} />
+            <input
+              type="tel"
+              required
+              className="input-field"
+              dir="ltr"
+              placeholder="01xxxxxxxxx"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+            />
           </div>
           <div>
             <label className="text-xs text-white/50 uppercase tracking-wider mb-2 flex items-center gap-2">
-              <Lock className="w-3 h-3" />Password
+              <Lock className="w-3 h-3" />{t('login.password', lang)}
             </label>
-            <input type="password" required className="input-field" value={password} onChange={(e) => setPassword(e.target.value)} />
+            <input
+              type="password"
+              required
+              className="input-field"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
           </div>
           {error && <p className="text-danger text-sm">{error}</p>}
           <button type="submit" disabled={loading} className="btn-luxury-filled w-full">
-            {loading ? '...' : 'Login'}
+            {loading ? '...' : t('btn.login', lang)}
           </button>
+          <p className="text-white/30 text-xs text-center">{t('admin.login_hint', lang)}</p>
         </form>
       </div>
     </div>

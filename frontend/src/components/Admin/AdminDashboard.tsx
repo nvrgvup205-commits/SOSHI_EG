@@ -21,21 +21,21 @@ export default function AdminDashboard() {
 
   return (
     <div>
-      <div className="mb-10">
+      <div className="mb-6">
         <p className="label-luxury mb-1">Overview</p>
-        <h1 className="font-display text-3xl text-white flex items-center gap-3">
-          <LayoutDashboard className="w-7 h-7 text-accent" />
+        <h1 className="font-display text-2xl sm:text-3xl text-white flex items-center gap-3">
+          <LayoutDashboard className="w-6 h-6 sm:w-7 sm:h-7 text-accent" />
           {t('admin.dashboard', lang)}
         </h1>
-        <p className="text-white/40 mt-2">{t('admin.welcome', lang)}, {(user as { full_name?: string })?.full_name}</p>
+        <p className="text-white/40 mt-2 text-sm">{t('admin.welcome', lang)}, {(user as { full_name?: string })?.full_name}</p>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         {cards.map((card) => (
-          <div key={card.label} className="card p-6">
-            <card.icon className="w-6 h-6 text-accent mb-4" />
-            <div className="font-display text-4xl text-white">{card.value}</div>
-            <div className="text-white/40 text-xs uppercase tracking-wider mt-2">{card.label}</div>
+          <div key={card.label} className="card p-4 sm:p-6">
+            <card.icon className="w-5 h-5 sm:w-6 sm:h-6 text-accent mb-3 sm:mb-4" />
+            <div className="font-display text-2xl sm:text-4xl text-white">{card.value}</div>
+            <div className="text-white/40 text-[10px] sm:text-xs uppercase tracking-wider mt-1 sm:mt-2">{card.label}</div>
           </div>
         ))}
       </div>

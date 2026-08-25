@@ -27,10 +27,10 @@ export default function OrdersPage() {
 
   return (
     <div>
-      <div className="mb-8">
+      <div className="mb-6">
         <p className="label-luxury mb-1">Management</p>
-        <h1 className="font-display text-3xl text-white flex items-center gap-3">
-          <ShoppingBag className="w-7 h-7 text-accent" />
+        <h1 className="font-display text-2xl sm:text-3xl text-white flex items-center gap-3">
+          <ShoppingBag className="w-6 h-6 sm:w-7 sm:h-7 text-accent" />
           {t('admin.orders', lang)}
         </h1>
       </div>

@@ -87,15 +87,15 @@ export default function ProductsPage() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <div>
           <p className="label-luxury mb-1">Management</p>
-          <h1 className="font-display text-3xl text-white flex items-center gap-3">
-            <Package className="w-7 h-7 text-accent" />
+          <h1 className="font-display text-2xl sm:text-3xl text-white flex items-center gap-3">
+            <Package className="w-6 h-6 sm:w-7 sm:h-7 text-accent" />
             {t('admin.products', lang)}
           </h1>
         </div>
-        <button onClick={openCreate} className="btn-luxury text-xs">
+        <button onClick={openCreate} className="btn-luxury text-xs w-full sm:w-auto">
           <Plus className="w-4 h-4" /> Add Product
         </button>
       </div>
@@ -150,8 +150,35 @@ export default function ProductsPage() {
       {loading ? (
         <div className="text-center py-16 text-white/30">Loading...</div>
       ) : (
-        <div className="card overflow-hidden">
-          <table className="w-full text-sm">
+        <>
+          {/* Mobile cards */}
+          <div className="space-y-3 lg:hidden">
+            {products.map((p) => (
+              <div key={p.id} className="card p-4">
+                <div className="flex justify-between items-start gap-3">
+                  <div className="min-w-0">
+                    <div className="text-white font-medium truncate">{p.name_ar}</div>
+                    <div className="text-white/40 text-xs capitalize mt-0.5">{p.category}</div>
+                    <div className="text-accent font-display text-lg mt-2">{p.price} EGP</div>
+                  </div>
+                  <div className="flex flex-col items-end gap-2 shrink-0">
+                    <button onClick={() => toggleAvailable(p)}
+                      className={`text-[10px] px-2 py-0.5 border ${p.is_available ? 'border-success/50 text-success' : 'border-white/20 text-white/40'}`}>
+                      {p.is_available ? 'Active' : 'Hidden'}
+                    </button>
+                    <div className="flex gap-2">
+                      <button onClick={() => openEdit(p)} className="text-accent p-1"><Pencil className="w-4 h-4" /></button>
+                      <button onClick={() => handleDelete(p.id)} className="text-danger/70 p-1"><Trash2 className="w-4 h-4" /></button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Desktop table */}
+          <div className="card overflow-hidden hidden lg:block">
+            <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-white/5 text-white/40 text-xs uppercase tracking-wider">
                 <th className="text-start p-4">Name (AR)</th>
@@ -183,7 +210,8 @@ export default function ProductsPage() {
               ))}
             </tbody>
           </table>
-        </div>
+          </div>
+        </>
       )}
     </div>
   );
