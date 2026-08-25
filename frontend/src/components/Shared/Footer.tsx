@@ -5,12 +5,13 @@ export default function Footer() {
   const { lang } = useLanguage();
 
   return (
-    <footer className="bg-secondary text-white mt-16">
-      <div className="max-w-7xl mx-auto px-4 py-8 text-center">
-        <div className="text-2xl mb-2">🍣</div>
-        <div className="font-heading font-bold text-lg">SUSHI SHOP EGYPT</div>
-        <p className="text-white/60 text-sm mt-2">
-          © 2026 Sushi Shop Egypt. {t('hero.subtitle', lang)}
+    <footer className="bg-charcoal border-t border-white/5 py-16">
+      <div className="max-w-7xl mx-auto px-6 text-center">
+        <div className="label-luxury mb-4">Sushi Shop Egypt</div>
+        <h3 className="font-display text-3xl text-white mb-4">Crafted by the sea</h3>
+        <div className="divider-gold mb-6" />
+        <p className="text-white/40 text-sm tracking-wide">
+          © 2026 — {t('hero.subtitle', lang)}
         </p>
       </div>
     </footer>

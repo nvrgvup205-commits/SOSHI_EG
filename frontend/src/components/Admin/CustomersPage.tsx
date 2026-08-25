@@ -35,19 +35,20 @@ export default function CustomersPage() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-2xl font-heading font-bold text-secondary flex items-center gap-2">
-            <Users className="w-7 h-7" />
+          <p className="label-luxury mb-1">Database</p>
+          <h1 className="font-display text-3xl text-white flex items-center gap-3">
+            <Users className="w-7 h-7 text-accent" />
             {t('admin.customers', lang)}
           </h1>
-          <p className="text-gray-500 text-sm mt-1">{total} {t('admin.total_customers', lang)}</p>
+          <p className="text-white/40 text-sm mt-2">{total} {t('admin.total_customers', lang)}</p>
         </div>
       </div>
 
-      <form onSubmit={handleSearch} className="mb-6 flex gap-2">
+      <form onSubmit={handleSearch} className="mb-8 flex gap-3">
         <div className="relative flex-1">
-          <Search className="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+          <Search className="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 text-white/30" />
           <input
             type="text"
             className="input-field ps-10"
@@ -56,13 +57,13 @@ export default function CustomersPage() {
             onChange={(e) => setSearch(e.target.value)}
           />
         </div>
-        <button type="submit" className="btn-primary">{t('btn.submit', lang)}</button>
+        <button type="submit" className="btn-luxury text-xs">{t('btn.submit', lang)}</button>
       </form>
 
       {loading ? (
-        <div className="text-center py-12 text-gray-400">Loading...</div>
+        <div className="text-center py-16 text-white/30">Loading...</div>
       ) : customers.length === 0 ? (
-        <div className="card p-12 text-center text-gray-400">
+        <div className="card p-16 text-center text-white/30">
           <Users className="w-12 h-12 mx-auto mb-3 opacity-30" />
           <p>No customers yet</p>
         </div>
@@ -70,44 +71,46 @@ export default function CustomersPage() {
         <div className="card overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
-              <thead className="bg-cream">
-                <tr>
-                  <th className="text-start p-4 font-semibold text-secondary">{t('customers.name', lang)}</th>
-                  <th className="text-start p-4 font-semibold text-secondary">{t('customers.email', lang)}</th>
-                  <th className="text-start p-4 font-semibold text-secondary">{t('customers.phone', lang)}</th>
-                  <th className="text-start p-4 font-semibold text-secondary">{t('customers.orders', lang)}</th>
-                  <th className="text-start p-4 font-semibold text-secondary">{t('customers.spent', lang)}</th>
-                  <th className="text-start p-4 font-semibold text-secondary">{t('customers.last_login', lang)}</th>
-                  <th className="text-start p-4 font-semibold text-secondary">{t('customers.status', lang)}</th>
+              <thead>
+                <tr className="border-b border-white/5 text-white/40 text-xs uppercase tracking-wider">
+                  <th className="text-start p-4">{t('customers.name', lang)}</th>
+                  <th className="text-start p-4">{t('customers.email', lang)}</th>
+                  <th className="text-start p-4">{t('customers.phone', lang)}</th>
+                  <th className="text-start p-4">{t('customers.orders', lang)}</th>
+                  <th className="text-start p-4">{t('customers.spent', lang)}</th>
+                  <th className="text-start p-4">{t('customers.last_login', lang)}</th>
+                  <th className="text-start p-4">{t('customers.status', lang)}</th>
                 </tr>
               </thead>
               <tbody>
                 {customers.map((c) => (
-                  <tr key={c.id} className="border-t border-gray-50 hover:bg-cream/50 transition-colors">
-                    <td className="p-4 font-medium">{c.full_name || '-'}</td>
+                  <tr key={c.id} className="border-b border-white/5 hover:bg-white/5 transition-colors">
+                    <td className="p-4 text-white font-medium">{c.full_name || '-'}</td>
                     <td className="p-4">
-                      <span className="flex items-center gap-1 text-gray-600" dir="ltr">
+                      <span className="flex items-center gap-1 text-white/50" dir="ltr">
                         <Mail className="w-3 h-3" />{c.email}
                       </span>
                     </td>
                     <td className="p-4">
-                      <span className="flex items-center gap-1 text-gray-600" dir="ltr">
+                      <span className="flex items-center gap-1 text-white/50" dir="ltr">
                         <Phone className="w-3 h-3" />{c.phone}
                       </span>
                     </td>
                     <td className="p-4">
-                      <span className="flex items-center gap-1">
-                        <ShoppingBag className="w-3 h-3 text-primary" />{c.total_orders}
+                      <span className="flex items-center gap-1 text-white/70">
+                        <ShoppingBag className="w-3 h-3 text-accent" />{c.total_orders}
                       </span>
                     </td>
-                    <td className="p-4 font-semibold text-primary">{Number(c.total_spent).toFixed(0)} {t('currency', lang)}</td>
-                    <td className="p-4 text-gray-500">
+                    <td className="p-4 font-display text-lg text-accent">
+                      {Number(c.total_spent).toFixed(0)} {t('currency', lang)}
+                    </td>
+                    <td className="p-4 text-white/40">
                       <span className="flex items-center gap-1">
                         <Clock className="w-3 h-3" />{formatDate(c.last_login_at, lang)}
                       </span>
                     </td>
                     <td className="p-4">
-                      <span className={`px-2 py-1 rounded-full text-xs font-semibold ${c.is_active ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                      <span className={`text-xs px-3 py-1 border ${c.is_active ? 'border-success/50 text-success' : 'border-white/20 text-white/40'}`}>
                         {c.is_active ? t('customers.active', lang) : t('customers.inactive', lang)}
                       </span>
                     </td>

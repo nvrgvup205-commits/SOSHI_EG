@@ -27,34 +27,37 @@ export default function StaffPortal() {
   if (type !== 'staff') return <AdminLogin />;
 
   return (
-    <div className="min-h-screen bg-cream">
-      <div className="bg-secondary text-white p-4">
-        <h1 className="text-xl font-heading font-bold">🍣 {t('nav.staff', lang)}</h1>
-        <p className="text-white/60 text-sm">{(user as { full_name?: string })?.full_name}</p>
+    <div className="min-h-screen bg-ink">
+      <div className="bg-charcoal border-b border-white/5 p-6">
+        <p className="label-luxury mb-1">Staff Portal</p>
+        <h1 className="font-display text-2xl text-white">{t('nav.staff', lang)}</h1>
+        <p className="text-white/40 text-sm mt-1">{(user as { full_name?: string })?.full_name}</p>
       </div>
 
-      <div className="max-w-4xl mx-auto p-4">
-        <h2 className="text-lg font-semibold text-secondary mb-4">{t('staff.orders', lang)}</h2>
+      <div className="max-w-4xl mx-auto p-6">
+        <h2 className="font-display text-xl text-white mb-6">{t('staff.orders', lang)}</h2>
         {orders.length === 0 ? (
-          <div className="card p-8 text-center text-gray-400">No orders</div>
+          <div className="card p-12 text-center text-white/30">No orders</div>
         ) : (
-          <div className="space-y-3">
+          <div className="space-y-4">
             {orders.map((order) => (
-              <div key={order.id} className="card p-4">
-                <div className="flex justify-between items-start mb-2">
+              <div key={order.id} className="card p-5">
+                <div className="flex justify-between items-start mb-3">
                   <div>
-                    <div className="font-bold text-secondary">#{order.order_number}</div>
-                    <div className="text-sm text-gray-500">{order.customer_name} - {order.customer_phone}</div>
+                    <div className="font-display text-xl text-white">#{order.order_number}</div>
+                    <div className="text-sm text-white/40 mt-1">{order.customer_name} — {order.customer_phone}</div>
                   </div>
-                  <div className="text-primary font-bold">{order.total_price} {t('currency', lang)}</div>
+                  <div className="text-accent font-display text-xl">{order.total_price} {t('currency', lang)}</div>
                 </div>
-                <div className="flex gap-2 flex-wrap mt-3">
+                <div className="flex gap-2 flex-wrap mt-4">
                   {statuses.map((s) => (
                     <button
                       key={s}
                       onClick={() => updateStatus(order.id, s)}
-                      className={`px-3 py-1 rounded-full text-xs font-semibold transition-all ${
-                        order.status === s ? 'bg-primary text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                      className={`px-4 py-1.5 text-xs uppercase tracking-wider border transition-all ${
+                        order.status === s
+                          ? 'border-accent text-accent bg-accent/10'
+                          : 'border-white/10 text-white/40 hover:border-white/30'
                       }`}
                     >
                       {t(`status.${s}`, lang)}
