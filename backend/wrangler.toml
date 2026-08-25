@@ -1,0 +1,14 @@
+name = "soshi-eg-api"
+main = "src/index.ts"
+compatibility_date = "2025-08-25"
+compatibility_flags = ["nodejs_compat"]
+
+[vars]
+SUPABASE_URL = "https://khzrapojrkhxjsjgnflr.supabase.co"
+SUPABASE_SCHEMA = "soshi"
+CORS_ORIGIN = "*"
+
+# Set via: wrangler secret put SUPABASE_SERVICE_ROLE_KEY
+
+[build]
+command = ""

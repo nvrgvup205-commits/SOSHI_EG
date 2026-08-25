@@ -1,0 +1,6 @@
+name = "soshi-eg"
+pages_build_output_dir = "frontend/dist"
+compatibility_date = "2025-08-25"
+
+[env.production.vars]
+VITE_API_URL = "https://soshi-eg-api.nvrgvup205.workers.dev"

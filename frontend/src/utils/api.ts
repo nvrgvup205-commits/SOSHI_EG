@@ -1,0 +1,120 @@
+const API_BASE = import.meta.env.VITE_API_URL || '';
+
+import type { Customer, StaffUser } from '../types';
+
+class ApiClient {
+  private token: string | null = null;
+
+  constructor() {
+    this.token = localStorage.getItem('session_token');
+  }
+
+  setToken(token: string | null) {
+    this.token = token;
+    if (token) localStorage.setItem('session_token', token);
+    else localStorage.removeItem('session_token');
+  }
+
+  getToken() {
+    return this.token || localStorage.getItem('session_token');
+  }
+
+  private async request<T>(path: string, options: RequestInit = {}): Promise<T> {
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+      ...(options.headers as Record<string, string>),
+    };
+    const token = this.getToken();
+    if (token) headers['Authorization'] = `Bearer ${token}`;
+
+    const res = await fetch(`${API_BASE}${path}`, { ...options, headers });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Request failed');
+    return data;
+  }
+
+  // Auth
+  customerLogin(data: { email: string; phone: string; full_name?: string; preferred_language?: string }) {
+    return this.request<{ session_token: string; customer: Record<string, unknown> }>(
+      '/api/auth/customer/login',
+      { method: 'POST', body: JSON.stringify(data) },
+    );
+  }
+
+  staffLogin(data: { email: string; password: string }) {
+    return this.request<{ session_token: string; user: Record<string, unknown> }>(
+      '/api/auth/staff/login',
+      { method: 'POST', body: JSON.stringify(data) },
+    );
+  }
+
+  getMe() {
+    return this.request<{ type: 'customer' | 'staff'; user: Customer | StaffUser }>('/api/auth/me');
+  }
+
+  logout() {
+    return this.request('/api/auth/logout', { method: 'POST' });
+  }
+
+  // Products
+  getProducts(category?: string) {
+    const q = category ? `?category=${category}` : '';
+    return this.request<{ products: import('../types').Product[] }>(`/api/products${q}`);
+  }
+
+  // Customers (admin)
+  getCustomers(params?: { search?: string; page?: number }) {
+    const q = new URLSearchParams();
+    if (params?.search) q.set('search', params.search);
+    if (params?.page) q.set('page', String(params.page));
+    return this.request<{ customers: import('../types').Customer[]; pagination: { total: number } }>(
+      `/api/customers?${q}`,
+    );
+  }
+
+  updateCustomer(id: string, data: Partial<import('../types').Customer>) {
+    return this.request(`/api/customers/${id}`, { method: 'PATCH', body: JSON.stringify(data) });
+  }
+
+  // Orders
+  createOrder(data: { items: Array<{ product_id: string; quantity: number }>; notes?: string }) {
+    return this.request('/api/orders', { method: 'POST', body: JSON.stringify(data) });
+  }
+
+  getOrders(status?: string) {
+    const q = status ? `?status=${status}` : '';
+    return this.request<{ orders: import('../types').Order[] }>(`/api/orders${q}`);
+  }
+
+  updateOrderStatus(id: string, status: string) {
+    return this.request(`/api/orders/${id}/status`, {
+      method: 'PATCH',
+      body: JSON.stringify({ status }),
+    });
+  }
+
+  // Admin
+  getAnalytics() {
+    return this.request<{
+      today_orders: number;
+      total_customers: number;
+      today_messages: number;
+      active_staff: number;
+    }>('/api/admin/analytics');
+  }
+
+  getStaff() {
+    return this.request<{ staff: import('../types').StaffUser[] }>('/api/admin/staff');
+  }
+
+  updateSettings(settings: Record<string, string>) {
+    return this.request('/api/admin/settings', { method: 'PATCH', body: JSON.stringify(settings) });
+  }
+
+  // Settings
+  getSettings() {
+    return this.request<{ settings: import('../types').SiteSettings }>('/api/settings');
+  }
+}
+
+export const api = new ApiClient();
