@@ -5,6 +5,7 @@ import { api } from '../utils/api';
 import { t } from '../utils/i18n';
 import type { Order, OrderStatus } from '../types';
 import AdminLogin from '../components/Admin/AdminLogin';
+import AnimatedLogo from '../components/Shared/AnimatedLogo';
 
 const statuses: OrderStatus[] = ['pending', 'processing', 'ready', 'delivered'];
 
@@ -28,10 +29,13 @@ export default function StaffPortal() {
 
   return (
     <div className="min-h-screen bg-ink">
-      <div className="bg-charcoal border-b border-white/5 p-6">
-        <p className="label-luxury mb-1">Staff Portal</p>
-        <h1 className="font-display text-2xl text-white">{t('nav.staff', lang)}</h1>
-        <p className="text-white/40 text-sm mt-1">{(user as { full_name?: string })?.full_name}</p>
+      <div className="bg-charcoal border-b border-white/5 p-6 flex items-center gap-4">
+        <AnimatedLogo size="sm" animate={false} />
+        <div>
+          <p className="label-luxury mb-1">Staff Portal</p>
+          <h1 className="font-display text-xl text-white">{t('nav.staff', lang)}</h1>
+          <p className="text-white/40 text-sm mt-1">{(user as { full_name?: string })?.full_name}</p>
+        </div>
       </div>
 
       <div className="max-w-4xl mx-auto p-6">

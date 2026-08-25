@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Lock, Mail } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
+import AnimatedLogo from '../Shared/AnimatedLogo';
 
 export default function AdminLogin() {
   const { loginStaff } = useAuth();
@@ -29,9 +30,11 @@ export default function AdminLogin() {
     <div className="min-h-screen bg-ink flex items-center justify-center px-4">
       <div className="w-full max-w-md">
         <div className="text-center mb-10">
-          <p className="label-luxury mb-4">Administration</p>
-          <h1 className="font-display text-4xl text-white">Sushi Shop</h1>
-          <div className="divider-gold mt-6" />
+          <div className="flex justify-center mb-6">
+            <AnimatedLogo size="md" animate />
+          </div>
+          <p className="label-luxury mb-2">Administration</p>
+          <div className="divider-gold" />
         </div>
         <form onSubmit={handleSubmit} className="card p-8 space-y-5">
           <div>

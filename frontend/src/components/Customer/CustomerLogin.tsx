@@ -6,6 +6,7 @@ import { useLanguage } from '../../hooks/useLanguage';
 import { t } from '../../utils/i18n';
 import { isValidEmail, isValidPhone, formatPhone } from '../../utils/validators';
 import Header from '../Shared/Header';
+import AnimatedLogo from '../Shared/AnimatedLogo';
 
 export default function CustomerLogin() {
   const { loginCustomer } = useAuth();
@@ -38,9 +39,11 @@ export default function CustomerLogin() {
       <div className="min-h-screen flex items-center justify-center px-4 pt-20">
         <div className="w-full max-w-md">
           <div className="text-center mb-10">
-            <p className="label-luxury mb-4">{t('login.title', lang)}</p>
-            <h1 className="font-display text-4xl text-white">{t('login.subtitle', lang)}</h1>
-            <div className="divider-gold mt-6" />
+            <div className="flex justify-center mb-6">
+              <AnimatedLogo size="md" animate />
+            </div>
+            <p className="label-luxury mb-2">{t('login.title', lang)}</p>
+            <div className="divider-gold" />
           </div>
           <form onSubmit={handleSubmit} className="card p-8 space-y-5">
             <div>
