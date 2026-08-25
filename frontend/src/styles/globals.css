@@ -1,0 +1,85 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Montserrat:wght@600;700;800&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #E07856;
+  --color-primary-light: #E89B7E;
+  --color-primary-dark: #C85A3A;
+  --color-secondary: #0F3B4F;
+  --color-secondary-light: #1A5A7E;
+  --color-accent: #D4AF37;
+  --color-accent-light: #E8C547;
+  --color-cream: #F8F7F4;
+  --color-success: #27AE60;
+  --color-danger: #E74C3C;
+  --color-warning: #F39C12;
+  --font-heading: 'Montserrat', sans-serif;
+  --font-body: 'Inter', sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  background: var(--color-cream);
+  color: #1A1A1A;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading);
+}
+
+@keyframes shine {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes popIn {
+  0% { opacity: 0; transform: scale(0.8); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+.animate-slide-up {
+  animation: slideUp 0.5s ease-out;
+}
+
+.animate-pop-in {
+  animation: popIn 0.3s ease-out;
+}
+
+.btn-primary {
+  @apply bg-primary text-white px-6 py-3 rounded-lg font-semibold transition-all duration-300 hover:bg-primary-dark hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-50 disabled:cursor-not-allowed;
+}
+
+.btn-secondary {
+  @apply bg-secondary text-white px-6 py-3 rounded-lg font-semibold transition-all duration-300 hover:bg-secondary-light;
+}
+
+.btn-outline {
+  @apply border-2 border-primary text-primary px-6 py-3 rounded-lg font-semibold transition-all duration-300 hover:bg-primary hover:text-white;
+}
+
+.input-field {
+  @apply w-full border border-gray-200 rounded-lg px-4 py-3 text-base focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 transition-all;
+}
+
+.card {
+  @apply bg-white rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow duration-300;
+}
+
+.sidebar-link {
+  @apply flex items-center gap-3 px-4 py-3 rounded-lg text-gray-600 hover:bg-cream hover:text-secondary transition-colors;
+}
+
+.sidebar-link.active {
+  @apply bg-secondary text-white hover:bg-secondary hover:text-white;
+}
