@@ -8,7 +8,7 @@
     "dev:backend": "npm run dev --prefix backend",
     "build:frontend": "npm ci --prefix frontend && npm run build --prefix frontend",
     "deploy:production": "wrangler versions upload && wrangler versions deploy --percentage 100",
-    "deploy:worker": "wrangler deploy --yes",
+    "deploy:worker": "wrangler deploy",
     "deploy:pages": "npm run build:frontend && npm run deploy:worker",
     "deploy:backend": "npm run deploy --prefix backend",
     "typecheck": "npm run typecheck --prefix backend && npx tsc --noEmit --project frontend/tsconfig.app.json"
