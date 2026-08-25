@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import Header from '../components/Shared/Header';
 import Footer from '../components/Shared/Footer';
+import AnimatedLogo from '../components/Shared/AnimatedLogo';
 import ProductCard from '../components/Products/ProductCard';
 import { useLanguage } from '../hooks/useLanguage';
 import { useProducts } from '../hooks/useProducts';
@@ -25,11 +26,10 @@ export default function HomePage() {
           style={{ backgroundImage: 'radial-gradient(circle at 30% 50%, #E07856 0%, transparent 50%), radial-gradient(circle at 70% 30%, #D4AF37 0%, transparent 40%)' }}
         />
         <div className="relative text-center px-6 max-w-4xl mx-auto pt-24">
-          <p className="label-luxury mb-6 animate-fade-up">North Coast · Egypt</p>
-          <h1 className="font-display text-5xl md:text-7xl lg:text-8xl text-white leading-[1.1] mb-6 animate-fade-up">
-            {t('hero.title', lang)}
-          </h1>
-          <div className="divider-gold mb-8 animate-fade-up-delay" />
+          <p className="label-luxury mb-8 animate-fade-up">North Coast · Egypt</p>
+          <div className="mb-8 flex justify-center">
+            <AnimatedLogo size="hero" animate />
+          </div>
           <p className="text-white/60 text-lg md:text-xl font-light tracking-wide max-w-xl mx-auto mb-12 animate-fade-up-delay">
             {t('hero.subtitle', lang)}
           </p>

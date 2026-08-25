@@ -109,3 +109,40 @@ h1, h2, h3, h4 {
 .divider-gold {
   @apply w-16 h-px bg-gradient-to-r from-transparent via-accent to-transparent mx-auto;
 }
+
+.logo-piece {
+  animation: logoAssemble 1.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+  opacity: 0;
+  will-change: transform, opacity;
+}
+
+@keyframes logoAssemble {
+  0% {
+    opacity: 0;
+    transform: translate(var(--tx), var(--ty)) rotate(var(--rot)) scale(0.5);
+    filter: blur(6px) brightness(1.5);
+  }
+  50% {
+    opacity: 1;
+    filter: blur(0) brightness(1.2);
+  }
+  75% {
+    transform: translate(0, 0) rotate(0) scale(1.03);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(0, 0) rotate(0) scale(1);
+    filter: blur(0) brightness(1);
+  }
+}
+
+.logo-shine {
+  animation: logoGlow 1.2s ease-out both;
+  background: radial-gradient(ellipse at center, rgba(212, 175, 55, 0.2) 0%, transparent 65%);
+}
+
+@keyframes logoGlow {
+  0% { opacity: 0; transform: scale(0.85); }
+  50% { opacity: 1; }
+  100% { opacity: 0; transform: scale(1.1); }
+}

@@ -6,6 +6,7 @@ import {
 import { useAuth } from '../../hooks/useAuth';
 import { useLanguage } from '../../hooks/useLanguage';
 import { t } from '../../utils/i18n';
+import SiteLogo from '../Shared/SiteLogo';
 
 const navItems = [
   { path: '/admin', icon: LayoutDashboard, labelKey: 'admin.dashboard', exact: true },
@@ -26,8 +27,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     <div className="min-h-screen bg-ink flex">
       <aside className={`fixed inset-y-0 start-0 z-40 w-64 bg-charcoal border-e border-white/5 transform transition-transform lg:translate-x-0 lg:static ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
         <div className="p-6 border-b border-white/5">
-          <div className="text-xs tracking-[0.3em] uppercase text-accent">Admin</div>
-          <div className="font-display text-xl text-white mt-1">Sushi Shop</div>
+          <SiteLogo to="/admin" size="sm" />
+          <div className="text-xs tracking-[0.3em] uppercase text-accent/60 mt-2">Administration</div>
         </div>
         <nav className="p-4 space-y-1">
           {navItems.map((item) => {

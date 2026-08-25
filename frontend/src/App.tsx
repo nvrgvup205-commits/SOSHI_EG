@@ -13,6 +13,7 @@ import StaffPage from './components/Admin/StaffPage';
 import OrdersPage from './components/Admin/OrdersPage';
 import SettingsPage from './components/Admin/SettingsPage';
 import StaffPortal from './pages/StaffPortal';
+import InstallPrompt from './components/Shared/InstallPrompt';
 
 function ProtectedAdmin({ children }: { children: React.ReactNode }) {
   const { type, loading } = useAuth();
@@ -45,6 +46,7 @@ export default function App() {
     <LanguageProvider>
       <AuthProvider>
         <AppRoutes />
+        <InstallPrompt />
       </AuthProvider>
     </LanguageProvider>
   );
