@@ -7,9 +7,9 @@
     "dev:frontend": "npm run dev --prefix frontend",
     "dev:backend": "npm run dev --prefix backend",
     "build:frontend": "npm ci --prefix frontend && npm run build --prefix frontend",
-    "deploy": "npm run build && wrangler deploy",
-    "deploy:production": "npm run build && wrangler deploy",
-    "deploy:worker": "wrangler deploy",
+    "deploy": "npm run build && npx wrangler deploy",
+    "deploy:production": "npm run build && npx wrangler deploy",
+    "deploy:worker": "npx wrangler deploy",
     "deploy:pages": "npm run build:frontend && npm run deploy:worker",
     "deploy:backend": "npm run deploy --prefix backend",
     "typecheck": "npm run typecheck --prefix backend && npx tsc --noEmit --project frontend/tsconfig.app.json"
