@@ -1,5 +1,5 @@
 name = "soshi-eg"
-compatibility_date = "2025-08-25"
+compatibility_date = "2026-08-25"
 pages_build_output_dir = "frontend/dist"
 
 # Build frontend before deploy (install deps first — Cloudflare root has no node_modules)
