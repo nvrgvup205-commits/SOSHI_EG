@@ -1,12 +1,11 @@
 name = "soshi-eg"
 compatibility_date = "2026-08-25"
-pages_build_output_dir = "frontend/dist"
 
 # Build frontend before deploy (install deps first — Cloudflare root has no node_modules)
 [build]
 command = "npm ci --prefix frontend && npm run build --prefix frontend"
 
-# Static assets for Cloudflare Pages (React SPA)
+# Static assets for Cloudflare Workers (React SPA)
 [assets]
 directory = "./frontend/dist"
 not_found_handling = "single-page-application"
