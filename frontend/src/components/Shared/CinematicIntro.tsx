@@ -1,10 +1,11 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const INTRO_KEY = 'soshi_intro_seen';
 const SLICES = 4;
 const LOGO_SRC = '/logo.png';
+const LOGO_ASPECT = 1024 / 1536;
 
 const scatter = [
   { x: -420, y: -280, rotate: -28, scale: 0.55 },
@@ -14,25 +15,42 @@ const scatter = [
 ];
 
 function LogoSlices({ onLocked }: { onLocked: () => void }) {
-  useEffect(() => {
-    const t = setTimeout(onLocked, 1700);
-    return () => clearTimeout(t);
+  const [unified, setUnified] = useState(false);
+  const sliceW = 100 / SLICES;
+
+  const handleLocked = useCallback(() => {
+    setUnified(true);
+    onLocked();
   }, [onLocked]);
 
+  useEffect(() => {
+    const t = setTimeout(handleLocked, 1750);
+    return () => clearTimeout(t);
+  }, [handleLocked]);
+
   return (
-    <div className="flex h-[min(70vh,520px)] w-[min(85vw,340px)] sm:w-[min(70vw,380px)]">
-      {Array.from({ length: SLICES }).map((_, i) => (
+    <div
+      className="relative mx-auto"
+      style={{
+        width: 'min(85vw, 360px)',
+        aspectRatio: String(LOGO_ASPECT),
+      }}
+    >
+      {!unified && Array.from({ length: SLICES }).map((_, i) => (
         <motion.div
           key={i}
-          className="relative h-full overflow-hidden"
-          style={{ width: `${100 / SLICES}%` }}
+          className="absolute top-0 h-full overflow-hidden"
+          style={{
+            left: `${i * sliceW}%`,
+            width: `${sliceW}%`,
+          }}
           initial={{
             x: scatter[i].x,
             y: scatter[i].y,
             rotate: scatter[i].rotate,
             scale: scatter[i].scale,
             opacity: 0,
-            filter: 'blur(8px)',
+            filter: 'blur(10px)',
           }}
           animate={{
             x: 0,
@@ -44,7 +62,7 @@ function LogoSlices({ onLocked }: { onLocked: () => void }) {
           }}
           transition={{
             duration: 1.7,
-            delay: 0.1 + i * 0.14,
+            delay: 0.1 + i * 0.13,
             ease: [0.16, 1, 0.3, 1],
           }}
         >
@@ -55,11 +73,21 @@ function LogoSlices({ onLocked }: { onLocked: () => void }) {
             className="absolute top-0 h-full max-w-none select-none pointer-events-none"
             style={{
               width: `${SLICES * 100}%`,
-              left: `-${i * (100 / SLICES)}%`,
+              left: `-${i * 100}%`,
             }}
           />
         </motion.div>
       ))}
+
+      <motion.img
+        src={LOGO_SRC}
+        alt="Sushi Shop Egypt"
+        draggable={false}
+        className="absolute inset-0 w-full h-full object-contain select-none pointer-events-none"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: unified ? 1 : 0 }}
+        transition={{ duration: 0.35, ease: 'easeOut' }}
+      />
     </div>
   );
 }
@@ -83,12 +111,12 @@ export default function CinematicIntro() {
 
   useEffect(() => {
     if (phase !== 'playing') return;
-    const glow = setTimeout(() => setPhase('glow'), 1900);
-    const exit = setTimeout(() => setPhase('exit'), 2600);
+    const glow = setTimeout(() => setPhase('glow'), 1950);
+    const exit = setTimeout(() => setPhase('exit'), 2700);
     const done = setTimeout(() => {
       sessionStorage.setItem(INTRO_KEY, '1');
       setPhase('done');
-    }, 3400);
+    }, 3500);
     return () => {
       clearTimeout(glow);
       clearTimeout(exit);

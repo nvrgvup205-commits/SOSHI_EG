@@ -55,14 +55,16 @@ export default function InstallPrompt() {
     const onPrompt = (e: Event) => {
       e.preventDefault();
       setDeferred(e as BeforeInstallPromptEvent);
-      setTimeout(() => setVisible(true), 3000);
+      const introDelay = sessionStorage.getItem('soshi_intro_seen') ? 2500 : 5500;
+      setTimeout(() => setVisible(true), introDelay);
     };
 
     window.addEventListener('beforeinstallprompt', onPrompt);
     window.addEventListener('appinstalled', () => setVisible(false));
 
     if (isIOS()) {
-      setTimeout(() => setShowIOS(true), 4000);
+      const introDelay = sessionStorage.getItem('soshi_intro_seen') ? 3000 : 6000;
+      setTimeout(() => setShowIOS(true), introDelay);
     }
 
     return () => window.removeEventListener('beforeinstallprompt', onPrompt);
