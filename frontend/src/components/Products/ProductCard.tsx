@@ -3,6 +3,7 @@ import type { Product } from '../../types';
 import type { Language } from '../../types';
 import { getProductName, getProductDescription, t } from '../../utils/i18n';
 import { useCart } from '../../hooks/useCart';
+import { pickProductImage } from '../../utils/productImage';
 
 interface Props {
   product: Product;
@@ -15,14 +16,16 @@ export default function ProductCard({ product, lang, delay = 0 }: Props) {
   const name = getProductName(product, lang);
   const desc = getProductDescription(product, lang);
 
+  const photo = pickProductImage(product);
+
   return (
     <div
       className="group card overflow-hidden animate-fade-up"
       style={{ animationDelay: `${delay}s` }}
     >
       <div className="relative aspect-[4/3] bg-gradient-to-br from-secondary/30 to-primary/10 flex items-center justify-center overflow-hidden">
-        {product.image_thumbnail_url ? (
-          <img src={product.image_thumbnail_url} alt={name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+        {photo ? (
+          <img src={photo} alt={name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
         ) : (
           <span className="text-7xl opacity-60 group-hover:scale-110 transition-transform duration-700">🍣</span>
         )}
