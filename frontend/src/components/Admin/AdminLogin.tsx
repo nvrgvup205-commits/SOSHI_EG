@@ -27,10 +27,10 @@ export default function AdminLogin() {
   };
 
   return (
-    <div className="min-h-screen bg-ink flex items-center justify-center px-4">
+    <div className="min-h-screen bg-black flex items-center justify-center px-4">
       <div className="w-full max-w-md">
         <div className="text-center mb-10">
-          <div className="flex justify-center mb-6">
+          <div className="flex justify-center mb-4">
             <AnimatedLogo size="md" animate />
           </div>
           <p className="label-luxury mb-2">Administration</p>

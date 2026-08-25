@@ -1,21 +1,20 @@
 import { Link } from 'react-router-dom';
-import AnimatedLogo from './AnimatedLogo';
+import BrandName from './BrandName';
 
 interface Props {
   to?: string;
-  size?: 'hero' | 'md' | 'sm';
-  animate?: boolean;
+  size?: 'sm' | 'md' | 'lg';
   className?: string;
 }
 
-export default function SiteLogo({ to = '/', size = 'sm', animate = false, className = '' }: Props) {
-  const logo = <AnimatedLogo size={size} animate={animate} className={className} />;
+export default function SiteLogo({ to = '/', size = 'sm', className = '' }: Props) {
+  const mark = <BrandName size={size} className={className} />;
 
-  if (!to) return logo;
+  if (!to) return mark;
 
   return (
-    <Link to={to} className="block shrink-0">
-      {logo}
+    <Link to={to} className="block shrink-0" aria-label="Sushi Shop Egypt">
+      {mark}
     </Link>
   );
 }

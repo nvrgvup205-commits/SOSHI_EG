@@ -17,7 +17,7 @@ import InstallPrompt from './components/Shared/InstallPrompt';
 
 function ProtectedAdmin({ children }: { children: React.ReactNode }) {
   const { type, loading } = useAuth();
-  if (loading) return <div className="min-h-screen flex items-center justify-center bg-ink text-white">Loading...</div>;
+  if (loading) return <div className="min-h-screen flex items-center justify-center bg-black text-white">Loading...</div>;
   if (type !== 'staff') return <Navigate to="/admin/login" />;
   return <AdminLayout>{children}</AdminLayout>;
 }

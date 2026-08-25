@@ -34,12 +34,12 @@ export default function CustomerLogin() {
   };
 
   return (
-    <div className="min-h-screen bg-ink">
+    <div className="min-h-screen bg-black">
       <Header />
       <div className="min-h-screen flex items-center justify-center px-4 pt-20">
         <div className="w-full max-w-md">
           <div className="text-center mb-10">
-            <div className="flex justify-center mb-6">
+            <div className="flex justify-center mb-4">
               <AnimatedLogo size="md" animate />
             </div>
             <p className="label-luxury mb-2">{t('login.title', lang)}</p>

@@ -24,8 +24,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
-    <div className="min-h-screen bg-ink flex">
-      <aside className={`fixed inset-y-0 start-0 z-40 w-64 bg-charcoal border-e border-white/5 transform transition-transform lg:translate-x-0 lg:static ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+    <div className="min-h-screen bg-black flex">
+      <aside className={`fixed inset-y-0 start-0 z-40 w-64 bg-black border-e border-white/5 transform transition-transform lg:translate-x-0 lg:static ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
         <div className="p-6 border-b border-white/5">
           <SiteLogo to="/admin" size="sm" />
           <div className="text-xs tracking-[0.3em] uppercase text-accent/60 mt-2">Administration</div>
@@ -58,7 +58,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       <div className="flex-1 min-w-0">
         <div className="lg:hidden flex items-center justify-between p-4 bg-charcoal border-b border-white/5">
           <button onClick={() => setSidebarOpen(true)}><Menu className="w-6 h-6 text-white" /></button>
-          <span className="font-display text-white">Admin</span>
+          <SiteLogo to="/admin" size="sm" />
           <button onClick={() => setSidebarOpen(false)}><X className="w-6 h-6 text-white opacity-0" /></button>
         </div>
         <main className="p-6 lg:p-10">{children}</main>

@@ -59,7 +59,7 @@ export default function CartPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-ink">
+    <div className="min-h-screen flex flex-col bg-black">
       <Header />
       <div className="max-w-3xl mx-auto px-6 py-16 flex-1 w-full">
         <p className="label-luxury mb-2">Your Order</p>
