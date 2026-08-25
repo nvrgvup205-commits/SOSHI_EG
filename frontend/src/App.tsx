@@ -15,6 +15,7 @@ import SettingsPage from './components/Admin/SettingsPage';
 import StaffPortal from './pages/StaffPortal';
 import InstallPrompt from './components/Shared/InstallPrompt';
 import CinematicIntro from './components/Shared/CinematicIntro';
+import { IntroProvider } from './hooks/useIntro';
 
 function ProtectedAdmin({ children }: { children: React.ReactNode }) {
   const { type, loading } = useAuth();
@@ -45,11 +46,13 @@ function AppRoutes() {
 export default function App() {
   return (
     <LanguageProvider>
-      <AuthProvider>
-        <CinematicIntro />
-        <AppRoutes />
-        <InstallPrompt />
-      </AuthProvider>
+      <IntroProvider>
+        <AuthProvider>
+          <CinematicIntro />
+          <AppRoutes />
+          <InstallPrompt />
+        </AuthProvider>
+      </IntroProvider>
     </LanguageProvider>
   );
 }

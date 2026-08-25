@@ -1,8 +1,9 @@
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { ShoppingBag } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
 import { useCart } from '../../hooks/useCart';
 import { useLanguage } from '../../hooks/useLanguage';
+import { useIntro } from '../../hooks/useIntro';
 import { t } from '../../utils/i18n';
 import LanguageSwitcher from './LanguageSwitcher';
 import SiteLogo from './SiteLogo';
@@ -11,6 +12,10 @@ export default function Header() {
   const { lang } = useLanguage();
   const { type, user } = useAuth();
   const { count } = useCart();
+  const { introDismissed } = useIntro();
+  const location = useLocation();
+
+  if (location.pathname === '/' && !introDismissed) return null;
 
   return (
     <header className="fixed top-0 inset-x-0 z-50 bg-ink/80 backdrop-blur-md border-b border-white/5">

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Download, X, Share } from 'lucide-react';
 import { useLanguage } from '../../hooks/useLanguage';
+import { useIntro } from '../../hooks/useIntro';
 import type { Language } from '../../types';
 
 interface BeforeInstallPromptEvent extends Event {
@@ -43,32 +44,32 @@ function isStandalone() {
 
 export default function InstallPrompt() {
   const { lang } = useLanguage();
+  const { introDismissed } = useIntro();
   const [deferred, setDeferred] = useState<BeforeInstallPromptEvent | null>(null);
   const [visible, setVisible] = useState(false);
   const [showIOS, setShowIOS] = useState(false);
   const t = texts[lang];
 
   useEffect(() => {
+    if (!introDismissed) return;
     if (isStandalone()) return;
     if (localStorage.getItem('pwa-dismissed')) return;
 
     const onPrompt = (e: Event) => {
       e.preventDefault();
       setDeferred(e as BeforeInstallPromptEvent);
-      const introDelay = sessionStorage.getItem('soshi_intro_seen') ? 2500 : 5500;
-      setTimeout(() => setVisible(true), introDelay);
+      setTimeout(() => setVisible(true), 2500);
     };
 
     window.addEventListener('beforeinstallprompt', onPrompt);
     window.addEventListener('appinstalled', () => setVisible(false));
 
     if (isIOS()) {
-      const introDelay = sessionStorage.getItem('soshi_intro_seen') ? 3000 : 6000;
-      setTimeout(() => setShowIOS(true), introDelay);
+      setTimeout(() => setShowIOS(true), 3000);
     }
 
     return () => window.removeEventListener('beforeinstallprompt', onPrompt);
-  }, []);
+  }, [introDismissed]);
 
   const dismiss = () => {
     localStorage.setItem('pwa-dismissed', '1');
