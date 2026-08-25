@@ -5,10 +5,11 @@ interface Props {
   to?: string;
   size?: 'hero' | 'md' | 'sm';
   className?: string;
+  loop?: boolean;
 }
 
-export default function SiteLogo({ to = '/', size = 'sm', className = '' }: Props) {
-  const logo = <AnimatedLogo size={size} className={className} />;
+export default function SiteLogo({ to = '/', size = 'sm', className = '', loop = false }: Props) {
+  const logo = <AnimatedLogo size={size} loop={loop} className={className} />;
 
   if (!to) return logo;
 

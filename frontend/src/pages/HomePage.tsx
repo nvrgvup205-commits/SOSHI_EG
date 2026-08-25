@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import Animated3DTitle from '../components/Shared/Animated3DTitle';
 import Header from '../components/Shared/Header';
 import Footer from '../components/Shared/Footer';
 import ProductCard from '../components/Products/ProductCard';
@@ -55,9 +56,9 @@ export default function HomePage() {
           transition={{ duration: 0.9, delay: introDismissed ? 0.3 : 0, ease: 'easeOut' }}
         >
           <p className="label-luxury mb-6">North Coast · Egypt</p>
-          <h1 className="font-display text-5xl md:text-6xl lg:text-7xl text-white leading-tight mb-6 drop-shadow-lg">
-            {t('hero.title', lang)}
-          </h1>
+          {introDismissed && (
+            <Animated3DTitle text={t('hero.title', lang)} startDelay={0.4} />
+          )}
           <div className="divider-gold mb-8" />
           <p className="text-white/90 text-lg md:text-xl font-light tracking-wide max-w-xl mx-auto mb-12">
             {t('hero.subtitle', lang)}

@@ -18,9 +18,9 @@ export default function Header() {
   if (location.pathname === '/' && !introDismissed) return null;
 
   return (
-    <header className="fixed top-0 inset-x-0 z-50 bg-ink/80 backdrop-blur-md border-b border-white/5">
-      <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-        <SiteLogo to="/" size="sm" />
+    <header className="fixed top-0 inset-x-0 z-50 bg-ink border-b border-white/5">
+      <div className="max-w-7xl mx-auto px-6 py-3 flex items-center justify-between">
+        <SiteLogo to="/" size="sm" loop />
 
         <nav className="hidden md:flex items-center gap-10">
           <Link to="/#menu" className="text-xs uppercase tracking-[0.2em] text-white/70 hover:text-accent transition-colors">
