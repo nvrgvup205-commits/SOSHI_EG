@@ -87,27 +87,29 @@ GET  /api/admin/analytics        # Admin: dashboard stats
 
 ## Deployment
 
-### Frontend → Cloudflare Pages (`soshi-eg`)
+### Frontend → Cloudflare Workers (`soshi-eg`)
 
-**Build command** (in Cloudflare dashboard):
+Production URL: https://soshi-eg.nvrgvup205.workers.dev
+
+In the Cloudflare dashboard (**Workers & Pages → soshi-eg → Settings → Builds**), use:
+
+**Build command** (optional — can leave empty if deploy handles it):
 ```bash
-npm run build --prefix frontend
+npm ci && npm run build
 ```
 
-**Build output directory:**
-```
-frontend/dist
-```
-
-**Deploy command:** leave empty (default) **OR** use:
+**Deploy command** (production branch):
 ```bash
-npx wrangler deploy --env=""
+npm run deploy
 ```
 
-> Do **not** use `wrangler deploy` without the `[build]` + `[assets]` config in root `wrangler.toml`.
-> The previous error happened because deploy ran without building `frontend/dist` first.
+> Workers Builds does **not** run the `[build]` block from `wrangler.toml`.
+> The deploy script installs frontend deps, builds `frontend/dist`, then runs `wrangler deploy`.
+> Do **not** set `pages_build_output_dir` in `wrangler.toml` — it makes `wrangler deploy` fail with a Pages-project error.
 
-**Environment variables** (Cloudflare Pages → Settings → Variables):
+**GitHub Actions (optional):** add repository secrets `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` to enable the Deploy workflow.
+
+**Environment variables** (Cloudflare Worker → Settings → Variables):
 - `VITE_API_URL` = your Workers API URL
 - `VITE_SUPABASE_URL` = `https://khzrapojrkhxjsjgnflr.supabase.co`
 - `VITE_SUPABASE_ANON_KEY` = your anon key
