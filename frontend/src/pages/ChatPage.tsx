@@ -1,8 +1,9 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 import CustomerShell from '../components/Shared/CustomerShell';
 import ChatThread from '../components/Chat/ChatThread';
 import { api } from '../utils/api';
 import { useLanguage } from '../hooks/useLanguage';
+import { useChatPolling } from '../hooks/useChatPolling';
 import { t } from '../utils/i18n';
 import type { ChatMessage } from '../types';
 
@@ -10,9 +11,11 @@ export default function ChatPage() {
   const { lang } = useLanguage();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
 
-  useEffect(() => {
-    api.getChat(undefined, lang).then((r) => setMessages(r.messages)).catch(console.error);
-  }, [lang]);
+  const load = useCallback(
+    () => api.getChat(undefined, lang).then((r) => r.messages),
+    [lang],
+  );
+  useChatPolling(true, load, setMessages);
 
   const send = async (text: string) => {
     const res = await api.sendChat(text, undefined, lang);

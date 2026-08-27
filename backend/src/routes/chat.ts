@@ -7,7 +7,9 @@ import {
   detectMessageLanguage,
   localizeMessages,
   normalizeLang,
+  writeTranslationCache,
   type ChatMessageRow,
+  type LangCode,
 } from '../lib/translate';
 
 type AppEnv = {
@@ -19,6 +21,25 @@ type AppEnv = {
 };
 
 const chat = new Hono<AppEnv>();
+
+async function persistTranslationCache(
+  supabase: ReturnType<typeof createSupabase>,
+  messages: ChatMessageRow[],
+  viewerLang: LangCode,
+) {
+  await Promise.all(
+    messages.map(async (msg) => {
+      if (!msg.is_translated || !msg.translated_message || typeof msg.translated_message !== 'string') return;
+      await supabase
+        .from('chat_messages')
+        .update({
+          translated_message: writeTranslationCache(viewerLang, msg.translated_message),
+          is_translated: true,
+        })
+        .eq('id', msg.id);
+    }),
+  );
+}
 
 async function getOrCreateConversation(
   supabase: ReturnType<typeof createSupabase>,
@@ -84,6 +105,7 @@ chat.get('/', requireCustomer, async (c) => {
       'customer',
       uiLang,
     );
+    await persistTranslationCache(supabase, localized, uiLang);
     return jsonResponse({ conversation: { ...conversation, customer_language: uiLang }, messages: localized });
   } catch (err) {
     return errorResponse(err instanceof Error ? err.message : 'Chat error', 500);
@@ -157,6 +179,7 @@ chat.get('/inbox/:id', requireStaff, async (c) => {
     'staff',
     uiLang,
   );
+  await persistTranslationCache(supabase, localized, uiLang);
   return jsonResponse({ conversation, messages: localized });
 });
 

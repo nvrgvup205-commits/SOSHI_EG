@@ -1,6 +1,7 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { api } from '../../utils/api';
 import { useLanguage } from '../../hooks/useLanguage';
+import { useChatPolling } from '../../hooks/useChatPolling';
 import { t } from '../../utils/i18n';
 import ChatThread from '../Chat/ChatThread';
 import type { ChatMessage, Conversation } from '../../types';
@@ -11,13 +12,28 @@ export default function ChatInbox() {
   const [active, setActive] = useState<string | null>(null);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
 
-  const loadList = () => api.getInbox().then((r) => setList(r.conversations)).catch(console.error);
-  useEffect(() => { loadList(); }, []);
+  const loadList = useCallback(
+    () => api.getInbox().then((r) => setList(r.conversations)).catch(console.error),
+    [],
+  );
+
+  useEffect(() => { loadList(); }, [loadList]);
 
   useEffect(() => {
     if (!active) return;
-    api.getInboxThread(active, lang).then((r) => setMessages(r.messages)).catch(console.error);
-  }, [active, lang]);
+    const timer = window.setInterval(loadList, 8000);
+    return () => window.clearInterval(timer);
+  }, [active, loadList]);
+
+  const loadThread = useCallback(
+    () => {
+      if (!active) return Promise.resolve([]);
+      return api.getInboxThread(active, lang).then((r) => r.messages);
+    },
+    [active, lang],
+  );
+
+  useChatPolling(Boolean(active), loadThread, setMessages);
 
   const open = (id: string) => {
     setActive(id);

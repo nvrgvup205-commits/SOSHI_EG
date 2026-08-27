@@ -2,6 +2,7 @@ import { Context, Next } from 'hono';
 import type { Env } from '../types';
 import { createSupabase } from '../lib/supabase';
 import { errorResponse } from '../lib/auth';
+import { touchCustomerSession, touchStaffSession } from '../lib/sessions';
 
 type AppEnv = {
   Bindings: Env;
@@ -29,6 +30,7 @@ export async function requireStaff(c: Context<AppEnv>, next: Next) {
 
   if (!data?.staff_users) return errorResponse('Unauthorized', 401);
   c.set('staff', data.staff_users);
+  await touchStaffSession(c.env, token);
   await next();
 }
 
@@ -46,6 +48,7 @@ export async function requireCustomer(c: Context<AppEnv>, next: Next) {
 
   if (!data?.customers) return errorResponse('Please login first', 401);
   c.set('customer', data.customers);
+  await touchCustomerSession(c.env, token);
   await next();
 }
 

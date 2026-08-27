@@ -1,6 +1,7 @@
 import { Hono } from 'hono';
 import type { Env } from '../types';
 import { createSupabase } from '../lib/supabase';
+import { refreshSession } from '../lib/sessions';
 import {
   errorResponse,
   generateToken,
@@ -375,6 +376,7 @@ auth.get('/me', async (c) => {
     .maybeSingle();
 
   if (customerSession?.customers) {
+    await refreshSession(c.env, token);
     return jsonResponse({
       type: 'customer',
       user: customerSession.customers,
@@ -389,6 +391,7 @@ auth.get('/me', async (c) => {
     .maybeSingle();
 
   if (staffSession?.staff_users) {
+    await refreshSession(c.env, token);
     return jsonResponse({
       type: 'staff',
       user: staffSession.staff_users,
@@ -396,6 +399,14 @@ auth.get('/me', async (c) => {
   }
 
   return errorResponse('Session expired or invalid', 401);
+});
+
+auth.post('/refresh', async (c) => {
+  const token = c.req.header('Authorization')?.replace('Bearer ', '');
+  if (!token) return errorResponse('Unauthorized', 401);
+  const kind = await refreshSession(c.env, token);
+  if (!kind) return errorResponse('Session expired or invalid', 401);
+  return jsonResponse({ ok: true, type: kind });
 });
 
 auth.post('/logout', async (c) => {

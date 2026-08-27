@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
 import { api } from '../utils/api';
+import { useSessionKeepAlive } from './useSessionKeepAlive';
 import type { Customer, StaffUser } from '../types';
 
 interface AuthState {
@@ -34,6 +35,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<Customer | StaffUser | null>(null);
   const [loading, setLoading] = useState(true);
 
+  useSessionKeepAlive(Boolean(type));
+
   useEffect(() => {
     const token = api.getToken();
     if (!token) {
@@ -45,7 +48,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setType(res.type);
         setUser(res.user);
       })
-      .catch(() => api.setToken(null))
+      .catch(() => {
+        // Try refresh before clearing token (handles near-expiry sessions)
+        return api.refreshSession()
+          .then(() => api.getMe())
+          .then((res) => {
+            setType(res.type);
+            setUser(res.user);
+          })
+          .catch(() => api.setToken(null));
+      })
       .finally(() => setLoading(false));
   }, []);
 

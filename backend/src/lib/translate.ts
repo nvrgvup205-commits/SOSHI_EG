@@ -15,8 +15,12 @@ const LANG_NAMES: Record<LangCode, string> = {
   ru: 'Russian',
 };
 
-const LLM_MODEL = '@cf/meta/llama-3.1-8b-instruct';
+/** Best quality on Workers AI free tier — 70B instruct, excellent multilingual + dialect. */
+const PRIMARY_LLM = '@cf/meta/llama-3.3-70b-instruct-fp8-fast';
+const FALLBACK_LLM = '@cf/openai/gpt-oss-120b';
 const M2M_MODEL = '@cf/meta/m2m100-1.2b';
+
+type TranslationCache = { target: LangCode; text: string };
 
 export function normalizeLang(code: string | null | undefined): LangCode {
   const c = (code || 'ar').toLowerCase().slice(0, 2);
@@ -24,7 +28,6 @@ export function normalizeLang(code: string | null | undefined): LangCode {
   return 'ar';
 }
 
-/** Detect message language from script — handles mixed Egyptian dialect in Arabic script. */
 export function detectMessageLanguage(text: string): LangCode {
   const trimmed = text.trim();
   if (!trimmed) return 'ar';
@@ -61,31 +64,47 @@ function isUsefulTranslation(source: string, translated: string | null): transla
   return Boolean(b) && a !== b;
 }
 
-async function translateWithLLM(
-  ai: Ai,
-  text: string,
-  from: LangCode,
-  to: LangCode,
-): Promise<string | null> {
+function buildSystemPrompt(from: LangCode, to: LangCode): string {
+  const dialectNote = from === 'ar'
+    ? 'The source may be Egyptian Arabic dialect (عامية مصرية). Translate the MEANING accurately, not word-by-word. '
+    : '';
+  return (
+    `You are an expert human translator for a sushi restaurant customer-support chat. ` +
+    `Translate from ${LANG_NAMES[from]} to ${LANG_NAMES[to]}. ` +
+    dialectNote +
+    'Rules: preserve intent; use natural native phrasing; do NOT invent names or facts; ' +
+    'do NOT add greetings or explanations; output ONLY the translated message text.'
+  );
+}
+
+async function runLlm(ai: Ai, model: string, from: LangCode, to: LangCode, text: string): Promise<string | null> {
   try {
-    const result = await ai.run(LLM_MODEL, {
+    const result = await ai.run(model, {
       messages: [
-        {
-          role: 'system',
-          content:
-            `You translate restaurant chat messages from ${LANG_NAMES[from]} to ${LANG_NAMES[to]}. ` +
-            'Handle Egyptian Arabic dialect (عامية مصرية), slang, typos, and mixed language naturally. ' +
-            'Return ONLY the translation with no quotes, labels, or explanation.',
-        },
+        { role: 'system', content: buildSystemPrompt(from, to) },
         { role: 'user', content: text.slice(0, 2000) },
       ],
-      max_tokens: 512,
+      max_tokens: 400,
+      temperature: 0.1,
     });
     const translated = extractTranslation(result);
     return isUsefulTranslation(text, translated) ? translated : null;
   } catch {
     return null;
   }
+}
+
+async function translateWithLLM(
+  ai: Ai,
+  text: string,
+  from: LangCode,
+  to: LangCode,
+): Promise<string | null> {
+  const primary = await runLlm(ai, PRIMARY_LLM, from, to, text);
+  if (primary) return primary;
+  const fallback = await runLlm(ai, FALLBACK_LLM, from, to, text);
+  if (fallback) return fallback;
+  return null;
 }
 
 async function translateWithM2M100(
@@ -105,6 +124,24 @@ async function translateWithM2M100(
   } catch {
     return null;
   }
+}
+
+export function readTranslationCache(raw: string | null | undefined, target: LangCode): string | null {
+  if (!raw) return null;
+  try {
+    const parsed = JSON.parse(raw) as TranslationCache;
+    if (parsed?.target === target && typeof parsed.text === 'string' && parsed.text.trim()) {
+      return parsed.text.trim();
+    }
+  } catch {
+    // legacy plain-text cache
+    if (raw.trim()) return raw.trim();
+  }
+  return null;
+}
+
+export function writeTranslationCache(target: LangCode, text: string): string {
+  return JSON.stringify({ target, text });
 }
 
 export async function translateText(
@@ -150,6 +187,11 @@ export async function localizeMessages(
       const messageLang = normalizeLang(msg.language || detectMessageLanguage(msg.message));
       if (messageLang === viewerLang) {
         return { ...msg, translated_message: null, is_translated: false };
+      }
+
+      const cached = readTranslationCache(msg.translated_message, viewerLang);
+      if (cached) {
+        return { ...msg, translated_message: cached, is_translated: true };
       }
 
       const translated = await translateText(ai, msg.message, messageLang, viewerLang);

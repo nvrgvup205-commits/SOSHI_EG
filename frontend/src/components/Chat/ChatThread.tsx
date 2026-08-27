@@ -7,10 +7,12 @@ export default function ChatThread({
   messages,
   viewer,
   onSend,
+  compact = false,
 }: {
   messages: ChatMessage[];
   viewer: 'customer' | 'staff';
   onSend: (text: string) => Promise<void>;
+  compact?: boolean;
 }) {
   const { lang } = useLanguage();
   const [text, setText] = useState('');
@@ -44,8 +46,8 @@ export default function ChatThread({
   };
 
   return (
-    <div className="card overflow-hidden">
-      <div className="h-80 overflow-y-auto p-4 space-y-3">
+    <div className={`${compact ? '' : 'card'} overflow-hidden`}>
+      <div className={`${compact ? 'h-64' : 'h-80'} overflow-y-auto p-4 space-y-3`}>
         {messages.length === 0 && <p className="text-muted text-center py-10">{t('chat.empty', lang)}</p>}
         {messages.map((msg) => {
           const mine = viewer === 'staff' ? msg.sender_type === 'staff' : msg.sender_type === 'customer';

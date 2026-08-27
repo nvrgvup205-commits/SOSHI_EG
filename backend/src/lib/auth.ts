@@ -1,5 +1,5 @@
 const PASSWORD_SALT = 'soshi-admin-salt-v1';
-const SESSION_TTL_HOURS = 72;
+const SESSION_TTL_HOURS = 24 * 30; // 30 days — extended on each request
 
 export async function hashPassword(password: string): Promise<string> {
   const data = new TextEncoder().encode(PASSWORD_SALT + password);
