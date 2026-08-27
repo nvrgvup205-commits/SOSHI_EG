@@ -126,21 +126,22 @@ Production URL: https://soshi-eg.nvrgvup205.workers.dev
 
 In the Cloudflare dashboard (**Workers & Pages → soshi-eg → Settings → Builds**), use:
 
-**Build command** (optional — can leave empty if deploy handles it):
-```bash
-npm ci && npm run build
-```
+**Build command** (leave empty — `npm run deploy` builds the frontend):
 
 **Deploy command** (production branch):
 ```bash
 npm run deploy
 ```
 
+That script **only** builds the React app and deploys `soshi-eg`. It must **not** deploy `soshi-eg-api` from this Worker — Cloudflare Builds tokens are scoped to `soshi-eg`, so deploying the API from here fails the whole build.
+
 > Workers Builds does **not** run the `[build]` block from `wrangler.toml`.
-> The deploy script installs frontend deps, builds `frontend/dist`, then runs `wrangler deploy`.
+> `npm run deploy` installs frontend deps, builds `frontend/dist`, then runs `wrangler deploy`.
 > Do **not** set `pages_build_output_dir` in `wrangler.toml` — it makes `wrangler deploy` fail with a Pages-project error.
 
-**GitHub Actions (optional):** add repository secrets `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` to enable the Deploy workflow. The workflow deploys **both** workers: `soshi-eg-api` (backend) then `soshi-eg` (frontend).
+**Backend worker (`soshi-eg-api`):** either connect that Worker to the same repo in Cloudflare Builds with deploy command `npm run deploy --prefix backend`, or let GitHub Actions deploy both.
+
+**GitHub Actions:** add repository secrets `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID`. The workflow deploys **both** workers: `soshi-eg-api` then `soshi-eg`.
 
 Set the backend secret once in Cloudflare:
 

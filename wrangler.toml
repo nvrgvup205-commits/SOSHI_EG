@@ -2,7 +2,8 @@ name = "soshi-eg"
 main = "worker/index.ts"
 compatibility_date = "2026-08-25"
 
-# Build frontend before deploy (install deps first — Cloudflare root has no node_modules)
+# Custom build used by local `wrangler deploy` and GitHub Actions.
+# Cloudflare Workers Builds ignores this block — `npm run deploy` builds the frontend instead.
 [build]
 command = "npm ci --prefix frontend && npm run build --prefix frontend"
 

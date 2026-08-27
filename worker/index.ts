@@ -1,12 +1,10 @@
-export interface Env {
-  ASSETS: Fetcher;
-  API_ORIGIN: string;
-}
-
-const API_ORIGIN = 'https://soshi-eg-api.nvrgvup205.workers.dev';
+const FALLBACK_API = 'https://soshi-eg-api.nvrgvup205.workers.dev';
 
 export default {
-  async fetch(request: Request, env: Env): Promise<Response> {
+  async fetch(request: Request, env: {
+    ASSETS: { fetch: (request: Request) => Promise<Response> };
+    API_ORIGIN: string;
+  }): Promise<Response> {
     const url = new URL(request.url);
     if (url.pathname.startsWith('/api/')) {
       if (request.method === 'OPTIONS') {
@@ -19,7 +17,7 @@ export default {
           },
         });
       }
-      const target = `${env.API_ORIGIN || API_ORIGIN}${url.pathname}${url.search}`;
+      const target = `${env.API_ORIGIN || FALLBACK_API}${url.pathname}${url.search}`;
       const headers = new Headers(request.headers);
       headers.delete('host');
       const init: RequestInit & { duplex?: 'half' } = {
