@@ -8,6 +8,7 @@ import { staffDashboardPath } from '../../utils/staffRoles';
 import type { UserRole } from '../../types';
 import BrandMark from '../Shared/BrandMark';
 import ThemeToggle from '../Shared/ThemeToggle';
+import LanguageSwitcher from '../Shared/LanguageSwitcher';
 
 export default function AdminLogin() {
   const { loginStaff } = useAuth();
@@ -40,7 +41,8 @@ export default function AdminLogin() {
   return (
     <div className="min-h-screen app-shell flex items-center justify-center px-4">
       <div className="w-full max-w-md">
-        <div className="flex justify-end mb-4">
+        <div className="flex items-center justify-between mb-4 gap-3">
+          <LanguageSwitcher />
           <ThemeToggle compact />
         </div>
         <div className="text-center mb-10">

@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
+import { useLocation } from 'react-router-dom';
 import type { Language } from '../types';
 
 interface LanguageState {
@@ -11,35 +12,52 @@ interface LanguageState {
 
 const LanguageContext = createContext<LanguageState | null>(null);
 
-function readStoredLang(): Language {
-  const stored = localStorage.getItem('lang') as Language | null;
+const CUSTOMER_LANG_KEY = 'lang';
+const STAFF_LANG_KEY = 'staff_lang';
+const LANG_CHOSEN_KEY = 'lang_chosen';
+
+function isStaffRoute(pathname: string) {
+  return pathname.startsWith('/admin') || pathname.startsWith('/staff');
+}
+
+function readLang(key: string, fallback: Language): Language {
+  const stored = localStorage.getItem(key) as Language | null;
   if (stored === 'ar' || stored === 'en' || stored === 'ru') return stored;
-  return 'ar';
+  return fallback;
+}
+
+function applyDocumentLang(l: Language) {
+  document.documentElement.dir = l === 'ar' ? 'rtl' : 'ltr';
+  document.documentElement.lang = l;
 }
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
-  const [lang, setLangState] = useState<Language>(readStoredLang);
-  const [hasChosen, setHasChosen] = useState(() => localStorage.getItem('lang_chosen') === '1');
+  const location = useLocation();
+  const staffRoute = isStaffRoute(location.pathname);
+  const storageKey = staffRoute ? STAFF_LANG_KEY : CUSTOMER_LANG_KEY;
+  const fallback: Language = staffRoute ? 'ar' : 'ar';
 
-  const apply = (l: Language) => {
-    document.documentElement.dir = l === 'ar' ? 'rtl' : 'ltr';
-    document.documentElement.lang = l;
-  };
+  const [lang, setLangState] = useState<Language>(() => readLang(storageKey, fallback));
+  const [hasChosen, setHasChosen] = useState(() => localStorage.getItem(LANG_CHOSEN_KEY) === '1');
 
   useEffect(() => {
-    apply(lang);
-  }, [lang]);
+    const next = readLang(storageKey, fallback);
+    setLangState(next);
+    applyDocumentLang(next);
+  }, [storageKey, fallback]);
 
   const setLang = (l: Language) => {
     setLangState(l);
-    localStorage.setItem('lang', l);
-    apply(l);
+    localStorage.setItem(storageKey, l);
+    applyDocumentLang(l);
   };
 
   const chooseLang = (l: Language) => {
-    setLang(l);
-    localStorage.setItem('lang_chosen', '1');
+    setLangState(l);
+    localStorage.setItem(CUSTOMER_LANG_KEY, l);
+    localStorage.setItem(LANG_CHOSEN_KEY, '1');
     setHasChosen(true);
+    applyDocumentLang(l);
   };
 
   const dir = lang === 'ar' ? 'rtl' : 'ltr';
