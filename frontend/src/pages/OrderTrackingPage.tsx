@@ -20,11 +20,11 @@ export default function OrderTrackingPage() {
   useEffect(() => {
     if (!id) return;
     api.getOrder(id).then((r) => setOrder(r.order)).catch((e) => setError(e.message));
-    api.getChat(id).then((r) => setMessages(r.messages)).catch(console.error);
-  }, [id]);
+    api.getChat(id, lang).then((r) => setMessages(r.messages)).catch(console.error);
+  }, [id, lang]);
 
   const send = async (text: string) => {
-    const res = await api.sendChat(text, id);
+    const res = await api.sendChat(text, id, lang);
     setMessages((prev) => [...prev, res.message]);
   };
 

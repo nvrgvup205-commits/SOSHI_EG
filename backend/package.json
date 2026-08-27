@@ -7,7 +7,7 @@
     "dev": "wrangler dev",
     "deploy": "wrangler deploy",
     "typecheck": "tsc --noEmit",
-    "test": "node --experimental-strip-types --test src/lib/storagePaths.test.ts src/lib/http.test.ts src/lib/demo.test.ts"
+    "test": "node --experimental-strip-types --test src/lib/storagePaths.test.ts src/lib/http.test.ts src/lib/demo.test.ts src/lib/translate.test.ts"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.112.4",

@@ -1,8 +1,11 @@
+import type { Ai } from '@cloudflare/workers-types';
+
 export interface Env {
   SUPABASE_URL: string;
   SUPABASE_SERVICE_ROLE_KEY: string;
   SUPABASE_SCHEMA: string;
   CORS_ORIGIN: string;
+  AI: Ai;
 }
 
 export type UserRole =

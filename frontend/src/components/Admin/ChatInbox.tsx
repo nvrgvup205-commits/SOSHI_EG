@@ -14,15 +14,18 @@ export default function ChatInbox() {
   const loadList = () => api.getInbox().then((r) => setList(r.conversations)).catch(console.error);
   useEffect(() => { loadList(); }, []);
 
-  const open = async (id: string) => {
+  useEffect(() => {
+    if (!active) return;
+    api.getInboxThread(active, lang).then((r) => setMessages(r.messages)).catch(console.error);
+  }, [active, lang]);
+
+  const open = (id: string) => {
     setActive(id);
-    const r = await api.getInboxThread(id);
-    setMessages(r.messages);
   };
 
   const send = async (text: string) => {
     if (!active) return;
-    const res = await api.sendStaffChat(active, text);
+    const res = await api.sendStaffChat(active, text, lang);
     setMessages((prev) => [...prev, res.message]);
   };
 
