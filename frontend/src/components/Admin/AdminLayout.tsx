@@ -80,9 +80,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   return (
     <div className="min-h-screen app-shell flex flex-col lg:flex-row">
       {/* Desktop sidebar */}
-      <aside className="hidden lg:flex lg:flex-col lg:w-64 lg:shrink-0 bg-black border-e border-white/5">
+      <aside className="admin-sidebar hidden lg:flex lg:flex-col lg:w-64 lg:shrink-0 bg-black border-e border-white/5">
         <div className="p-6 border-b border-white/5">
-          <SiteLogo to="/admin" size="sm" />
+          <SiteLogo to="/admin" size="sm" surface="dark" />
           <div className="text-xs tracking-[0.3em] uppercase text-accent/60 mt-2">{t('admin.panel', lang)}</div>
         </div>
         <nav className="p-4 space-y-1 flex-1">
@@ -112,7 +112,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         {/* Mobile header with dropdown */}
         <header className="lg:hidden sticky top-0 z-50 bg-charcoal border-b border-white/5 safe-area-top">
           <div className="flex items-center justify-between px-4 py-3 gap-3">
-            <SiteLogo to="/admin" size="sm" />
+            <SiteLogo to="/admin" size="sm" surface="dark" />
             <div className="flex items-center gap-2">
               {!isStandalone() && deferredPrompt && (
                 <button onClick={installPwa} className="p-2 text-accent" aria-label="Install">

@@ -37,19 +37,19 @@ export default function SettingsPage() {
     <div>
       <div className="mb-8">
         <p className="label-luxury mb-1">Configuration</p>
-        <h1 className="font-display text-3xl text-white flex items-center gap-3">
+        <h1 className="font-display text-3xl text-fg flex items-center gap-3">
           <Settings className="w-7 h-7 text-accent" />
           {t('admin.settings', lang)}
         </h1>
       </div>
 
       {loading ? (
-        <div className="text-center py-16 text-white/30">Loading...</div>
+        <div className="text-center py-16 text-muted">Loading...</div>
       ) : (
         <form onSubmit={handleSave} className="card p-6 max-w-2xl">
           <div className="space-y-4">
             <label className="flex items-center justify-between card p-4">
-              <span className="text-white">{settings.restaurant_open === 'false' ? t('admin.closed', lang) : t('admin.open', lang)}</span>
+              <span className="text-fg">{settings.restaurant_open === 'false' ? t('admin.closed', lang) : t('admin.open', lang)}</span>
               <input
                 type="checkbox"
                 checked={settings.restaurant_open !== 'false'}
@@ -58,7 +58,7 @@ export default function SettingsPage() {
             </label>
             {fields.map((f) => (
               <div key={f.key}>
-                <label className="text-xs text-white/50 uppercase tracking-wider mb-1 block">{f.label}</label>
+                <label className="text-xs text-muted uppercase tracking-wider mb-1 block">{f.label}</label>
                 <input className="input-field" dir="ltr"
                   value={settings[f.key] || ''}
                   onChange={(e) => setSettings({ ...settings, [f.key]: e.target.value })} />

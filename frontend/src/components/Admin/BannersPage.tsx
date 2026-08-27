@@ -22,7 +22,7 @@ export default function BannersPage() {
 
   return (
     <div>
-      <h1 className="font-display text-3xl text-white mb-6">{t('admin.banners', lang)}</h1>
+      <h1 className="font-display text-3xl text-fg mb-6">{t('admin.banners', lang)}</h1>
       <form onSubmit={save} className="card p-5 grid grid-cols-1 md:grid-cols-2 gap-3 mb-6">
         <select className="input-field" value={form.kind} onChange={(e) => setForm({ ...form, kind: e.target.value })}>
           <option value="new_rolls">new_rolls</option>
@@ -37,7 +37,7 @@ export default function BannersPage() {
       <div className="space-y-2">
         {items.map((b) => (
           <div key={b.id} className="card p-4 flex justify-between">
-            <span className="text-white">{b.kind} — {b.title_ar}</span>
+            <span className="text-fg">{b.kind} — {b.title_ar}</span>
             <button className="text-danger text-sm" onClick={async () => { await api.deleteBanner(b.id); load(); }}>Delete</button>
           </div>
         ))}

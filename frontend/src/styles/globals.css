@@ -124,8 +124,23 @@ h1, h2, h3, h4 {
     0 0 0 1px rgba(224, 184, 74, 0.25);
 }
 
-html.dark .brand-mark-dark img {
-  mix-blend-mode: multiply;
+html.dark .logo-plate {
+  background: transparent;
+  border-radius: 0;
+  padding: 0;
+  box-shadow: none;
+}
+
+.admin-sidebar .sidebar-link {
+  color: rgba(246, 241, 232, 0.62);
+}
+
+.admin-sidebar .sidebar-link:hover {
+  color: #f6f1e8;
+}
+
+.admin-sidebar .sidebar-link.active {
+  color: var(--color-accent);
 }
 
 .glass-card {

@@ -15,7 +15,7 @@ export default function ZonesPage() {
 
   return (
     <div>
-      <h1 className="font-display text-3xl text-white mb-6">{t('admin.zones', lang)}</h1>
+      <h1 className="font-display text-3xl text-fg mb-6">{t('admin.zones', lang)}</h1>
       <form
         className="card p-5 flex flex-col md:flex-row gap-3 mb-6"
         onSubmit={async (e) => {
@@ -31,7 +31,7 @@ export default function ZonesPage() {
       </form>
       <div className="space-y-2">
         {items.map((z) => (
-          <div key={z.id} className="card p-4 flex justify-between text-white">
+          <div key={z.id} className="card p-4 flex justify-between text-fg">
             <span>{z.name}</span>
             <span className="text-accent">{z.delivery_fee} {t('currency', lang)}</span>
           </div>
