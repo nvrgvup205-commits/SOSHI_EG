@@ -23,11 +23,23 @@ jobs:
           cache-dependency-path: |
             package-lock.json
             frontend/package-lock.json
+            backend/package-lock.json
 
       - name: Install root tooling
         run: npm ci
 
-      - name: Deploy to Cloudflare Workers
+      - name: Install backend deps
+        run: cd backend && npm ci
+
+      - name: Deploy backend API (soshi-eg-api)
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          workingDirectory: backend
+          command: deploy
+
+      - name: Deploy frontend (soshi-eg)
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
