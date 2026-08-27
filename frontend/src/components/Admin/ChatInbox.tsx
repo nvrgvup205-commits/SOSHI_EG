@@ -28,7 +28,7 @@ export default function ChatInbox() {
 
   return (
     <div>
-      <h1 className="font-display text-3xl text-white mb-6">{t('admin.chat', lang)}</h1>
+      <h1 className="font-display text-3xl text-fg mb-6">{t('admin.chat', lang)}</h1>
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         <div className="space-y-2">
           {list.map((c) => (
@@ -38,8 +38,8 @@ export default function ChatInbox() {
               onClick={() => open(c.id)}
               className={`w-full card p-4 text-start ${active === c.id ? 'border-accent' : ''}`}
             >
-              <div className="text-white">{c.customers?.full_name || 'Customer'}</div>
-              <div className="text-white/40 text-xs">{c.kind}{c.orders?.order_number ? ` #${c.orders.order_number}` : ''}</div>
+              <div className="text-fg">{c.customers?.full_name || 'Customer'}</div>
+              <div className="text-muted text-xs">{c.kind}{c.orders?.order_number ? ` #${c.orders.order_number}` : ''}</div>
             </button>
           ))}
         </div>
@@ -47,7 +47,7 @@ export default function ChatInbox() {
           {active ? (
             <ChatThread messages={messages} viewer="staff" onSend={send} />
           ) : (
-            <div className="card p-12 text-center text-white/30">{t('staff.chat', lang)}</div>
+            <div className="card p-12 text-center text-muted">{t('staff.chat', lang)}</div>
           )}
         </div>
       </div>

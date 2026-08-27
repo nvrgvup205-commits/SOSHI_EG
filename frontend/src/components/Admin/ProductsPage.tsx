@@ -118,7 +118,7 @@ export default function ProductsPage() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <div>
           <p className="label-luxury mb-1">Management</p>
-          <h1 className="font-display text-2xl sm:text-3xl text-white flex items-center gap-3">
+          <h1 className="font-display text-2xl sm:text-3xl text-fg flex items-center gap-3">
             <Package className="w-6 h-6 sm:w-7 sm:h-7 text-accent" />
             {t('admin.products', lang)}
           </h1>
@@ -130,28 +130,28 @@ export default function ProductsPage() {
 
       {showForm && (
         <div className="card p-6 mb-8">
-          <h2 className="font-display text-xl text-white mb-6">
+          <h2 className="font-display text-xl text-fg mb-6">
             {editing ? 'Edit Product' : 'New Product'}
           </h2>
           <form onSubmit={handleSave} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {(['name_ar', 'name_en', 'name_ru'] as const).map((f) => (
               <div key={f}>
-                <label className="text-xs text-white/50 uppercase tracking-wider mb-1 block">{f.replace('name_', '')}</label>
+                <label className="text-xs text-muted uppercase tracking-wider mb-1 block">{f.replace('name_', '')}</label>
                 <input className="input-field" required value={form[f]} onChange={(e) => setForm({ ...form, [f]: e.target.value })} />
               </div>
             ))}
             {(['description_ar', 'description_en', 'description_ru'] as const).map((f) => (
               <div key={f}>
-                <label className="text-xs text-white/50 uppercase tracking-wider mb-1 block">{f.replace('description_', '')} desc</label>
+                <label className="text-xs text-muted uppercase tracking-wider mb-1 block">{f.replace('description_', '')} desc</label>
                 <input className="input-field" value={form[f]} onChange={(e) => setForm({ ...form, [f]: e.target.value })} />
               </div>
             ))}
             <div>
-              <label className="text-xs text-white/50 uppercase tracking-wider mb-1 block">Price (EGP)</label>
+              <label className="text-xs text-muted uppercase tracking-wider mb-1 block">Price (EGP)</label>
               <input className="input-field" type="number" step="0.01" required value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} />
             </div>
             <div>
-              <label className="text-xs text-white/50 uppercase tracking-wider mb-1 block">Category</label>
+              <label className="text-xs text-muted uppercase tracking-wider mb-1 block">Category</label>
               <select className="input-field" value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })}>
                 <option value="nigiri">Nigiri</option>
                 <option value="rolls">Rolls</option>
@@ -159,31 +159,31 @@ export default function ProductsPage() {
               </select>
             </div>
             <div>
-              <label className="text-xs text-white/50 uppercase tracking-wider mb-1 block">Sort Order</label>
+              <label className="text-xs text-muted uppercase tracking-wider mb-1 block">Sort Order</label>
               <input className="input-field" type="number" value={form.sort_order} onChange={(e) => setForm({ ...form, sort_order: Number(e.target.value) })} />
             </div>
             <div>
-              <label className="text-xs text-white/50 uppercase tracking-wider mb-1 block">Video URL</label>
+              <label className="text-xs text-muted uppercase tracking-wider mb-1 block">Video URL</label>
               <input className="input-field" dir="ltr" value={form.video_url} onChange={(e) => setForm({ ...form, video_url: e.target.value })} />
             </div>
             <div className="flex items-center gap-3 pt-6">
               <input type="checkbox" id="avail" checked={form.is_available} onChange={(e) => setForm({ ...form, is_available: e.target.checked })} />
-              <label htmlFor="avail" className="text-white/70 text-sm">Available</label>
+              <label htmlFor="avail" className="text-fg/70 text-sm">Available</label>
             </div>
             <div className="flex items-center gap-3 pt-6">
               <input type="checkbox" id="isnew" checked={form.is_new} onChange={(e) => setForm({ ...form, is_new: e.target.checked })} />
-              <label htmlFor="isnew" className="text-white/70 text-sm">New</label>
+              <label htmlFor="isnew" className="text-fg/70 text-sm">New</label>
             </div>
             <div className="flex items-center gap-3 pt-6">
               <input type="checkbox" id="popular" checked={form.is_popular} onChange={(e) => setForm({ ...form, is_popular: e.target.checked })} />
-              <label htmlFor="popular" className="text-white/70 text-sm">Popular</label>
+              <label htmlFor="popular" className="text-fg/70 text-sm">Popular</label>
             </div>
             <div className="flex items-center gap-3 pt-6">
               <input type="checkbox" id="offer" checked={form.is_offer} onChange={(e) => setForm({ ...form, is_offer: e.target.checked })} />
-              <label htmlFor="offer" className="text-white/70 text-sm">Offer</label>
+              <label htmlFor="offer" className="text-fg/70 text-sm">Offer</label>
             </div>
             <div className="col-span-full">
-              <label className="text-xs text-white/50 uppercase tracking-wider mb-2 block">Product image</label>
+              <label className="text-xs text-muted uppercase tracking-wider mb-2 block">Product image</label>
               <div className="flex flex-wrap items-center gap-4">
                 <label className="btn-luxury text-xs cursor-pointer inline-flex items-center gap-2">
                   <ImagePlus className="w-4 h-4" />
@@ -201,7 +201,7 @@ export default function ProductsPage() {
                 {imagePreview && (
                   <img src={imagePreview} alt="" className="h-16 w-16 rounded object-cover border border-white/10" />
                 )}
-                <p className="text-white/40 text-xs">Compressed automatically — same upload button</p>
+                <p className="text-muted text-xs">Compressed automatically — same upload button</p>
               </div>
             </div>
             {error && <p className="text-danger text-sm col-span-full">{error}</p>}
@@ -214,7 +214,7 @@ export default function ProductsPage() {
       )}
 
       {loading ? (
-        <div className="text-center py-16 text-white/30">Loading...</div>
+        <div className="text-center py-16 text-muted">Loading...</div>
       ) : (
         <>
           {/* Mobile cards */}
@@ -229,14 +229,14 @@ export default function ProductsPage() {
                       <div className="h-12 w-12 rounded bg-white/5 flex items-center justify-center text-lg shrink-0">🍣</div>
                     )}
                     <div className="min-w-0">
-                      <div className="text-white font-medium truncate">{p.name_ar}</div>
-                      <div className="text-white/40 text-xs capitalize mt-0.5">{p.category}</div>
+                      <div className="text-fg font-medium truncate">{p.name_ar}</div>
+                      <div className="text-muted text-xs capitalize mt-0.5">{p.category}</div>
                       <div className="text-accent font-display text-lg mt-2">{p.price} EGP</div>
                     </div>
                   </div>
                   <div className="flex flex-col items-end gap-2 shrink-0">
                     <button onClick={() => toggleAvailable(p)}
-                      className={`text-[10px] px-2 py-0.5 border ${p.is_available ? 'border-success/50 text-success' : 'border-white/20 text-white/40'}`}>
+                      className={`text-[10px] px-2 py-0.5 border ${p.is_available ? 'border-success/50 text-success' : 'border-white/20 text-muted'}`}>
                       {p.is_available ? 'Active' : 'Hidden'}
                     </button>
                     <div className="flex gap-2">
@@ -253,7 +253,7 @@ export default function ProductsPage() {
           <div className="card overflow-hidden hidden lg:block">
             <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-white/5 text-white/40 text-xs uppercase tracking-wider">
+              <tr className="border-b border-white/5 text-muted text-xs uppercase tracking-wider">
                 <th className="text-start p-4">Image</th>
                 <th className="text-start p-4">Name (AR)</th>
                 <th className="text-start p-4">Category</th>
@@ -269,21 +269,21 @@ export default function ProductsPage() {
                     {pickProductThumbnail(p) ? (
                       <img src={pickProductThumbnail(p)!} alt="" className="h-10 w-10 rounded object-cover" />
                     ) : (
-                      <span className="text-white/30">—</span>
+                      <span className="text-muted">—</span>
                     )}
                   </td>
-                  <td className="p-4 text-white">{p.name_ar}</td>
-                  <td className="p-4 text-white/50 capitalize">{p.category}</td>
+                  <td className="p-4 text-fg">{p.name_ar}</td>
+                  <td className="p-4 text-muted capitalize">{p.category}</td>
                   <td className="p-4 text-accent font-display text-lg">{p.price} EGP</td>
                   <td className="p-4">
                     <button onClick={() => toggleAvailable(p)}
-                      className={`text-xs px-3 py-1 border ${p.is_available ? 'border-success/50 text-success' : 'border-white/20 text-white/40'}`}>
+                      className={`text-xs px-3 py-1 border ${p.is_available ? 'border-success/50 text-success' : 'border-white/20 text-muted'}`}>
                       {p.is_available ? 'Active' : 'Hidden'}
                     </button>
                   </td>
                   <td className="p-4">
                     <div className="flex gap-2">
-                      <button onClick={() => openEdit(p)} className="text-accent hover:text-white transition-colors"><Pencil className="w-4 h-4" /></button>
+                      <button onClick={() => openEdit(p)} className="text-accent hover:text-fg transition-colors"><Pencil className="w-4 h-4" /></button>
                       <button onClick={() => handleDelete(p.id)} className="text-danger/70 hover:text-danger transition-colors"><Trash2 className="w-4 h-4" /></button>
                     </div>
                   </td>

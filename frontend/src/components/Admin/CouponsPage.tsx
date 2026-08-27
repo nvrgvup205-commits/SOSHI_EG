@@ -16,7 +16,7 @@ export default function CouponsPage() {
 
   return (
     <div>
-      <h1 className="font-display text-3xl text-white mb-6">{t('admin.coupons', lang)}</h1>
+      <h1 className="font-display text-3xl text-fg mb-6">{t('admin.coupons', lang)}</h1>
       <form
         className="card p-5 grid grid-cols-1 md:grid-cols-4 gap-3 mb-6"
         onSubmit={async (e) => {
@@ -36,7 +36,7 @@ export default function CouponsPage() {
       </form>
       <div className="space-y-2">
         {items.map((c) => (
-          <div key={c.id} className="card p-4 flex justify-between text-white">
+          <div key={c.id} className="card p-4 flex justify-between text-fg">
             <span>{c.code} — {c.discount}{c.type === 'percent' ? '%' : ` ${t('currency', lang)}`}</span>
             <button className="text-danger text-sm" onClick={async () => { await api.deleteCoupon(c.id); load(); }}>Delete</button>
           </div>
