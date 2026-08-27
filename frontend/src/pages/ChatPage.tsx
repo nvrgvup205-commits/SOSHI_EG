@@ -11,11 +11,11 @@ export default function ChatPage() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
 
   useEffect(() => {
-    api.getChat().then((r) => setMessages(r.messages)).catch(console.error);
-  }, []);
+    api.getChat(undefined, lang).then((r) => setMessages(r.messages)).catch(console.error);
+  }, [lang]);
 
   const send = async (text: string) => {
-    const res = await api.sendChat(text);
+    const res = await api.sendChat(text, undefined, lang);
     setMessages((prev) => [...prev, res.message]);
   };
 

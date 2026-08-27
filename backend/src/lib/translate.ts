@@ -1,30 +1,163 @@
-const LANG: Record<string, string> = { ar: 'ar', en: 'en', ru: 'ru' };
+import type { Ai } from '@cloudflare/workers-types';
 
-export async function translateText(
-  text: string,
-  from: string,
-  to: string,
-): Promise<string | null> {
-  const src = LANG[from] || from;
-  const dst = LANG[to] || to;
+export const LANG_CODES = ['ar', 'en', 'ru'] as const;
+export type LangCode = (typeof LANG_CODES)[number];
+
+const M2M100: Record<LangCode, string> = {
+  ar: 'arabic',
+  en: 'english',
+  ru: 'russian',
+};
+
+const LANG_NAMES: Record<LangCode, string> = {
+  ar: 'Arabic',
+  en: 'English',
+  ru: 'Russian',
+};
+
+const LLM_MODEL = '@cf/meta/llama-3.1-8b-instruct';
+const M2M_MODEL = '@cf/meta/m2m100-1.2b';
+
+export function normalizeLang(code: string | null | undefined): LangCode {
+  const c = (code || 'ar').toLowerCase().slice(0, 2);
+  if (c === 'en' || c === 'ru') return c;
+  return 'ar';
+}
+
+/** Detect message language from script — handles mixed Egyptian dialect in Arabic script. */
+export function detectMessageLanguage(text: string): LangCode {
   const trimmed = text.trim();
-  if (!trimmed) return null;
-  if (src === dst) return trimmed;
+  if (!trimmed) return 'ar';
+  const arabic = (trimmed.match(/[\u0600-\u06FF]/g) || []).length;
+  const cyrillic = (trimmed.match(/[\u0400-\u04FF]/g) || []).length;
+  const latin = (trimmed.match(/[A-Za-z]/g) || []).length;
+  if (arabic >= cyrillic && arabic >= latin && arabic > 0) return 'ar';
+  if (cyrillic > latin && cyrillic > 0) return 'ru';
+  if (latin > 0) return 'en';
+  return 'ar';
+}
 
+function extractTranslation(result: unknown): string | null {
+  if (!result) return null;
+  if (typeof result === 'string') {
+    const trimmed = result.trim();
+    return trimmed || null;
+  }
+  if (typeof result === 'object') {
+    const record = result as Record<string, unknown>;
+    const candidate = record.translated_text ?? record.translation ?? record.response ?? record.text;
+    if (typeof candidate === 'string') {
+      const trimmed = candidate.trim();
+      return trimmed || null;
+    }
+  }
+  return null;
+}
+
+function isUsefulTranslation(source: string, translated: string | null): translated is string {
+  if (!translated) return false;
+  const a = source.trim().toLowerCase();
+  const b = translated.trim().toLowerCase();
+  return Boolean(b) && a !== b;
+}
+
+async function translateWithLLM(
+  ai: Ai,
+  text: string,
+  from: LangCode,
+  to: LangCode,
+): Promise<string | null> {
   try {
-    const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(trimmed.slice(0, 500))}&langpair=${src}|${dst}`;
-    const res = await fetch(url);
-    if (!res.ok) return null;
-    const data = (await res.json()) as { responseData?: { translatedText?: string } };
-    const translated = data.responseData?.translatedText?.trim();
-    if (!translated || translated.toLowerCase() === trimmed.toLowerCase()) return null;
-    return translated;
+    const result = await ai.run(LLM_MODEL, {
+      messages: [
+        {
+          role: 'system',
+          content:
+            `You translate restaurant chat messages from ${LANG_NAMES[from]} to ${LANG_NAMES[to]}. ` +
+            'Handle Egyptian Arabic dialect (عامية مصرية), slang, typos, and mixed language naturally. ' +
+            'Return ONLY the translation with no quotes, labels, or explanation.',
+        },
+        { role: 'user', content: text.slice(0, 2000) },
+      ],
+      max_tokens: 512,
+    });
+    const translated = extractTranslation(result);
+    return isUsefulTranslation(text, translated) ? translated : null;
   } catch {
     return null;
   }
 }
 
-export function otherLanguage(senderLang: string, customerLang: string, senderType: string): string {
-  if (senderType === 'staff') return customerLang || 'ar';
-  return 'ar';
+async function translateWithM2M100(
+  ai: Ai,
+  text: string,
+  from: LangCode,
+  to: LangCode,
+): Promise<string | null> {
+  try {
+    const result = await ai.run(M2M_MODEL, {
+      text: text.slice(0, 2000),
+      source_lang: M2M100[from],
+      target_lang: M2M100[to],
+    });
+    const translated = extractTranslation(result);
+    return isUsefulTranslation(text, translated) ? translated : null;
+  } catch {
+    return null;
+  }
+}
+
+export async function translateText(
+  ai: Ai | undefined,
+  text: string,
+  from: string,
+  to: string,
+): Promise<string | null> {
+  const src = normalizeLang(from);
+  const dst = normalizeLang(to);
+  const trimmed = text.trim();
+  if (!trimmed || src === dst) return null;
+  if (!ai) return null;
+
+  const llm = await translateWithLLM(ai, trimmed, src, dst);
+  if (llm) return llm;
+  return translateWithM2M100(ai, trimmed, src, dst);
+}
+
+export type ChatMessageRow = {
+  id: string;
+  sender_type: string;
+  message: string;
+  language?: string | null;
+  translated_message?: string | null;
+  is_translated?: boolean;
+  [key: string]: unknown;
+};
+
+export async function localizeMessages(
+  ai: Ai | undefined,
+  messages: ChatMessageRow[],
+  viewer: 'customer' | 'staff',
+  viewerLang: LangCode,
+): Promise<ChatMessageRow[]> {
+  return Promise.all(
+    messages.map(async (msg) => {
+      const isOwn = viewer === 'staff' ? msg.sender_type === 'staff' : msg.sender_type === 'customer';
+      if (isOwn) {
+        return { ...msg, translated_message: null, is_translated: false };
+      }
+
+      const messageLang = normalizeLang(msg.language || detectMessageLanguage(msg.message));
+      if (messageLang === viewerLang) {
+        return { ...msg, translated_message: null, is_translated: false };
+      }
+
+      const translated = await translateText(ai, msg.message, messageLang, viewerLang);
+      return {
+        ...msg,
+        translated_message: translated,
+        is_translated: Boolean(translated),
+      };
+    }),
+  );
 }

@@ -206,15 +206,18 @@ class ApiClient {
     });
   }
 
-  getChat(orderId?: string) {
-    const q = orderId ? `?order_id=${orderId}` : '';
-    return this.request<{ conversation: Conversation; messages: ChatMessage[] }>(`/api/chat${q}`);
+  getChat(orderId?: string, lang?: string) {
+    const q = new URLSearchParams();
+    if (orderId) q.set('order_id', orderId);
+    if (lang) q.set('lang', lang);
+    const query = q.toString();
+    return this.request<{ conversation: Conversation; messages: ChatMessage[] }>(`/api/chat${query ? `?${query}` : ''}`);
   }
 
-  sendChat(message: string, orderId?: string) {
+  sendChat(message: string, orderId?: string, lang?: string) {
     return this.request<{ message: ChatMessage }>('/api/chat/messages', {
       method: 'POST',
-      body: JSON.stringify({ message, order_id: orderId }),
+      body: JSON.stringify({ message, order_id: orderId, lang }),
     });
   }
 
@@ -222,14 +225,15 @@ class ApiClient {
     return this.request<{ conversations: Conversation[] }>('/api/chat/inbox');
   }
 
-  getInboxThread(id: string) {
-    return this.request<{ conversation: Conversation; messages: ChatMessage[] }>(`/api/chat/inbox/${id}`);
+  getInboxThread(id: string, lang?: string) {
+    const q = lang ? `?lang=${encodeURIComponent(lang)}` : '';
+    return this.request<{ conversation: Conversation; messages: ChatMessage[] }>(`/api/chat/inbox/${id}${q}`);
   }
 
-  sendStaffChat(id: string, message: string) {
+  sendStaffChat(id: string, message: string, lang?: string) {
     return this.request<{ message: ChatMessage }>(`/api/chat/inbox/${id}/messages`, {
       method: 'POST',
-      body: JSON.stringify({ message }),
+      body: JSON.stringify({ message, lang }),
     });
   }
 

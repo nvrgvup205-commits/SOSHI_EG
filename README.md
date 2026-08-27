@@ -104,7 +104,7 @@ Light/dark theme toggle is available on every customer screen.
 - Customer: username `1111` / password `1111`
 - Admin: username `1111` / password `1111` at `/admin/login`
 
-Checkout is cash on delivery. Chat translates between Arabic (staff) and the customer language.
+Checkout is cash on delivery. Chat auto-translates messages to each viewer's UI language using Cloudflare Workers AI (handles Egyptian dialect).
 
 ## API Endpoints
 
