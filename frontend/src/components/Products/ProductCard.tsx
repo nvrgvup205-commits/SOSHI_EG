@@ -18,7 +18,7 @@ export default function ProductCard({ product, lang, delay = 0, onOpen }: Props)
     <button
       type="button"
       onClick={() => onOpen(product)}
-      className="group card overflow-hidden animate-fade-up text-start w-full"
+      className="group glass-card overflow-hidden animate-fade-up text-start w-full"
       style={{ animationDelay: `${delay}s` }}
     >
       <div className="relative aspect-[4/3] bg-gradient-to-br from-secondary/30 to-primary/10 flex items-center justify-center overflow-hidden">
@@ -36,13 +36,13 @@ export default function ProductCard({ product, lang, delay = 0, onOpen }: Props)
         )}
       </div>
       <div className="p-6">
-        <h3 className="font-display text-2xl text-white mb-2">{name}</h3>
-        {desc && <p className="text-white/40 text-sm mb-4 line-clamp-2 font-light">{desc}</p>}
-        <div className="flex items-center justify-between pt-4 border-t border-white/5">
+        <h3 className="font-display text-2xl text-fg mb-2">{name}</h3>
+        {desc && <p className="text-muted text-sm mb-4 line-clamp-2 font-light">{desc}</p>}
+        <div className="flex items-center justify-between pt-4 border-t border-[var(--app-line)]">
           <span className="text-accent font-display text-2xl">
             {product.price} <span className="text-sm">{t('currency', lang)}</span>
           </span>
-          <span className="text-xs uppercase tracking-[0.15em] text-white/70 group-hover:text-accent">
+          <span className="text-xs uppercase tracking-[0.15em] text-muted group-hover:text-accent">
             {t('btn.add_to_cart', lang)}
           </span>
         </div>

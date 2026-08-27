@@ -51,13 +51,4 @@ export function isValidPhone(phone: string): boolean {
   return /^\+[1-9]\d{7,14}$/.test(normalized);
 }
 
-export function jsonResponse(data: unknown, status = 200): Response {
-  return new Response(JSON.stringify(data), {
-    status,
-    headers: { 'Content-Type': 'application/json' },
-  });
-}
-
-export function errorResponse(message: string, status = 400): Response {
-  return jsonResponse({ error: message }, status);
-}
+export { errorResponse, jsonResponse } from './http';

@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
-import Header from '../components/Shared/Header';
-import Footer from '../components/Shared/Footer';
+import CustomerShell from '../components/Shared/CustomerShell';
 import ChatThread from '../components/Chat/ChatThread';
 import { api } from '../utils/api';
 import { useLanguage } from '../hooks/useLanguage';
@@ -21,13 +20,11 @@ export default function ChatPage() {
   };
 
   return (
-    <div className="min-h-screen bg-black pb-24">
-      <Header />
+    <CustomerShell>
       <div className="max-w-3xl mx-auto px-6 py-16 pt-24">
-        <h1 className="font-display text-4xl text-white mb-6">{t('chat.title', lang)}</h1>
+        <h1 className="font-display text-4xl text-fg mb-6">{t('chat.title', lang)}</h1>
         <ChatThread messages={messages} viewer="customer" onSend={send} />
       </div>
-      <Footer />
-    </div>
+    </CustomerShell>
   );
 }

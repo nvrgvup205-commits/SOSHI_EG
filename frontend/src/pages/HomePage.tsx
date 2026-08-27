@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
-import Header from '../components/Shared/Header';
-import Footer from '../components/Shared/Footer';
+import CustomerShell from '../components/Shared/CustomerShell';
 import ProductCard from '../components/Products/ProductCard';
 import ProductModal from '../components/Products/ProductModal';
+import SushiStage from '../components/Shared/SushiStageLazy';
+import BrandMark from '../components/Shared/BrandMark';
 import { useLanguage } from '../hooks/useLanguage';
 import { api } from '../utils/api';
 import { t } from '../utils/i18n';
@@ -84,20 +85,34 @@ export default function HomePage() {
   );
 
   return (
-    <div className="min-h-screen bg-black pb-24">
-      <Header />
+    <CustomerShell>
+      <section className="relative min-h-[78vh] overflow-hidden pt-20">
+        <SushiStage />
+        <div className="splash-veil" />
+        <div className="relative z-10 max-w-7xl mx-auto px-6 py-16 grid lg:grid-cols-2 gap-10 items-center">
+          <div>
+            <div className="logo-plate w-max mb-8">
+              <BrandMark size="lg" />
+            </div>
+            <p className="label-luxury mb-3">{t('home.featured', lang)}</p>
+            <h1 className="font-display text-5xl sm:text-7xl text-fg max-w-xl">{t('hero.title', lang)}</h1>
+            <p className="text-muted text-lg mt-4 max-w-md">{t('hero.subtitle', lang)}</p>
+            <a href="#menu" className="btn-luxury-filled mt-8 inline-flex">{t('btn.order_now', lang)}</a>
+          </div>
+        </div>
+      </section>
 
       {!open && (
-        <div className="pt-20 px-6">
-          <div className="max-w-3xl mx-auto mt-4 card p-4 text-center text-warning">
+        <div className="px-6">
+          <div className="max-w-3xl mx-auto card p-4 text-center text-warning">
             {t('checkout.closed', lang)}
           </div>
         </div>
       )}
 
       {banners.length > 0 && (
-        <section className={`${open ? 'pt-20' : 'pt-4'} px-4`}>
-          <div className="max-w-7xl mx-auto relative overflow-hidden">
+        <section className="px-4 pt-4">
+          <div className="max-w-7xl mx-auto relative overflow-hidden rounded-3xl">
             <div className="flex transition-transform duration-700" style={{ transform: `translateX(-${slide * 100}%)` }} dir="ltr">
               {banners.map((b) => {
                 const product = products.find((p) => p.id === b.product_id);
@@ -105,13 +120,13 @@ export default function HomePage() {
                   <button
                     key={b.id}
                     type="button"
-                    className="min-w-full relative aspect-[16/7] sm:aspect-[21/8] overflow-hidden border border-white/10"
+                    className="min-w-full relative aspect-[16/7] sm:aspect-[21/8] overflow-hidden border border-[var(--app-line)]"
                     onClick={() => product && setSelected(product)}
                   >
                     {b.image_url && (
                       <img src={b.image_url} alt="" className="absolute inset-0 w-full h-full object-cover" />
                     )}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
                     <div className="absolute bottom-0 start-0 p-6 text-start">
                       <p className="label-luxury mb-2">{t(`banner.${b.kind}`, lang)}</p>
                       <h2 className="font-display text-3xl sm:text-5xl text-white">{bannerTitle(b, lang)}</h2>
@@ -127,7 +142,7 @@ export default function HomePage() {
                   key={b.id}
                   type="button"
                   onClick={() => setSlide(i)}
-                  className={`h-1.5 rounded-full ${i === slide ? 'w-8 bg-accent' : 'w-3 bg-white/20'}`}
+                  className={`h-1.5 rounded-full ${i === slide ? 'w-8 bg-accent' : 'w-3 bg-muted'}`}
                 />
               ))}
             </div>
@@ -135,22 +150,22 @@ export default function HomePage() {
         </section>
       )}
 
-      <section id="menu" className="py-16 bg-black">
+      <section id="menu" className="py-16">
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-12">
-            <p className="label-luxury mb-3">Menu</p>
-            <h2 className="text-4xl md:text-5xl text-white">{t('nav.products', lang)}</h2>
+            <p className="label-luxury mb-3">{t('home.menu_label', lang)}</p>
+            <h2 className="text-4xl md:text-5xl text-fg">{t('nav.products', lang)}</h2>
             <div className="divider-gold mt-6" />
           </div>
 
           {loading ? (
-            <div className="text-center py-20 text-white/30 tracking-widest uppercase text-sm">Loading...</div>
+            <div className="text-center py-20 text-muted tracking-widest uppercase text-sm">{t('error.loading', lang)}</div>
           ) : (
             <div className="space-y-20">
               {grouped.map((group) => (
                 <div key={group.category.id} id={group.category.slug}>
                   <div className="flex items-end justify-between mb-8">
-                    <h3 className="font-display text-3xl text-white">{categoryName(group.category, lang)}</h3>
+                    <h3 className="font-display text-3xl text-fg">{categoryName(group.category, lang)}</h3>
                     <div className="divider-gold !mx-0 w-24" />
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -173,7 +188,6 @@ export default function HomePage() {
       </section>
 
       {selected && <ProductModal product={selected} addons={addons} onClose={() => setSelected(null)} />}
-      <Footer />
-    </div>
+    </CustomerShell>
   );
 }

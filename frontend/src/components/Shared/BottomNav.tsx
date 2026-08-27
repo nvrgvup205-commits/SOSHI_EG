@@ -23,7 +23,7 @@ export default function BottomNav() {
   if (location.pathname.startsWith('/admin') || location.pathname.startsWith('/staff')) return null;
 
   return (
-    <nav className="fixed bottom-0 inset-x-0 z-40 bg-black/95 border-t border-white/10 pb-[env(safe-area-inset-bottom)] md:hidden">
+    <nav className="app-bottom-nav md:hidden">
       <div className="grid grid-cols-5">
         {items.map((item) => {
           const active = item.to === '/'
@@ -34,7 +34,7 @@ export default function BottomNav() {
               key={item.to}
               to={item.to}
               className={`relative flex flex-col items-center gap-1 py-3 text-[10px] uppercase tracking-wider ${
-                active ? 'text-accent' : 'text-white/45'
+                active ? 'text-accent' : 'text-muted'
               }`}
             >
               <item.icon className="w-5 h-5" />

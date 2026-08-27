@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import Header from '../components/Shared/Header';
-import Footer from '../components/Shared/Footer';
+import CustomerShell from '../components/Shared/CustomerShell';
 import ChatThread from '../components/Chat/ChatThread';
 import { api } from '../utils/api';
 import { useLanguage } from '../hooks/useLanguage';
@@ -31,30 +30,29 @@ export default function OrderTrackingPage() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-black pt-24 px-6 text-danger">{error}</div>
+      <div className="min-h-screen app-shell pt-24 px-6 text-danger">{error}</div>
     );
   }
 
   if (!order) {
-    return <div className="min-h-screen bg-black pt-24 text-white/40 text-center">Loading...</div>;
+    return <div className="min-h-screen app-shell pt-24 text-muted text-center">{t('error.loading', lang)}</div>;
   }
 
   const idx = Math.max(0, steps.indexOf(order.status));
 
   return (
-    <div className="min-h-screen bg-black pb-24">
-      <Header />
+    <CustomerShell>
       <div className="max-w-3xl mx-auto px-6 py-16 pt-24 space-y-8">
         <div>
           <p className="label-luxury mb-2">{t('track.title', lang)}</p>
-          <h1 className="font-display text-4xl text-white">#{order.order_number}</h1>
-          <p className="text-white/40 mt-2">{formatDate(order.created_at, lang)}</p>
+          <h1 className="font-display text-4xl text-fg">#{order.order_number}</h1>
+          <p className="text-muted mt-2">{formatDate(order.created_at, lang)}</p>
         </div>
 
         <div className="grid grid-cols-4 gap-2">
           {steps.map((s, i) => (
             <div key={s} className={`text-center py-3 border text-[10px] uppercase tracking-wider ${
-              i <= idx ? 'border-accent text-accent bg-accent/10' : 'border-white/10 text-white/30'
+              i <= idx ? 'border-accent text-accent bg-accent/10' : 'border-[var(--app-line)] text-muted'
             }`}>
               {t(`status.${s}`, lang)}
             </div>
@@ -63,25 +61,24 @@ export default function OrderTrackingPage() {
 
         <div className="card p-5 space-y-2">
           {(order.order_items || []).map((item) => (
-            <div key={item.id} className="flex justify-between text-white/80">
+            <div key={item.id} className="flex justify-between text-muted">
               <span>{item.quantity}× {item.product_name}{item.notes ? ` (${item.notes})` : ''}</span>
               <span className="text-accent">{item.price_at_order}</span>
             </div>
           ))}
-          <div className="flex justify-between text-white font-display text-xl pt-3 border-t border-white/10">
+          <div className="flex justify-between text-fg font-display text-xl pt-3 border-t border-[var(--app-line)]">
             <span>{t('cart.total', lang)}</span>
             <span className="text-accent">{order.total_price} {t('currency', lang)}</span>
           </div>
-          <p className="text-white/50 text-sm">{t('checkout.cash', lang)}</p>
-          {order.delivery_address && <p className="text-white/50 text-sm">{order.delivery_address}</p>}
+          <p className="text-muted text-sm">{t('checkout.cash', lang)}</p>
+          {order.delivery_address && <p className="text-muted text-sm">{order.delivery_address}</p>}
         </div>
 
         <div>
-          <h2 className="font-display text-2xl text-white mb-4">{t('orders.chat', lang)}</h2>
+          <h2 className="font-display text-2xl text-fg mb-4">{t('orders.chat', lang)}</h2>
           <ChatThread messages={messages} viewer="customer" onSend={send} />
         </div>
       </div>
-      <Footer />
-    </div>
+    </CustomerShell>
   );
 }

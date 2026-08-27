@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import BrandName from './BrandName';
+import BrandMark from './BrandMark';
 
 interface Props {
   to?: string;
@@ -8,10 +8,8 @@ interface Props {
 }
 
 export default function SiteLogo({ to = '/', size = 'sm', className = '' }: Props) {
-  const mark = <BrandName size={size} className={className} />;
-
+  const mark = <BrandMark size={size} className={className} />;
   if (!to) return mark;
-
   return (
     <Link to={to} className="block shrink-0" aria-label="Sushi Shop Egypt">
       {mark}

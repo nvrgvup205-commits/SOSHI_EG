@@ -53,7 +53,7 @@ export default function ProductModal({
 
   return (
     <div className="fixed inset-0 z-[70] bg-black/80 flex items-end sm:items-center justify-center p-0 sm:p-6" onClick={onClose}>
-      <div className="bg-charcoal w-full max-w-2xl max-h-[92vh] overflow-y-auto border border-white/10" onClick={(e) => e.stopPropagation()}>
+      <div className="glass-card w-full max-w-2xl max-h-[92vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
         <div className="relative">
           {yt ? (
             <iframe
@@ -76,8 +76,8 @@ export default function ProductModal({
         </div>
         <div className="p-6 space-y-5">
           <div>
-            <h2 className="font-display text-3xl text-white">{name}</h2>
-            {desc && <p className="text-white/50 mt-2">{desc}</p>}
+            <h2 className="font-display text-3xl text-fg">{name}</h2>
+            {desc && <p className="text-muted mt-2">{desc}</p>}
             <p className="text-accent font-display text-2xl mt-3">
               {Number(full.price) + extras} {t('currency', lang)}
             </p>
@@ -99,7 +99,7 @@ export default function ProductModal({
                           )
                         }
                       />
-                      <span className="text-white">{localizedName(addon, lang)}</span>
+                      <span className="text-fg">{localizedName(addon, lang)}</span>
                     </span>
                     <span className="text-accent">+{addon.price} {t('currency', lang)}</span>
                   </label>

@@ -96,8 +96,14 @@ If this returns `404`, redeploy the backend (see Deployment below).
 
 ## Customer Login (Current)
 
-First visit: language picker with flags (🇪🇬 Arabic / 🇬🇧 English / 🇷🇺 Russian).
-Then login (existing phone + Gmail) or register (name + phone + Gmail + address).
+First visit: animated logo splash, then language picker (🇪🇬 Arabic / 🇬🇧 English / 🇷🇺 Russian), then login or register.
+Light/dark theme toggle is available on every customer screen.
+
+**Temporary demo accounts (no email required):**
+
+- Customer: username `1111` / password `1111`
+- Admin: username `1111` / password `1111` at `/admin/login`
+
 Checkout is cash on delivery. Chat translates between Arabic (staff) and the customer language.
 
 ## API Endpoints

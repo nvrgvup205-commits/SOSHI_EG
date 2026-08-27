@@ -1,7 +1,6 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { Minus, Plus, Trash2 } from 'lucide-react';
-import Header from '../components/Shared/Header';
-import Footer from '../components/Shared/Footer';
+import CustomerShell from '../components/Shared/CustomerShell';
 import { useCart } from '../hooks/useCart';
 import { useLanguage } from '../hooks/useLanguage';
 import { t, getProductName, localizedName } from '../utils/i18n';
@@ -13,17 +12,16 @@ export default function CartPage() {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen flex flex-col bg-black pb-24">
-      <Header />
+    <CustomerShell>
       <div className="max-w-3xl mx-auto px-6 py-16 flex-1 w-full pt-24">
         <p className="label-luxury mb-2">Your Order</p>
-        <h1 className="font-display text-4xl text-white mb-2">{t('cart.title', lang)}</h1>
+        <h1 className="font-display text-4xl text-fg mb-2">{t('cart.title', lang)}</h1>
         <div className="divider-gold mb-10 !mx-0" />
 
         {items.length === 0 ? (
           <div className="card p-16 text-center">
             <span className="text-5xl block mb-4 opacity-40">🍣</span>
-            <p className="text-white/40">{t('cart.empty', lang)}</p>
+            <p className="text-muted">{t('cart.empty', lang)}</p>
             <Link to="/" className="btn-luxury mt-6 inline-flex">{t('nav.products', lang)}</Link>
           </div>
         ) : (
@@ -42,36 +40,36 @@ export default function CartPage() {
                       <span className="text-4xl">🍣</span>
                     )}
                     <div className="min-w-0">
-                      <div className="font-display text-xl text-white">{getProductName(item.product, lang)}</div>
+                      <div className="font-display text-xl text-fg">{getProductName(item.product, lang)}</div>
                       <div className="text-accent font-display text-lg mt-1">
                         {lineTotal(item)} {t('currency', lang)}
                       </div>
                     </div>
                   </div>
                   <div className="flex items-center gap-3 shrink-0">
-                    <button onClick={() => updateQuantity(index, item.quantity - 1)} className="w-9 h-9 border border-white/10 flex items-center justify-center text-white/60">
+                    <button onClick={() => updateQuantity(index, item.quantity - 1)} className="w-9 h-9 border border-[var(--app-line)] flex items-center justify-center text-muted">
                       <Minus className="w-4 h-4" />
                     </button>
-                    <span className="font-display text-xl text-white w-8 text-center">{item.quantity}</span>
-                    <button onClick={() => updateQuantity(index, item.quantity + 1)} className="w-9 h-9 border border-white/10 flex items-center justify-center text-white/60">
+                    <span className="font-display text-xl text-fg w-8 text-center">{item.quantity}</span>
+                    <button onClick={() => updateQuantity(index, item.quantity + 1)} className="w-9 h-9 border border-[var(--app-line)] flex items-center justify-center text-muted">
                       <Plus className="w-4 h-4" />
                     </button>
-                    <button onClick={() => removeItem(index)} className="ms-2 text-white/30 hover:text-danger">
+                    <button onClick={() => removeItem(index)} className="ms-2 text-muted hover:text-danger">
                       <Trash2 className="w-4 h-4" />
                     </button>
                   </div>
                 </div>
                 {item.addons.length > 0 && (
-                  <p className="text-white/40 text-sm">
+                  <p className="text-muted text-sm">
                     {item.addons.map((a) => localizedName(a, lang)).join(' · ')}
                   </p>
                 )}
-                {item.notes && <p className="text-white/50 text-sm">{t('cart.notes', lang)}: {item.notes}</p>}
+                {item.notes && <p className="text-muted text-sm">{t('cart.notes', lang)}: {item.notes}</p>}
               </div>
             ))}
 
             <div className="card p-6 flex items-center justify-between mt-8">
-              <span className="text-white/50 uppercase tracking-wider text-sm">{t('cart.total', lang)}</span>
+              <span className="text-muted uppercase tracking-wider text-sm">{t('cart.total', lang)}</span>
               <span className="font-display text-3xl text-accent">
                 {total.toFixed(0)} {t('currency', lang)}
               </span>
@@ -83,7 +81,6 @@ export default function CartPage() {
           </div>
         )}
       </div>
-      <Footer />
-    </div>
+    </CustomerShell>
   );
 }

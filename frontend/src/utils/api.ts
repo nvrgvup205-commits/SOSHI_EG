@@ -4,6 +4,7 @@ import type {
   Addon, Address, Banner, Category, Conversation, Coupon, Customer, DeliveryZone,
   Order, Product, StaffUser, ChatMessage,
 } from '../types';
+import { parseApiResponse } from './parseResponse';
 
 class ApiClient {
   private token: string | null = null;
@@ -31,12 +32,16 @@ class ApiClient {
     if (token) headers['Authorization'] = `Bearer ${token}`;
 
     const res = await fetch(`${API_BASE}${path}`, { ...options, headers });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.error || 'Request failed');
-    return data;
+    return parseApiResponse<T>(res);
   }
 
-  customerLogin(data: { email: string; phone: string; preferred_language?: string }) {
+  customerLogin(data: {
+    email?: string;
+    phone?: string;
+    identifier?: string;
+    password?: string;
+    preferred_language?: string;
+  }) {
     return this.request<{ session_token: string; customer: Record<string, unknown> }>(
       '/api/auth/customer/login',
       { method: 'POST', body: JSON.stringify(data) },
@@ -44,11 +49,13 @@ class ApiClient {
   }
 
   customerRegister(data: {
-    email: string;
+    email?: string;
     phone: string;
     full_name: string;
     address: string;
     area?: string;
+    password?: string;
+    identifier?: string;
     preferred_language?: string;
   }) {
     return this.request<{ session_token: string; customer: Record<string, unknown> }>(
@@ -129,13 +136,12 @@ class ApiClient {
       headers,
       body: form,
     });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.error || 'Image upload failed');
-    return data as {
+    const data = await parseApiResponse<{
       image_original_url: string;
       image_compressed_url: string;
       image_thumbnail_url: string;
-    };
+    }>(res);
+    return data;
   }
 
   getCustomers(params?: { search?: string; page?: number }) {

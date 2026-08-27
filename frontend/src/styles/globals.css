@@ -1,6 +1,8 @@
 @import url('https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@300;400;500;600&family=Oswald:wght@500;600;700&display=swap');
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 @theme {
   --color-primary: #E23A1A;
   --color-primary-light: #FF6B1A;
@@ -16,9 +18,31 @@
   --color-success: #27AE60;
   --color-danger: #E74C3C;
   --color-warning: #F39C12;
+  --color-fg: var(--app-fg);
+  --color-muted: var(--app-muted);
   --font-display: 'Oswald', sans-serif;
   --font-body: 'Inter', sans-serif;
   --font-brand: 'Anton', sans-serif;
+}
+
+:root, html.dark {
+  --app-bg: #050505;
+  --app-fg: #f6f1e8;
+  --app-card: rgba(12, 12, 12, 0.9);
+  --app-muted: rgba(246, 241, 232, 0.58);
+  --app-line: rgba(255, 255, 255, 0.1);
+  --app-header: rgba(5, 5, 5, 0.78);
+  --app-veil: rgba(5, 5, 5, 0.38);
+}
+
+html.light {
+  --app-bg: #f4efe6;
+  --app-fg: #14110e;
+  --app-card: rgba(255, 255, 255, 0.92);
+  --app-muted: rgba(20, 17, 14, 0.55);
+  --app-line: rgba(20, 17, 14, 0.1);
+  --app-header: rgba(244, 239, 230, 0.82);
+  --app-veil: rgba(244, 239, 230, 0.28);
 }
 
 * { box-sizing: border-box; }
@@ -28,8 +52,8 @@ html { scroll-behavior: smooth; }
 body {
   margin: 0;
   font-family: var(--font-body);
-  background: #000000;
-  color: #f5f5f5;
+  background: var(--app-bg);
+  color: var(--app-fg);
   -webkit-font-smoothing: antialiased;
 }
 
@@ -38,6 +62,99 @@ h1, h2, h3, h4 {
   font-weight: 600;
   letter-spacing: 0.04em;
 }
+
+.app-shell {
+  background:
+    radial-gradient(1200px 600px at 80% -10%, rgba(224, 184, 74, 0.12), transparent 55%),
+    radial-gradient(900px 500px at -10% 110%, rgba(42, 180, 196, 0.12), transparent 50%),
+    var(--app-bg);
+  color: var(--app-fg);
+}
+
+.app-header {
+  position: fixed;
+  top: 0;
+  inset-inline: 0;
+  z-index: 50;
+  background: var(--app-header);
+  backdrop-filter: blur(18px);
+  border-bottom: 1px solid var(--app-line);
+}
+
+.app-footer {
+  border-top: 1px solid var(--app-line);
+  padding: 4rem 0;
+}
+
+.app-bottom-nav {
+  position: fixed;
+  bottom: 0;
+  inset-inline: 0;
+  z-index: 40;
+  background: var(--app-header);
+  border-top: 1px solid var(--app-line);
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.nav-link {
+  @apply text-xs uppercase tracking-[0.2em] text-muted hover:text-accent transition-colors;
+}
+
+.splash-screen {
+  min-height: 100vh;
+  background: var(--app-bg);
+  position: relative;
+  overflow: hidden;
+}
+
+.splash-veil {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, var(--app-veil), transparent 30%, var(--app-bg) 88%);
+  pointer-events: none;
+}
+
+.logo-plate {
+  background: #ffffff;
+  border-radius: 1.5rem;
+  padding: 0.85rem 1.1rem;
+  box-shadow:
+    0 20px 50px rgba(0, 0, 0, 0.18),
+    0 0 0 1px rgba(224, 184, 74, 0.25);
+}
+
+html.dark .brand-mark-dark img {
+  mix-blend-mode: multiply;
+}
+
+.glass-card {
+  background: var(--app-card);
+  border: 1px solid var(--app-line);
+  backdrop-filter: blur(22px);
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.12);
+}
+
+.theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  border: 1px solid var(--app-line);
+  background: var(--app-card);
+  color: var(--app-fg);
+  padding: 0.4rem 0.7rem;
+  font-size: 0.7rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.field-label {
+  @apply text-xs text-muted uppercase tracking-wider mb-2 flex items-center gap-2;
+}
+
+.text-fg { color: var(--app-fg); }
+.text-muted { color: var(--app-muted); }
+
 
 @keyframes fadeUp {
   from { opacity: 0; transform: translateY(30px); }
@@ -76,15 +193,20 @@ h1, h2, h3, h4 {
 }
 
 .input-field {
-  @apply w-full bg-white/5 border border-white/10 px-4 py-3 text-white placeholder:text-white/30 focus:outline-none focus:border-accent/50 transition-all;
+  @apply w-full px-4 py-3 focus:outline-none focus:border-accent/50 transition-all;
+  background: color-mix(in srgb, var(--app-fg) 6%, transparent);
+  border: 1px solid var(--app-line);
+  color: var(--app-fg);
 }
 
-.input-field-light {
-  @apply w-full bg-white border border-sand px-4 py-3 text-ink placeholder:text-gray-400 focus:outline-none focus:border-secondary transition-all;
+.input-field::placeholder {
+  color: var(--app-muted);
 }
 
 .card {
-  @apply bg-charcoal border border-white/5 transition-all duration-500;
+  background: var(--app-card);
+  border: 1px solid var(--app-line);
+  transition: all 0.5s ease;
 }
 
 .card-light {
@@ -92,7 +214,7 @@ h1, h2, h3, h4 {
 }
 
 .sidebar-link {
-  @apply flex items-center gap-3 px-4 py-3 text-white/60 hover:text-white hover:bg-white/5 transition-all duration-300 text-sm tracking-wide;
+  @apply flex items-center gap-3 px-4 py-3 text-muted hover:text-fg hover:bg-white/5 transition-all duration-300 text-sm tracking-wide;
 }
 
 .sidebar-link.active {
