@@ -7,12 +7,13 @@
     "dev:frontend": "npm run dev --prefix frontend",
     "dev:backend": "npm run dev --prefix backend",
     "build:frontend": "npm ci --prefix frontend && npm run build --prefix frontend",
-    "deploy": "npm run build && npx wrangler deploy",
-    "deploy:production": "npm run build && npx wrangler deploy",
+    "deploy": "npm run deploy:backend && npm run build && npx wrangler deploy",
+    "deploy:production": "npm run deploy",
     "deploy:worker": "npx wrangler deploy",
     "deploy:pages": "npm run build:frontend && npm run deploy:worker",
     "deploy:backend": "npm run deploy --prefix backend",
-    "typecheck": "npm run typecheck --prefix backend && npx tsc --noEmit --project frontend/tsconfig.app.json",
+    "setup": "bash scripts/setup.sh",
+    "typecheck": "npm run typecheck --prefix backend && npm run typecheck --prefix frontend",
     "test": "npm run test --prefix frontend && npm run test --prefix backend"
   },
   "devDependencies": {

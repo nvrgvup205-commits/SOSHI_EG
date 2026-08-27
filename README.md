@@ -38,6 +38,18 @@ SOSHI_EG/
 
 ## Setup
 
+### Quick start (local)
+
+```bash
+npm run setup
+# Edit backend/.dev.vars → add SUPABASE_SERVICE_ROLE_KEY from Supabase dashboard
+
+npm run dev:backend    # Terminal 1 → http://localhost:8787
+npm run dev:frontend   # Terminal 2 → http://localhost:5173
+```
+
+The frontend dev server proxies `/api` to `localhost:8787`, so you can leave `VITE_API_URL` empty in `frontend/.env` for local work.
+
 ### 1. Environment Variables
 
 ```bash
@@ -71,6 +83,16 @@ The admin form accepts **email or phone**.
 - **Phone:** `01000000001` or `+201000000001`
 - **Password:** `Admin@2026`
 - **URL:** `/admin/login`
+
+## Verify production
+
+After deploy, confirm the API is up to date:
+
+```bash
+curl https://soshi-eg-api.nvrgvup205.workers.dev/api/catalog/home
+```
+
+If this returns `404`, redeploy the backend (see Deployment below).
 
 ## Customer Login (Current)
 
@@ -112,7 +134,14 @@ npm run deploy
 > The deploy script installs frontend deps, builds `frontend/dist`, then runs `wrangler deploy`.
 > Do **not** set `pages_build_output_dir` in `wrangler.toml` — it makes `wrangler deploy` fail with a Pages-project error.
 
-**GitHub Actions (optional):** add repository secrets `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` to enable the Deploy workflow.
+**GitHub Actions (optional):** add repository secrets `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` to enable the Deploy workflow. The workflow deploys **both** workers: `soshi-eg-api` (backend) then `soshi-eg` (frontend).
+
+Set the backend secret once in Cloudflare:
+
+```bash
+cd backend
+npx wrangler secret put SUPABASE_SERVICE_ROLE_KEY
+```
 
 **Environment variables** (Cloudflare Worker → Settings → Variables):
 - `VITE_API_URL` = your Workers API URL

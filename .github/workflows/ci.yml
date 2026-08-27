@@ -31,3 +31,6 @@ jobs:
 
       - name: Typecheck backend
         run: cd backend && npm run typecheck
+
+      - name: Typecheck frontend
+        run: cd frontend && npm run typecheck
