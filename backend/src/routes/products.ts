@@ -4,6 +4,7 @@ import { createSupabase } from '../lib/supabase';
 import { errorResponse, jsonResponse } from '../lib/auth';
 import { requireStaff } from '../middleware/auth';
 import { buildProductImagePath, extensionForType } from '../lib/storagePaths';
+import { readJsonBody, sanitizeProductPayload } from '../lib/http';
 
 type AppEnv = { Bindings: Env; Variables: { staff?: Record<string, unknown> } };
 
@@ -127,7 +128,12 @@ products.get('/:id', async (c) => {
 });
 
 products.post('/', requireStaff, async (c) => {
-  const body = await c.req.json();
+  const parsed = await readJsonBody<Record<string, unknown>>(c.req.raw);
+  if (parsed.error) return errorResponse(parsed.error, 400);
+  const body = sanitizeProductPayload(parsed.data || {});
+  if (!body.name_ar || !body.name_en || !body.name_ru) {
+    return errorResponse('Product names (ar/en/ru) are required', 400);
+  }
   const supabase = createSupabase(c.env);
   const { data, error } = await supabase.from('products').insert(body).select().single();
   if (error) return errorResponse(error.message, 500);
@@ -135,7 +141,9 @@ products.post('/', requireStaff, async (c) => {
 });
 
 products.patch('/:id', requireStaff, async (c) => {
-  const body = await c.req.json();
+  const parsed = await readJsonBody<Record<string, unknown>>(c.req.raw);
+  if (parsed.error) return errorResponse(parsed.error, 400);
+  const body = sanitizeProductPayload(parsed.data || {});
   const supabase = createSupabase(c.env);
   const { data, error } = await supabase
     .from('products')

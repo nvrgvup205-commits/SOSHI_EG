@@ -46,23 +46,23 @@ export default function ChatThread({
   return (
     <div className="card overflow-hidden">
       <div className="h-80 overflow-y-auto p-4 space-y-3">
-        {messages.length === 0 && <p className="text-white/30 text-center py-10">{t('chat.empty', lang)}</p>}
+        {messages.length === 0 && <p className="text-muted text-center py-10">{t('chat.empty', lang)}</p>}
         {messages.map((msg) => {
           const mine = viewer === 'staff' ? msg.sender_type === 'staff' : msg.sender_type === 'customer';
           return (
             <div key={msg.id} className={`max-w-[85%] ${mine ? 'ms-auto' : 'me-auto'}`}>
-              <div className={`px-4 py-2 ${mine ? 'bg-accent/20 text-white' : 'bg-white/5 text-white/90'}`}>
+              <div className={`px-4 py-2 ${mine ? 'bg-accent/20 text-fg' : 'bg-[color-mix(in_srgb,var(--app-fg)_8%,transparent)] text-fg'}`}>
                 {display(msg)}
               </div>
               {msg.is_translated && (
-                <p className="text-[10px] text-white/30 mt-1">{t('chat.translated', lang)}</p>
+                <p className="text-[10px] text-muted mt-1">{t('chat.translated', lang)}</p>
               )}
             </div>
           );
         })}
         <div ref={endRef} />
       </div>
-      <form onSubmit={submit} className="flex gap-2 p-3 border-t border-white/10">
+      <form onSubmit={submit} className="flex gap-2 p-3 border-t border-[var(--app-line)]">
         <input
           className="input-field"
           value={text}

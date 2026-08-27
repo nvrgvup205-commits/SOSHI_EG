@@ -1,4 +1,5 @@
 name = "soshi-eg"
+main = "worker/index.ts"
 compatibility_date = "2026-08-25"
 
 # Build frontend before deploy (install deps first — Cloudflare root has no node_modules)
@@ -9,3 +10,8 @@ command = "npm ci --prefix frontend && npm run build --prefix frontend"
 [assets]
 directory = "./frontend/dist"
 not_found_handling = "single-page-application"
+binding = "ASSETS"
+run_worker_first = ["/api/*"]
+
+[vars]
+API_ORIGIN = "https://soshi-eg-api.nvrgvup205.workers.dev"

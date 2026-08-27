@@ -78,7 +78,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   };
 
   return (
-    <div className="min-h-screen bg-black flex flex-col lg:flex-row">
+    <div className="min-h-screen app-shell flex flex-col lg:flex-row">
       {/* Desktop sidebar */}
       <aside className="hidden lg:flex lg:flex-col lg:w-64 lg:shrink-0 bg-black border-e border-white/5">
         <div className="p-6 border-b border-white/5">

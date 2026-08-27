@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Header from '../components/Shared/Header';
-import Footer from '../components/Shared/Footer';
+import CustomerShell from '../components/Shared/CustomerShell';
 import { useCart } from '../hooks/useCart';
 import { useLanguage } from '../hooks/useLanguage';
 import { useAuth } from '../hooks/useAuth';
@@ -103,30 +102,29 @@ export default function CheckoutPage() {
   };
 
   return (
-    <div className="min-h-screen bg-black pb-24">
-      <Header />
+    <CustomerShell>
       <div className="max-w-3xl mx-auto px-6 py-16 pt-24 space-y-6">
         <p className="label-luxury">{t('checkout.payment', lang)}</p>
-        <h1 className="font-display text-4xl text-white">{t('checkout.title', lang)}</h1>
+        <h1 className="font-display text-4xl text-fg">{t('checkout.title', lang)}</h1>
         <div className="divider-gold !mx-0" />
 
         {!open && <div className="card p-4 text-warning">{t('checkout.closed', lang)}</div>}
 
         <section className="card p-5 space-y-3">
-          <h2 className="font-display text-xl text-white">{t('checkout.address', lang)}</h2>
+          <h2 className="font-display text-xl text-fg">{t('checkout.address', lang)}</h2>
           {addresses.map((a) => (
-            <label key={a.id} className="flex items-start gap-3 text-white/80">
+            <label key={a.id} className="flex items-start gap-3 text-muted">
               <input type="radio" name="addr" checked={addressId === a.id} onChange={() => setAddressId(a.id)} />
               <span>{a.area ? `${a.area} — ` : ''}{a.address}</span>
             </label>
           ))}
-          <p className="text-white/40 text-xs uppercase tracking-wider pt-2">{t('checkout.new_address', lang)}</p>
+          <p className="text-muted text-xs uppercase tracking-wider pt-2">{t('checkout.new_address', lang)}</p>
           <input className="input-field" placeholder={t('login.area', lang)} value={newArea} onChange={(e) => setNewArea(e.target.value)} />
           <textarea className="input-field min-h-20" placeholder={t('login.address', lang)} value={newAddress} onChange={(e) => { setNewAddress(e.target.value); setAddressId(''); }} />
         </section>
 
         <section className="card p-5 space-y-3">
-          <h2 className="font-display text-xl text-white">{t('checkout.zone', lang)}</h2>
+          <h2 className="font-display text-xl text-fg">{t('checkout.zone', lang)}</h2>
           <select className="input-field" value={zoneId} onChange={(e) => setZoneId(e.target.value)}>
             {zones.map((z) => (
               <option key={z.id} value={z.id}>{z.name} — {z.delivery_fee} {t('currency', lang)}</option>
@@ -135,7 +133,7 @@ export default function CheckoutPage() {
         </section>
 
         <section className="card p-5 space-y-3">
-          <h2 className="font-display text-xl text-white">{t('checkout.coupon', lang)}</h2>
+          <h2 className="font-display text-xl text-fg">{t('checkout.coupon', lang)}</h2>
           <div className="flex gap-2">
             <input className="input-field" dir="ltr" value={couponCode} onChange={(e) => setCouponCode(e.target.value)} />
             <button type="button" onClick={applyCoupon} className="btn-luxury text-xs">{t('checkout.apply', lang)}</button>
@@ -147,11 +145,11 @@ export default function CheckoutPage() {
           <textarea className="input-field min-h-20" value={notes} onChange={(e) => setNotes(e.target.value)} />
         </section>
 
-        <section className="card p-5 space-y-2 text-white/70">
+        <section className="card p-5 space-y-2 text-muted">
           <div className="flex justify-between"><span>{t('checkout.subtotal', lang)}</span><span>{total} {t('currency', lang)}</span></div>
           <div className="flex justify-between"><span>{t('checkout.delivery_fee', lang)}</span><span>{deliveryFee} {t('currency', lang)}</span></div>
           <div className="flex justify-between"><span>{t('checkout.discount', lang)}</span><span>-{discount} {t('currency', lang)}</span></div>
-          <div className="flex justify-between text-white font-display text-2xl pt-2">
+          <div className="flex justify-between text-fg font-display text-2xl pt-2">
             <span>{t('cart.total', lang)}</span>
             <span className="text-accent">{grand} {t('currency', lang)}</span>
           </div>
@@ -163,7 +161,6 @@ export default function CheckoutPage() {
           {loading ? '...' : t('checkout.place', lang)}
         </button>
       </div>
-      <Footer />
-    </div>
+    </CustomerShell>
   );
 }

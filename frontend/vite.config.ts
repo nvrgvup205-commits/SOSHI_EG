@@ -9,7 +9,7 @@ export default defineConfig({
     tailwindcss(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['logo.png', 'favicon.svg', 'apple-touch-icon.png', 'logo/*.png'],
+      includeAssets: ['logo.png', 'logo-light.png', 'favicon.svg', 'apple-touch-icon.png', 'logo/*.png'],
       manifest: {
         name: 'Sushi Shop Egypt',
         short_name: 'Sushi Shop',
@@ -40,6 +40,14 @@ export default defineConfig({
         runtimeCaching: [
           {
             urlPattern: /^https:\/\/soshi-eg-api\.nvrgvup205\.workers\.dev\/api\/.*/i,
+            handler: 'NetworkFirst',
+            options: {
+              cacheName: 'api-cache',
+              expiration: { maxEntries: 50, maxAgeSeconds: 300 },
+            },
+          },
+          {
+            urlPattern: /\/api\/.*/i,
             handler: 'NetworkFirst',
             options: {
               cacheName: 'api-cache',

@@ -6,13 +6,21 @@ interface AuthState {
   type: 'customer' | 'staff' | null;
   user: Customer | StaffUser | null;
   loading: boolean;
-  loginCustomer: (data: { email: string; phone: string; preferred_language?: string }) => Promise<void>;
+  loginCustomer: (data: {
+    email?: string;
+    phone?: string;
+    identifier?: string;
+    password?: string;
+    preferred_language?: string;
+  }) => Promise<void>;
   registerCustomer: (data: {
-    email: string;
+    email?: string;
     phone: string;
     full_name: string;
     address: string;
     area?: string;
+    password?: string;
+    identifier?: string;
     preferred_language?: string;
   }) => Promise<void>;
   loginStaff: (data: { phone?: string; email?: string; identifier?: string; password: string }) => Promise<StaffUser>;
@@ -41,7 +49,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       .finally(() => setLoading(false));
   }, []);
 
-  const loginCustomer = async (data: { email: string; phone: string; preferred_language?: string }) => {
+  const loginCustomer = async (data: {
+    email?: string;
+    phone?: string;
+    identifier?: string;
+    password?: string;
+    preferred_language?: string;
+  }) => {
     const res = await api.customerLogin(data);
     api.setToken(res.session_token);
     setType('customer');
@@ -49,11 +63,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const registerCustomer = async (data: {
-    email: string;
+    email?: string;
     phone: string;
     full_name: string;
     address: string;
     area?: string;
+    password?: string;
+    identifier?: string;
     preferred_language?: string;
   }) => {
     const res = await api.customerRegister(data);

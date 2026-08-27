@@ -3,7 +3,7 @@ import type { Language } from '../../types';
 
 const langs: { code: Language; flag: string; label: string }[] = [
   { code: 'ar', flag: '🇪🇬', label: 'AR' },
-  { code: 'en', flag: '🇬🇧', label: 'EN' },
+  { code: 'en', flag: '🇬🇧', label: 'EN GB' },
   { code: 'ru', flag: '🇷🇺', label: 'RU' },
 ];
 
@@ -11,19 +11,18 @@ export default function LanguageSwitcher({ dark = false }: { dark?: boolean }) {
   const { lang, setLang } = useLanguage();
 
   return (
-    <div className={`flex gap-1 ${dark ? '' : 'bg-cream rounded-lg p-1'}`}>
-      {langs.map((l) => (
+    <div className={`flex gap-1 ${dark ? '' : 'lang-switch'}`}>
+      {langs.map((item) => (
         <button
-          key={l.code}
-          onClick={() => setLang(l.code)}
+          key={item.code}
+          type="button"
+          onClick={() => setLang(item.code)}
           className={`px-2 py-1 text-[10px] font-medium tracking-wider transition-all flex items-center gap-1 ${
-            lang === l.code
-              ? dark ? 'text-accent border-b border-accent' : 'bg-secondary text-white'
-              : dark ? 'text-white/40 hover:text-white/70' : 'text-gray-400 hover:text-secondary'
+            lang === item.code ? 'text-accent border-b border-accent' : 'text-muted hover:text-fg'
           }`}
         >
-          <span aria-hidden>{l.flag}</span>
-          {l.label}
+          <span aria-hidden>{item.flag}</span>
+          {item.label}
         </button>
       ))}
     </div>

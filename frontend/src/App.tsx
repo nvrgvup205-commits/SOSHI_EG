@@ -1,6 +1,8 @@
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { useState } from 'react';
 import { AuthProvider, useAuth } from './hooks/useAuth';
 import { LanguageProvider, useLanguage } from './hooks/useLanguage';
+import { ThemeProvider } from './hooks/useTheme';
 import HomePage from './pages/HomePage';
 import CartPage from './pages/CartPage';
 import CheckoutPage from './pages/CheckoutPage';
@@ -26,14 +28,17 @@ import ChatInbox from './components/Admin/ChatInbox';
 import StaffPortal from './pages/StaffPortal';
 import InstallPrompt from './components/Shared/InstallPrompt';
 import LanguageGate from './components/Shared/LanguageGate';
+import SplashScreen from './components/Shared/SplashScreen';
 import BottomNav from './components/Shared/BottomNav';
 import RequireCustomer from './components/Shared/RequireCustomer';
 import { isAdminRole, staffDashboardPath } from './utils/staffRoles';
+import { t } from './utils/i18n';
 import type { UserRole } from './types';
 
 function ProtectedAdmin({ children }: { children: React.ReactNode }) {
   const { type, user, loading } = useAuth();
-  if (loading) return <div className="min-h-screen flex items-center justify-center bg-black text-white">Loading...</div>;
+  const { lang } = useLanguage();
+  if (loading) return <div className="min-h-screen flex items-center justify-center app-shell">{t('error.loading', lang)}</div>;
   if (type !== 'staff') return <Navigate to="/admin/login" />;
   const role = (user as { role?: UserRole }).role || 'order_handler';
   if (!isAdminRole(role)) return <Navigate to="/staff" replace />;
@@ -42,7 +47,8 @@ function ProtectedAdmin({ children }: { children: React.ReactNode }) {
 
 function StaffLoginRedirect() {
   const { type, user, loading } = useAuth();
-  if (loading) return <div className="min-h-screen flex items-center justify-center bg-black text-white">Loading...</div>;
+  const { lang } = useLanguage();
+  if (loading) return <div className="min-h-screen flex items-center justify-center app-shell">{t('error.loading', lang)}</div>;
   if (type === 'staff') {
     const role = (user as { role?: UserRole }).role || 'order_handler';
     return <Navigate to={staffDashboardPath(role)} replace />;
@@ -54,6 +60,18 @@ function AppRoutes() {
   const { hasChosen } = useLanguage();
   const location = useLocation();
   const staffRoute = location.pathname.startsWith('/admin') || location.pathname.startsWith('/staff');
+  const [showSplash, setShowSplash] = useState(() => sessionStorage.getItem('splash_seen') !== '1');
+
+  if (!staffRoute && showSplash) {
+    return (
+      <SplashScreen
+        onDone={() => {
+          sessionStorage.setItem('splash_seen', '1');
+          setShowSplash(false);
+        }}
+      />
+    );
+  }
 
   if (!hasChosen && !staffRoute) return <LanguageGate />;
 
@@ -91,11 +109,13 @@ function AppRoutes() {
 
 export default function App() {
   return (
-    <LanguageProvider>
-      <AuthProvider>
-        <AppRoutes />
-        <InstallPrompt />
-      </AuthProvider>
-    </LanguageProvider>
+    <ThemeProvider>
+      <LanguageProvider>
+        <AuthProvider>
+          <AppRoutes />
+          <InstallPrompt />
+        </AuthProvider>
+      </LanguageProvider>
+    </ThemeProvider>
   );
 }

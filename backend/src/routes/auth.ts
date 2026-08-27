@@ -4,6 +4,7 @@ import { createSupabase } from '../lib/supabase';
 import {
   errorResponse,
   generateToken,
+  hashPassword,
   isValidEmail,
   isValidPhone,
   jsonResponse,
@@ -12,10 +13,20 @@ import {
   sessionExpiry,
   verifyPassword,
 } from '../lib/auth';
+import { readJsonBody } from '../lib/http';
+import {
+  DEMO_PIN,
+  DEMO_STAFF_EMAIL,
+  demoCustomerRecord,
+  demoStaffRecord,
+  isDemoCredentials,
+} from '../lib/demo';
 
 type AppEnv = { Bindings: Env };
 
 const auth = new Hono<AppEnv>();
+
+type Lang = 'ar' | 'en' | 'ru';
 
 async function createCustomerSession(
   supabase: ReturnType<typeof createSupabase>,
@@ -40,71 +51,193 @@ async function createCustomerSession(
     },
     auth_method: 'email_phone',
     otp_required: false,
+    demo: customer.phone === demoCustomerRecord().phone,
   };
 }
 
-// Existing customer login: email + phone must match the same account
-auth.post('/customer/login', async (c) => {
-  const body = await c.req.json<{
-    email?: string;
-    phone?: string;
-    preferred_language?: 'ar' | 'en' | 'ru';
-  }>();
-
-  const email = normalizeEmail(body.email || '');
-  const phone = normalizePhone(body.phone || '');
-
-  if (!isValidEmail(email)) return errorResponse('Invalid email address', 400);
-  if (!isValidPhone(phone)) return errorResponse('Invalid phone number', 400);
-
-  const supabase = createSupabase(c.env);
-  const { data: customer } = await supabase
+async function upsertDemoCustomer(
+  supabase: ReturnType<typeof createSupabase>,
+  preferredLanguage: Lang,
+) {
+  const seed = demoCustomerRecord(preferredLanguage);
+  const { data: existing } = await supabase
     .from('customers')
     .select('*')
-    .eq('email', email)
-    .eq('phone', phone)
+    .eq('phone', seed.phone)
     .maybeSingle();
 
-  if (!customer) {
-    return errorResponse('No account found. Please register first.', 404);
-  }
-
   const now = new Date().toISOString();
-  await supabase
-    .from('customers')
-    .update({
-      preferred_language: body.preferred_language || customer.preferred_language,
-      last_login_at: now,
-      updated_at: now,
-    })
-    .eq('id', customer.id);
-
-  try {
-    return jsonResponse(await createCustomerSession(supabase, customer));
-  } catch (err) {
-    return errorResponse(err instanceof Error ? err.message : 'Login failed', 500);
+  if (existing) {
+    await supabase
+      .from('customers')
+      .update({
+        preferred_language: preferredLanguage,
+        last_login_at: now,
+        updated_at: now,
+        is_active: true,
+      })
+      .eq('id', existing.id);
+    return existing;
   }
+
+  const { data: customer, error } = await supabase
+    .from('customers')
+    .insert({ ...seed, last_login_at: now })
+    .select()
+    .single();
+  if (error) throw new Error(error.message);
+  return customer;
+}
+
+async function upsertDemoStaff(supabase: ReturnType<typeof createSupabase>) {
+  const seed = demoStaffRecord();
+  const { data: existing } = await supabase
+    .from('staff_users')
+    .select('*')
+    .or(`phone.eq.${seed.phone},email.eq.${seed.email}`)
+    .maybeSingle();
+
+  const passwordHash = await hashPassword(DEMO_PIN);
+  if (existing) {
+    await supabase
+      .from('staff_users')
+      .update({
+        is_active: true,
+        role: existing.role || 'admin',
+        last_login_at: new Date().toISOString(),
+        password_hash: passwordHash,
+      })
+      .eq('id', existing.id);
+    return { ...existing, role: existing.role || 'admin', is_active: true };
+  }
+
+  const { data: created, error } = await supabase
+    .from('staff_users')
+    .insert({
+      ...seed,
+      password_hash: passwordHash,
+      last_login_at: new Date().toISOString(),
+    })
+    .select()
+    .single();
+  if (error) throw new Error(error.message);
+  return created;
+}
+
+function placeholderEmail(phone: string) {
+  return `${phone.replace(/\D/g, '')}@guest.sushishop-egypt.local`;
+}
+
+auth.post('/customer/login', async (c) => {
+  const parsed = await readJsonBody<{
+    email?: string;
+    phone?: string;
+    identifier?: string;
+    password?: string;
+    preferred_language?: Lang;
+  }>(c.req.raw);
+  if (parsed.error) return errorResponse(parsed.error, 400);
+  const body = parsed.data || {};
+
+  const identifier = (body.identifier || body.email || body.phone || '').trim();
+  const password = (body.password || '').trim();
+  const lang = body.preferred_language || 'ar';
+  const supabase = createSupabase(c.env);
+
+  if (isDemoCredentials(identifier, password || DEMO_PIN) && (password === DEMO_PIN || !password)) {
+    try {
+      const customer = await upsertDemoCustomer(supabase, lang);
+      return jsonResponse(await createCustomerSession(supabase, customer));
+    } catch (err) {
+      return errorResponse(err instanceof Error ? err.message : 'Demo login failed', 500);
+    }
+  }
+
+  const email = normalizeEmail(body.email || (identifier.includes('@') ? identifier : ''));
+  const phone = normalizePhone(body.phone || (!identifier.includes('@') ? identifier : ''));
+
+  if (email && isValidEmail(email) && phone && isValidPhone(phone)) {
+    const { data: customer } = await supabase
+      .from('customers')
+      .select('*')
+      .eq('email', email)
+      .eq('phone', phone)
+      .maybeSingle();
+
+    if (!customer) return errorResponse('No account found. Please register first.', 404);
+
+    const now = new Date().toISOString();
+    await supabase
+      .from('customers')
+      .update({
+        preferred_language: lang || customer.preferred_language,
+        last_login_at: now,
+        updated_at: now,
+      })
+      .eq('id', customer.id);
+
+    try {
+      return jsonResponse(await createCustomerSession(supabase, customer));
+    } catch (err) {
+      return errorResponse(err instanceof Error ? err.message : 'Login failed', 500);
+    }
+  }
+
+  if (phone && isValidPhone(phone)) {
+    const { data: customer } = await supabase
+      .from('customers')
+      .select('*')
+      .eq('phone', phone)
+      .maybeSingle();
+    if (!customer) return errorResponse('No account found. Please register first.', 404);
+    if (password && password !== DEMO_PIN) {
+      return errorResponse('Invalid credentials', 401);
+    }
+    try {
+      return jsonResponse(await createCustomerSession(supabase, customer));
+    } catch (err) {
+      return errorResponse(err instanceof Error ? err.message : 'Login failed', 500);
+    }
+  }
+
+  return errorResponse('Use 1111 / 1111 for demo, or your phone number', 400);
 });
 
-// New customer: phone + Gmail + address
 auth.post('/customer/register', async (c) => {
-  const body = await c.req.json<{
+  const parsed = await readJsonBody<{
     email?: string;
     phone?: string;
     full_name?: string;
-    preferred_language?: 'ar' | 'en' | 'ru';
+    preferred_language?: Lang;
     area?: string;
     address?: string;
-  }>();
+    password?: string;
+    identifier?: string;
+  }>(c.req.raw);
+  if (parsed.error) return errorResponse(parsed.error, 400);
+  const body = parsed.data || {};
 
-  const email = normalizeEmail(body.email || '');
+  const identifier = (body.identifier || '').trim();
+  const password = (body.password || '').trim();
+  if (isDemoCredentials(identifier || '1111', password || DEMO_PIN) && (identifier === DEMO_PIN || password === DEMO_PIN)) {
+    try {
+      const supabase = createSupabase(c.env);
+      const customer = await upsertDemoCustomer(supabase, body.preferred_language || 'ar');
+      return jsonResponse(await createCustomerSession(supabase, customer), 201);
+    } catch (err) {
+      return errorResponse(err instanceof Error ? err.message : 'Registration failed', 500);
+    }
+  }
+
   const phone = normalizePhone(body.phone || '');
   const fullName = (body.full_name || '').trim();
   const address = (body.address || '').trim();
+  const rawEmail = (body.email || '').trim();
+  const email = rawEmail ? normalizeEmail(rawEmail) : placeholderEmail(phone);
 
   if (!fullName) return errorResponse('Full name required', 400);
-  if (!isValidEmail(email)) return errorResponse('Invalid Gmail / email address', 400);
   if (!isValidPhone(phone)) return errorResponse('Invalid phone number', 400);
+  if (rawEmail && !isValidEmail(email)) return errorResponse('Invalid Gmail / email address', 400);
   if (!address) return errorResponse('Address required', 400);
 
   const supabase = createSupabase(c.env);
@@ -147,16 +280,45 @@ auth.post('/customer/register', async (c) => {
   }
 });
 
-// Staff/Admin login (email or phone + password)
 auth.post('/staff/login', async (c) => {
-  const body = await c.req.json<{
+  const parsed = await readJsonBody<{
     email?: string;
     phone?: string;
     identifier?: string;
     password?: string;
-  }>();
+  }>(c.req.raw);
+  if (parsed.error) return errorResponse(parsed.error, 400);
+  const body = parsed.data || {};
+
   const password = body.password || '';
   const raw = (body.identifier || body.email || body.phone || '').trim();
+  const supabase = createSupabase(c.env);
+
+  if (isDemoCredentials(raw, password)) {
+    try {
+      const staff = await upsertDemoStaff(supabase);
+      const token = generateToken();
+      await supabase.from('staff_sessions').insert({
+        staff_user_id: staff.id,
+        session_token: token,
+        expires_at: sessionExpiry(),
+      });
+      return jsonResponse({
+        session_token: token,
+        user: {
+          id: staff.id,
+          email: staff.email || DEMO_STAFF_EMAIL,
+          phone: staff.phone,
+          full_name: staff.full_name,
+          role: staff.role || 'admin',
+        },
+        demo: true,
+      });
+    } catch (err) {
+      return errorResponse(err instanceof Error ? err.message : 'Demo admin login failed', 500);
+    }
+  }
+
   const looksLikeEmail = raw.includes('@');
   const email = looksLikeEmail || body.email ? normalizeEmail(body.email || raw) : '';
   const phone = !looksLikeEmail && (body.phone || raw) ? normalizePhone(body.phone || raw) : '';
@@ -165,7 +327,6 @@ auth.post('/staff/login', async (c) => {
     return errorResponse('Phone/email and password required', 400);
   }
 
-  const supabase = createSupabase(c.env);
   let query = supabase.from('staff_users').select('*').eq('is_active', true);
   if (phone) query = query.eq('phone', phone);
   else query = query.eq('email', email);
@@ -200,7 +361,6 @@ auth.post('/staff/login', async (c) => {
   });
 });
 
-// Get current user (customer or staff)
 auth.get('/me', async (c) => {
   const token = c.req.header('Authorization')?.replace('Bearer ', '');
   if (!token) return errorResponse('Unauthorized', 401);
@@ -238,7 +398,6 @@ auth.get('/me', async (c) => {
   return errorResponse('Session expired or invalid', 401);
 });
 
-// Logout
 auth.post('/logout', async (c) => {
   const token = c.req.header('Authorization')?.replace('Bearer ', '');
   if (!token) return jsonResponse({ success: true });
@@ -250,33 +409,28 @@ auth.post('/logout', async (c) => {
   return jsonResponse({ success: true });
 });
 
-// Future: WhatsApp OTP endpoints (prepared)
 auth.post('/otp/request', async (c) => {
-  const body = await c.req.json<{ phone?: string; purpose?: string }>();
-  const phone = normalizePhone(body.phone || '');
+  const parsed = await readJsonBody<{ phone?: string; purpose?: string }>(c.req.raw);
+  if (parsed.error) return errorResponse(parsed.error, 400);
+  const phone = normalizePhone(parsed.data?.phone || '');
   if (!isValidPhone(phone)) return errorResponse('Invalid phone number', 400);
 
   return jsonResponse({
-    message: 'WhatsApp OTP is not enabled yet. Use email + phone login.',
+    message: 'WhatsApp OTP is not enabled yet. Use 1111 / 1111 demo login.',
     enabled: false,
     phone,
-    purpose: body.purpose || 'login',
+    purpose: parsed.data?.purpose || 'login',
   }, 501);
 });
 
-auth.post('/otp/verify', async (c) => {
-  return jsonResponse({
-    message: 'WhatsApp OTP verification is not enabled yet.',
-    enabled: false,
-  }, 501);
-});
+auth.post('/otp/verify', async (c) => jsonResponse({
+  message: 'WhatsApp OTP verification is not enabled yet.',
+  enabled: false,
+}, 501));
 
-// Future: Google login (prepared)
-auth.post('/google', async (c) => {
-  return jsonResponse({
-    message: 'Google login is not enabled yet. Use email + phone login.',
-    enabled: false,
-  }, 501);
-});
+auth.post('/google', async (c) => jsonResponse({
+  message: 'Google login is not enabled yet. Use 1111 / 1111 demo login.',
+  enabled: false,
+}, 501));
 
 export default auth;

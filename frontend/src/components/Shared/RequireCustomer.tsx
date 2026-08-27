@@ -6,7 +6,7 @@ export default function RequireCustomer({ children }: { children: React.ReactNod
   const location = useLocation();
 
   if (loading) {
-    return <div className="min-h-screen flex items-center justify-center bg-black text-white">Loading...</div>;
+    return <div className="min-h-screen flex items-center justify-center app-shell">…</div>;
   }
   if (type !== 'customer') {
     return <Navigate to="/login" replace state={{ from: location.pathname }} />;
