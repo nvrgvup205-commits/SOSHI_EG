@@ -8,6 +8,7 @@ import { useAuth } from '../../hooks/useAuth';
 import { useLanguage } from '../../hooks/useLanguage';
 import { t } from '../../utils/i18n';
 import SiteLogo from '../Shared/SiteLogo';
+import LanguageSwitcher from '../Shared/LanguageSwitcher';
 import type { UserRole } from '../../types';
 
 const allNavItems = [
@@ -98,8 +99,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             );
           })}
         </nav>
-        <div className="p-4 border-t border-white/5">
-          <div className="text-sm text-white/50 mb-3 truncate">{(user as { full_name?: string })?.full_name}</div>
+        <div className="p-4 border-t border-white/5 space-y-3">
+          <LanguageSwitcher onDark />
+          <div className="text-sm text-white/50 truncate">{(user as { full_name?: string })?.full_name}</div>
           <button onClick={logout} className="sidebar-link w-full text-danger/80 hover:text-danger">
             <LogOut className="w-4 h-4" />
             {t('nav.logout', lang)}
@@ -109,11 +111,17 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
       {/* Mobile + desktop content area */}
       <div className="flex-1 flex flex-col min-w-0 min-h-screen lg:min-h-0">
+        {/* Desktop top bar */}
+        <header className="hidden lg:flex items-center justify-end gap-3 px-6 py-4 border-b border-[var(--app-line)]">
+          <LanguageSwitcher />
+        </header>
+
         {/* Mobile header with dropdown */}
         <header className="lg:hidden sticky top-0 z-50 bg-charcoal border-b border-white/5 safe-area-top">
           <div className="flex items-center justify-between px-4 py-3 gap-3">
             <SiteLogo to="/admin" size="sm" surface="dark" />
             <div className="flex items-center gap-2">
+              <LanguageSwitcher onDark />
               {!isStandalone() && deferredPrompt && (
                 <button onClick={installPwa} className="p-2 text-accent" aria-label="Install">
                   <Download className="w-5 h-5" />

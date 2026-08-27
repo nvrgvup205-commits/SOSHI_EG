@@ -18,6 +18,7 @@ import type { Order, OrderStatus, Product, UserRole } from '../types';
 import { pickProductThumbnail } from '../utils/productImage';
 import AdminLogin from '../components/Admin/AdminLogin';
 import BrandName from '../components/Shared/BrandName';
+import LanguageSwitcher from '../components/Shared/LanguageSwitcher';
 import ChatInbox from '../components/Admin/ChatInbox';
 
 const statuses: OrderStatus[] = ['pending', 'processing', 'ready', 'delivered'];
@@ -106,6 +107,7 @@ export default function StaffPortal() {
             </div>
           </div>
           <div className="flex items-center gap-1 shrink-0">
+            <LanguageSwitcher onDark />
             {!isStandalone() && deferredPrompt && (
               <button onClick={installPwa} className="p-2 text-accent" aria-label="Install">
                 <Download className="w-5 h-5" />
