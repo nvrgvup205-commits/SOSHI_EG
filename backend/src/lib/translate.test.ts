@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
-import { detectMessageLanguage, normalizeLang } from './translate.ts';
+import { detectMessageLanguage, normalizeLang, readTranslationCache } from './translate.ts';
 
 describe('normalizeLang', () => {
   it('maps supported language codes', () => {
@@ -27,5 +27,13 @@ describe('detectMessageLanguage', () => {
 
   it('detects English', () => {
     assert.equal(detectMessageLanguage('I want sushi please'), 'en');
+  });
+});
+
+describe('readTranslationCache', () => {
+  it('reads JSON cache for matching target language', () => {
+    const raw = JSON.stringify({ target: 'ru', text: 'Привет' });
+    assert.equal(readTranslationCache(raw, 'ru'), 'Привет');
+    assert.equal(readTranslationCache(raw, 'en'), null);
   });
 });

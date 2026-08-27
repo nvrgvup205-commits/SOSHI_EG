@@ -79,6 +79,10 @@ class ApiClient {
     return this.request('/api/auth/logout', { method: 'POST' });
   }
 
+  refreshSession() {
+    return this.request<{ ok: boolean; type: 'customer' | 'staff' }>('/api/auth/refresh', { method: 'POST' });
+  }
+
   getHome() {
     return this.request<{
       categories: Category[];

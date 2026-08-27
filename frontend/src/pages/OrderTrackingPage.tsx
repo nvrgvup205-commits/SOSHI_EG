@@ -1,9 +1,10 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import CustomerShell from '../components/Shared/CustomerShell';
 import ChatThread from '../components/Chat/ChatThread';
 import { api } from '../utils/api';
 import { useLanguage } from '../hooks/useLanguage';
+import { useChatPolling } from '../hooks/useChatPolling';
 import { t } from '../utils/i18n';
 import { formatDate } from '../utils/validators';
 import type { ChatMessage, Order, OrderStatus } from '../types';
@@ -20,8 +21,13 @@ export default function OrderTrackingPage() {
   useEffect(() => {
     if (!id) return;
     api.getOrder(id).then((r) => setOrder(r.order)).catch((e) => setError(e.message));
-    api.getChat(id, lang).then((r) => setMessages(r.messages)).catch(console.error);
-  }, [id, lang]);
+  }, [id]);
+
+  const loadChat = useCallback(
+    () => (id ? api.getChat(id, lang).then((r) => r.messages) : Promise.resolve([])),
+    [id, lang],
+  );
+  useChatPolling(Boolean(id), loadChat, setMessages);
 
   const send = async (text: string) => {
     const res = await api.sendChat(text, id, lang);
