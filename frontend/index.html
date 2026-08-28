@@ -15,6 +15,19 @@
   </head>
   <body>
     <div id="root"></div>
+    <script>
+      (function () {
+        window.deferredPrompt = null;
+        window.addEventListener('beforeinstallprompt', function (e) {
+          e.preventDefault();
+          window.deferredPrompt = e;
+          window.dispatchEvent(new Event('pwa-install-ready'));
+        });
+        window.addEventListener('appinstalled', function () {
+          window.deferredPrompt = null;
+        });
+      })();
+    </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

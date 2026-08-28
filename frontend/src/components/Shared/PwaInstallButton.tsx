@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react';
-import { Download, Share, X } from 'lucide-react';
+import { Download, MoreVertical, Share, X } from 'lucide-react';
 import { useLanguage } from '../../hooks/useLanguage';
+import {
+  getDeferredPrompt,
+  subscribePwaInstall,
+  triggerPwaInstall,
+} from '../../lib/pwaInstall';
 import { t } from '../../utils/i18n';
-
-export interface BeforeInstallPromptEvent extends Event {
-  prompt: () => Promise<void>;
-  userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>;
-}
 
 export function isIOS() {
   return /iPad|iPhone|iPod/.test(navigator.userAgent)
@@ -18,32 +18,15 @@ export function isStandalone() {
     || (navigator as unknown as { standalone?: boolean }).standalone === true;
 }
 
-export function usePwaInstall() {
-  const [deferred, setDeferred] = useState<BeforeInstallPromptEvent | null>(null);
-  const ios = isIOS();
+function useDeferredPromptReady() {
+  const [ready, setReady] = useState(() => Boolean(getDeferredPrompt()));
 
   useEffect(() => {
-    if (isStandalone()) return;
-
-    const onPrompt = (e: Event) => {
-      e.preventDefault();
-      setDeferred(e as BeforeInstallPromptEvent);
-    };
-
-    window.addEventListener('beforeinstallprompt', onPrompt);
-    window.addEventListener('appinstalled', () => setDeferred(null));
-
-    return () => window.removeEventListener('beforeinstallprompt', onPrompt);
+    setReady(Boolean(getDeferredPrompt()));
+    return subscribePwaInstall(() => setReady(Boolean(getDeferredPrompt())));
   }, []);
 
-  const install = async () => {
-    if (!deferred) return;
-    await deferred.prompt();
-    await deferred.userChoice;
-    setDeferred(null);
-  };
-
-  return { deferred, ios, install, canPrompt: Boolean(deferred) || ios };
+  return ready;
 }
 
 interface Props {
@@ -82,32 +65,69 @@ function IosInstallSheet({ onClose }: { onClose: () => void }) {
   );
 }
 
+function AndroidFallbackSheet({ onClose }: { onClose: () => void }) {
+  const { lang } = useLanguage();
+
+  return (
+    <div className="fixed inset-0 z-[70] flex items-end justify-center p-4 bg-black/55" onClick={onClose}>
+      <div
+        className="w-full max-w-sm rounded-2xl bg-[#0d2b22] border border-amber-500/35 p-5 shadow-2xl animate-fade-up"
+        onClick={(e) => e.stopPropagation()}
+        role="dialog"
+        aria-label={t('pwa.android_fallback_title', lang)}
+      >
+        <div className="flex items-center justify-between mb-3">
+          <span className="text-sm font-medium text-fg">{t('pwa.android_fallback_title', lang)}</span>
+          <button type="button" onClick={onClose} className="p-1 rounded-full hover:bg-white/10" aria-label={t('pwa.close', lang)}>
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+        <p className="text-sm text-fg/90 leading-relaxed flex items-start gap-2">
+          <MoreVertical className="w-4 h-4 text-accent shrink-0 mt-0.5" aria-hidden />
+          <span>{t('pwa.android_fallback_body', lang)}</span>
+        </p>
+      </div>
+    </div>
+  );
+}
+
 export default function PwaInstallButton({ onIosOpen }: Props) {
   const { lang } = useLanguage();
-  const { deferred, ios, install } = usePwaInstall();
+  const ios = isIOS();
+  const promptReady = useDeferredPromptReady();
   const [iosSheet, setIosSheet] = useState(false);
+  const [androidFallback, setAndroidFallback] = useState(false);
 
-  const handleClick = () => {
+  const handleInstallClick = async () => {
     if (ios) {
       setIosSheet(true);
       onIosOpen?.();
       return;
     }
-    if (deferred) void install();
+
+    const outcome = await triggerPwaInstall();
+    if (outcome === 'unavailable') {
+      setAndroidFallback(true);
+    }
   };
 
   return (
     <>
       {iosSheet && <IosInstallSheet onClose={() => setIosSheet(false)} />}
+      {androidFallback && <AndroidFallbackSheet onClose={() => setAndroidFallback(false)} />}
       <div className="fixed bottom-4 inset-x-4 z-50 max-w-md mx-auto safe-area-bottom pointer-events-none">
         <button
           type="button"
-          onClick={handleClick}
+          onClick={() => void handleInstallClick()}
           className="pwa-install-btn w-full pointer-events-auto"
+          aria-describedby={!ios && !promptReady ? 'pwa-install-hint' : undefined}
         >
           <Download className="w-4 h-4 shrink-0" aria-hidden />
           <span>{t('pwa.install_cta', lang)}</span>
         </button>
+        {!ios && !promptReady && (
+          <p id="pwa-install-hint" className="sr-only">{t('pwa.android_fallback_body', lang)}</p>
+        )}
       </div>
     </>
   );

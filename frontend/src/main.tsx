@@ -2,8 +2,11 @@ import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import { registerSW } from 'virtual:pwa-register';
+import { initPwaInstallCapture } from './lib/pwaInstall';
 import App from './App';
 import './styles/globals.css';
+
+initPwaInstallCapture();
 
 async function purgeStaleCaches() {
   if (!('caches' in window)) return;
