@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import CustomerShell from '../components/Shared/CustomerShell';
+import CategoryNav from '../components/Shared/CategoryNav';
 import ProductCard from '../components/Products/ProductCard';
 import ProductModal from '../components/Products/ProductModal';
 import SushiStage from '../components/Shared/SushiStageLazy';
@@ -152,11 +153,13 @@ export default function HomePage() {
 
       <section id="menu" className="py-16">
         <div className="max-w-7xl mx-auto px-6">
-          <div className="text-center mb-12">
+          <div className="text-center mb-8">
             <p className="label-luxury mb-3">{t('home.menu_label', lang)}</p>
             <h2 className="text-4xl md:text-5xl text-fg">{t('nav.products', lang)}</h2>
             <div className="divider-gold mt-6" />
           </div>
+
+          {!loading && categories.length > 0 && <CategoryNav categories={categories} />}
 
           {loading ? (
             <div className="text-center py-20 text-muted tracking-widest uppercase text-sm">{t('error.loading', lang)}</div>

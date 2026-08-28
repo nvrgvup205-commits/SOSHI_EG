@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react';
-import { MessageSquare, X } from 'lucide-react';
+import { MessageSquare, X, Sparkles } from 'lucide-react';
 import { useLocation } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import { useLanguage } from '../../hooks/useLanguage';
@@ -46,13 +46,16 @@ export default function FloatingChatWidget() {
       }}
     >
       {open && (
-        <div className="w-[min(100vw-2rem,22rem)] sm:w-96 shadow-2xl border border-[var(--app-line)] bg-[var(--app-card)] overflow-hidden animate-fade-up">
-          <div className="flex items-center justify-between px-4 py-3 border-b border-[var(--app-line)] bg-accent/10">
-            <span className="text-sm font-medium text-fg">{t('chat.widget_title', lang)}</span>
+        <div className="chat-widget-panel w-[min(100vw-2rem,22rem)] sm:w-96 overflow-hidden animate-fade-up">
+          <div className="flex items-center justify-between px-4 py-3 border-b border-[rgba(229,169,60,0.2)] bg-gradient-to-r from-accent/10 to-emerald/5">
+            <span className="flex items-center gap-2 text-sm font-medium text-fg">
+              <Sparkles className="w-4 h-4 text-accent" />
+              {t('chat.widget_title', lang)}
+            </span>
             <button
               type="button"
               onClick={() => setOpen(false)}
-              className="p-1 text-muted hover:text-fg"
+              className="p-1.5 rounded-full text-muted hover:text-fg hover:bg-white/5 transition-colors"
               aria-label="Close chat"
             >
               <X className="w-4 h-4" />
@@ -65,7 +68,7 @@ export default function FloatingChatWidget() {
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
-        className="flex items-center gap-2 px-4 py-3 rounded-full bg-primary text-white shadow-lg hover:bg-primary-dark transition-colors"
+        className="chat-widget-btn flex items-center gap-2 px-5 py-3.5 rounded-full text-accent transition-all hover:scale-105 active:scale-95"
         aria-expanded={open}
       >
         <MessageSquare className="w-5 h-5 shrink-0" />

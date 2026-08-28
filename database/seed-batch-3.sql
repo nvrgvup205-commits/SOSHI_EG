@@ -1,0 +1,35 @@
+INSERT INTO soshi.products (name_ar, name_en, name_ru, price, category, is_available, sort_order, is_new, is_popular, is_offer, category_id)
+SELECT v.name_ar, v.name_en, v.name_ru, v.price, v.category, v.is_available, v.sort_order, v.is_new, v.is_popular, v.is_offer, c.id
+FROM (VALUES
+('سلطة خضار', 'Vegetable Salad', 'Овощной салат', 100, 'salads', true, 2, false, false, false),
+('سلطة يوناني', 'Greek Salad', 'Греческий салат', 180, 'salads', true, 3, false, false, false),
+('سلطة كابوريا', 'Crab Salad', 'Крабовый салат', 250, 'salads', true, 4, false, false, false),
+('بوكي بول', 'Poke Bowl', 'Поке боул', 50, 'salads', true, 5, false, false, false),
+('سلطة سلمون يابانية', 'Salmon Japanese Salad', 'Японский салат с лососем', 410, 'salads', true, 6, true, false, false),
+('بوكي بالجمبري', 'Poke with Shrimp', 'Поке с креветкой', 300, 'salads', true, 7, false, false, false),
+('بوكي بالسلمون', 'Poke with Salmon', 'Поке с лососем', 350, 'salads', true, 8, false, false, false),
+('سلطة التنين', 'Dragon Salad', 'Салат Дракон', 300, 'salads', true, 9, false, false, false),
+('سلطة سلمون أفوكادو', 'Salmon Avocado Salad', 'Салат лосось авокадо', 300, 'salads', true, 10, false, false, false),
+('سلطة سلمون كرانشي', 'Crunchy Salmon Salad', 'Хрустящий салат с лососем', 350, 'salads', true, 11, false, false, false),
+('سلطة أعشاب بحرية', 'Seaweed Salad', 'Салат из водорослей', 250, 'salads', true, 12, false, false, false),
+('نودلز فراخ', 'Noodles Chicken', 'Лапша с курицей', 250, 'noodles', true, 1, false, false, false),
+('نودلز جمبري', 'Noodles Shrimp', 'Лапша с креветкой', 300, 'noodles', true, 2, false, false, false),
+('نودلز لحم', 'Noodles Beef', 'Лапша с говядиной', 270, 'noodles', true, 3, false, false, false),
+('نودلز خضار', 'Noodles Vegetables', 'Лапша с овощами', 200, 'noodles', true, 4, false, false, false),
+('جمبري تايجر', 'Shrimp Tiger', 'Креветка тигр', 280, 'appetizers', true, 1, false, false, false),
+('بطاطس مقلية', 'French Fries', 'Картофель фри', 100, 'appetizers', true, 2, false, false, false),
+('سبرينج رول جبنة', 'Cheese Spring Rolls', 'Спринг-роллы с сыром', 130, 'appetizers', true, 3, false, false, false),
+('سبرينج رول جمبري', 'Shrimp Spring', 'Спринг-роллы с креветкой', 290, 'appetizers', true, 4, false, false, false),
+('موتزاريلا ستيك', 'Mozzarella Sticks', 'Палочки моцарелла', 120, 'appetizers', true, 5, false, false, false),
+('بونبون جبنة', 'Cheese Bonbon', 'Сырные бонбоны', 250, 'appetizers', true, 6, false, false, false),
+('سبرينج رول سوشي شوب', 'Sushi Shop Spring Rolls', 'Спринг-роллы Sushi Shop', 290, 'appetizers', true, 7, false, false, false),
+('سبرينج رول خضار', 'Vegetables Spring Rolls', 'Овощные спринг-роллы', 100, 'appetizers', true, 8, false, false, false),
+('فوتوماكي', 'Futomaki', 'Футомаки', 430, 'maki-large', true, 1, true, false, false),
+('شاورما فراخ مع صوص الجبنة والبطاطس', 'Chicken Shawarma with Cheese Sauce & Fries', 'Шаурма с сырным соусом и картофелем', 120, 'shawarma', true, 1, false, false, false),
+('شاورما فراخ مع صوص الجبنة', 'Chicken Shawarma with Cheese Sauce', 'Шаурма с сырным соусом', 105, 'shawarma', true, 2, false, false, false),
+('شاورما فراخ كلاسيك', 'Classic Chicken Shawarma', 'Классическая куриная шаурма', 90, 'shawarma', true, 3, false, false, false),
+('فتة شاورما فراخ', 'Chicken Shawarma Fatteh', 'Фатте с шаурмой', 120, 'shawarma', true, 4, false, false, false),
+('شاورما فراخ مع صوص الباربكيو', 'Chicken Shawarma with BBQ Sauce', 'Шаурма с BBQ соусом', 100, 'shawarma', true, 5, false, false, false),
+('كولا', 'Cola', 'Кола', 25, 'drinks', true, 1, false, false, false)
+) AS v(name_ar, name_en, name_ru, price, category, is_available, sort_order, is_new, is_popular, is_offer)
+JOIN soshi.categories c ON c.slug = v.category;
