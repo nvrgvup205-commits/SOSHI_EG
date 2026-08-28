@@ -1,5 +1,5 @@
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { AuthProvider, useAuth } from './hooks/useAuth';
 import { LanguageProvider, useLanguage } from './hooks/useLanguage';
 import { ThemeProvider } from './hooks/useTheme';
@@ -60,15 +60,26 @@ function StaffLoginRedirect() {
 }
 
 function AppRoutes() {
-  const { hasChosen } = useLanguage();
+  const { hasChosen, resetLangGate } = useLanguage();
+  const { type, loading } = useAuth();
   const location = useLocation();
   const staffRoute = location.pathname.startsWith('/admin') || location.pathname.startsWith('/staff');
   const [showSplash, setShowSplash] = useState(() => sessionStorage.getItem('splash_seen') !== '1');
+  const prevPath = useRef(location.pathname);
   useScrollTop();
 
-  if (!hasChosen && !staffRoute) return <LanguageGate />;
+  useEffect(() => {
+    if (staffRoute || loading) return;
+    const enteredRoot = location.pathname === '/' && prevPath.current !== '/';
+    prevPath.current = location.pathname;
+    if (enteredRoot && type !== 'customer') {
+      resetLangGate();
+    }
+  }, [location.pathname, type, loading, staffRoute, resetLangGate]);
 
-  if (!staffRoute && showSplash) {
+  if (!staffRoute && !hasChosen) return <LanguageGate />;
+
+  if (!staffRoute && type === 'customer' && showSplash) {
     return (
       <SplashScreen
         onDone={() => {

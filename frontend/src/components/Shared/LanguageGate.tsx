@@ -1,44 +1,56 @@
+import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '../../hooks/useLanguage';
 import type { Language } from '../../types';
 import { t } from '../../utils/i18n';
 import BrandMark from './BrandMark';
+import FlagIcon from './FlagIcon';
 import LogoHalo from './LogoHalo';
 import ThemeToggle from './ThemeToggle';
 
-const langs: { code: Language; flag: string }[] = [
-  { code: 'ar', flag: '🇪🇬' },
-  { code: 'en', flag: '🇬🇧' },
-  { code: 'ru', flag: '🇷🇺' },
+const langs: { code: Language; label: string }[] = [
+  { code: 'ar', label: 'العربية' },
+  { code: 'en', label: 'English' },
+  { code: 'ru', label: 'Русский' },
 ];
 
 export default function LanguageGate() {
   const { chooseLang, lang } = useLanguage();
+  const navigate = useNavigate();
+
+  const pick = (code: Language) => {
+    chooseLang(code);
+    navigate('/login', { replace: true });
+  };
 
   return (
-    <div className="splash-screen flex min-h-screen items-center justify-center px-6 py-16">
-      <div className="ambient-glow fixed inset-0" />
-      <div className="relative z-10 w-full max-w-lg text-center">
-        <div className="flex justify-start mb-6" dir="ltr">
+    <div className="splash-screen h-dvh max-h-dvh overflow-hidden flex flex-col py-4 px-6 pb-20">
+      <div className="ambient-glow fixed inset-0 pointer-events-none" />
+      <div className="relative z-10 flex flex-col h-full w-full max-w-md mx-auto gap-3">
+        <div className="flex justify-start shrink-0" dir="ltr">
           <ThemeToggle compact />
         </div>
-        <LogoHalo className="mx-auto mb-8">
-          <BrandMark size="lg" />
-        </LogoHalo>
-        <p className="label-luxury mb-3">SUSHI SHOP EGYPT</p>
-        <h1 className="font-display text-3xl text-fg mb-2">{t('lang.title', lang)}</h1>
-        <p className="text-muted mb-10">{t('gate.pick', lang)}</p>
-        <div className="space-y-3">
+
+        <div className="text-center shrink-0">
+          <LogoHalo className="mx-auto mb-3">
+            <BrandMark size="md" />
+          </LogoHalo>
+          <p className="label-luxury text-[10px] mb-1">SUSHI SHOP EGYPT</p>
+          <h1 className="font-display text-xl text-fg mb-1">{t('lang.title', lang)}</h1>
+          <p className="text-muted text-xs">{t('gate.pick', lang)}</p>
+        </div>
+
+        <div className="flex flex-col gap-2 shrink-0">
           {langs.map((item) => (
             <button
               key={item.code}
               type="button"
-              onClick={() => chooseLang(item.code)}
-              className="glass-card w-full p-5 flex items-center gap-5 text-start hover:border-accent/50 transition-colors rounded-2xl"
+              onClick={() => pick(item.code)}
+              className="glass-card w-full p-3 flex items-center gap-3 text-start hover:border-accent/50 transition-colors rounded-xl"
             >
-              <span className="text-4xl leading-none" aria-hidden>{item.flag}</span>
+              <FlagIcon lang={item.code} className="w-8 h-8" />
               <span>
-                <span className="block font-display text-xl text-fg">{t(`lang.${item.code}`, lang)}</span>
-                <span className="text-muted text-sm">{t(`lang.flag.${item.code}`, lang)}</span>
+                <span className="block font-display text-base text-fg">{t(`lang.${item.code}`, lang)}</span>
+                <span className="text-muted text-xs">{t(`lang.flag.${item.code}`, lang)}</span>
               </span>
             </button>
           ))}

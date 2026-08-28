@@ -425,6 +425,35 @@ html.light .brand-mark-img {
   @apply py-2 text-sm;
 }
 
+.auth-form-card {
+  flex: 0 0 auto;
+  align-self: stretch;
+}
+
+.pwa-install-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.7rem 1.25rem;
+  border-radius: 9999px;
+  background: linear-gradient(135deg, #e5a93c 0%, #10b981 50%, #c48a1f 100%);
+  color: #04120e;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  box-shadow:
+    0 4px 22px rgba(234, 179, 8, 0.4),
+    0 0 28px rgba(16, 185, 129, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.pwa-install-btn:active {
+  transform: scale(0.98);
+}
+
 .theme-toggle {
   display: inline-flex;
   align-items: center;

@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
+import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from 'react';
 import { useLocation } from 'react-router-dom';
 import type { Language } from '../types';
 
@@ -6,6 +6,7 @@ interface LanguageState {
   lang: Language;
   setLang: (lang: Language) => void;
   chooseLang: (lang: Language) => void;
+  resetLangGate: () => void;
   hasChosen: boolean;
   dir: 'rtl' | 'ltr';
 }
@@ -14,7 +15,7 @@ const LanguageContext = createContext<LanguageState | null>(null);
 
 const CUSTOMER_LANG_KEY = 'lang';
 const STAFF_LANG_KEY = 'staff_lang';
-const LANG_CHOSEN_KEY = 'lang_chosen';
+const LANG_GATE_SESSION_KEY = 'lang_gate_passed';
 const LANG_COOKIE = 'soshi_lang';
 
 function isStaffRoute(pathname: string) {
@@ -38,6 +39,14 @@ function readLang(key: string, fallback: Language): Language {
   return fallback;
 }
 
+function readGatePassed(): boolean {
+  try {
+    return sessionStorage.getItem(LANG_GATE_SESSION_KEY) === '1';
+  } catch {
+    return false;
+  }
+}
+
 function applyDocumentLang(l: Language) {
   document.documentElement.dir = l === 'ar' ? 'rtl' : 'ltr';
   document.documentElement.lang = l;
@@ -47,12 +56,10 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   const location = useLocation();
   const staffRoute = isStaffRoute(location.pathname);
   const storageKey = staffRoute ? STAFF_LANG_KEY : CUSTOMER_LANG_KEY;
-  const fallback: Language = staffRoute ? 'ar' : 'ar';
+  const fallback: Language = 'ar';
 
   const [lang, setLangState] = useState<Language>(() => readLang(storageKey, fallback));
-  const [hasChosen, setHasChosen] = useState(
-    () => localStorage.getItem(LANG_CHOSEN_KEY) === '1' || Boolean(readCookieLang()),
-  );
+  const [hasChosen, setHasChosen] = useState(() => readGatePassed());
 
   useEffect(() => {
     const next = readLang(storageKey, fallback);
@@ -67,10 +74,23 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     applyDocumentLang(l);
   };
 
+  const resetLangGate = useCallback(() => {
+    try {
+      sessionStorage.removeItem(LANG_GATE_SESSION_KEY);
+    } catch {
+      /* ignore */
+    }
+    setHasChosen(false);
+  }, []);
+
   const chooseLang = (l: Language) => {
     setLangState(l);
     localStorage.setItem(CUSTOMER_LANG_KEY, l);
-    localStorage.setItem(LANG_CHOSEN_KEY, '1');
+    try {
+      sessionStorage.setItem(LANG_GATE_SESSION_KEY, '1');
+    } catch {
+      /* ignore */
+    }
     writeLangCookie(l);
     setHasChosen(true);
     applyDocumentLang(l);
@@ -79,7 +99,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   const dir = lang === 'ar' ? 'rtl' : 'ltr';
 
   return (
-    <LanguageContext.Provider value={{ lang, setLang, chooseLang, hasChosen, dir }}>
+    <LanguageContext.Provider value={{ lang, setLang, chooseLang, resetLangGate, hasChosen, dir }}>
       {children}
     </LanguageContext.Provider>
   );
