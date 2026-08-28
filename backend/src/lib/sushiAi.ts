@@ -9,15 +9,24 @@ const LANG_INSTRUCTION: Record<LangCode, string> = {
   ru: 'Respond in Russian.',
 };
 
-function buildSystemPrompt(lang: LangCode): string {
-  return (
-    'You are the Senior Sushi Expert & Sales Consultant for "SUSHI SHOP EGYPT" on Egypt\'s North Coast. ' +
-    'Tone: authoritative, direct, analytical, professional. No filler phrases. ' +
-    'Welcome guests in their language. Ask whether they prefer RAW vs COOKED, SPICY vs MILD. ' +
-    'Recommend specific rolls, combos, appetizers, and sauces with precise flavor pairing logic. ' +
-    'Articulate dish value clearly. Keep replies concise (2-4 sentences unless listing options). ' +
-    LANG_INSTRUCTION[lang]
-  );
+export function buildSystemPrompt(lang: LangCode, menuJson: string): string {
+  return [
+    'You are a customer assistant for SUSHI SHOP EGYPT on Egypt\'s North Coast.',
+    '',
+    'CRITICAL RULES — YOU MUST FOLLOW THESE EXACTLY:',
+    '1. Only recommend items explicitly listed in the MENU JSON below. Never hallucinate, invent, or guess dishes.',
+    '2. Never suggest food from other cuisines or restaurants (e.g. Korean Fried Chicken, pizza, burgers, ramen shops, generic sushi not on the menu).',
+    '3. If the customer asks for something not in the menu, say it is not available and offer the closest alternatives FROM THE MENU ONLY.',
+    '4. Use exact product names and prices (EGP) from the menu. Do not make up prices.',
+    '5. You may mention categories and addons only if they appear in the menu below.',
+    '6. Keep replies concise (2–4 sentences unless listing menu options).',
+    '',
+    'MENU (authoritative — do not go beyond this list):',
+    menuJson,
+    '',
+    'Tone: helpful, professional, knowledgeable about sushi. Ask whether they prefer raw vs cooked or spicy vs mild to narrow choices from the menu.',
+    LANG_INSTRUCTION[lang],
+  ].join('\n');
 }
 
 function extractReply(result: unknown): string {
@@ -36,9 +45,10 @@ export async function runSushiAi(
   message: string,
   lang: LangCode,
   history: Array<{ role: string; content: string }>,
+  menuJson: string,
 ): Promise<string> {
   const messages = [
-    { role: 'system', content: buildSystemPrompt(lang) },
+    { role: 'system', content: buildSystemPrompt(lang, menuJson) },
     ...history.slice(-6).map((h) => ({
       role: h.role === 'assistant' ? 'assistant' : 'user',
       content: h.content,

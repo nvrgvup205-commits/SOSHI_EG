@@ -11,6 +11,7 @@ import {
   type ChatMessageRow,
   type LangCode,
 } from '../lib/translate';
+import { getMenuContextJson } from '../lib/menuContext';
 import { runSushiAi } from '../lib/sushiAi';
 
 type AppEnv = {
@@ -154,8 +155,10 @@ chat.post('/ai', requireCustomer, async (c) => {
   const text = (body.message || '').trim();
   if (!text) return errorResponse('Message required', 400);
   const uiLang = normalizeLang(body.lang || 'ar');
+  const supabase = createSupabase(c.env);
   try {
-    const reply = await runSushiAi(c.env.AI, text, uiLang, body.history || []);
+    const menuJson = await getMenuContextJson(supabase);
+    const reply = await runSushiAi(c.env.AI, text, uiLang, body.history || [], menuJson);
     return jsonResponse({ reply });
   } catch (err) {
     return errorResponse(err instanceof Error ? err.message : 'AI error', 500);
