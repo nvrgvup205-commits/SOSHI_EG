@@ -18,6 +18,7 @@ function wrapOffset(index: number, active: number, total: number) {
   return delta;
 }
 
+
 export default function FeaturedCarousel({ products, lang, onOpen }: Props) {
   const reduceMotion = useReducedMotion();
   const [active, setActive] = useState(0);
@@ -30,7 +31,8 @@ export default function FeaturedCarousel({ products, lang, onOpen }: Props) {
     if (!count) return [];
     return items
       .map((product, index) => ({ product, index, offset: wrapOffset(index, active, count) }))
-      .filter((item) => Math.abs(item.offset) <= 2);
+      .filter((item) => Math.abs(item.offset) <= 2)
+      .sort((a, b) => a.offset - b.offset);
   }, [items, active, count]);
 
   useEffect(() => {
@@ -53,70 +55,77 @@ export default function FeaturedCarousel({ products, lang, onOpen }: Props) {
   };
 
   const onDragEnd = (_: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
-    const swipe = info.offset.x + info.velocity.x * 0.18;
-    if (swipe < -42) go(active + 1);
-    else if (swipe > 42) go(active - 1);
+    const swipe = info.offset.x + info.velocity.x * 0.2;
+    if (swipe < -40) go(active + 1);
+    else if (swipe > 40) go(active - 1);
     window.setTimeout(() => {
       dragging.current = false;
-    }, 80);
+    }, 60);
   };
 
   return (
     <section className="hero-carousel relative px-2 pt-3 pb-5 overflow-hidden" style={{ touchAction: 'pan-y' }}>
       <div className="ambient-glow" />
-      <div className="relative h-[220px] w-full select-none" dir="ltr">
-        {visible.map(({ product, index, offset }) => {
-          const isCenter = offset === 0;
-          const name = getProductName(product, lang);
-          const img = pickProductImage(product);
-          return (
-            <motion.button
-              key={`${product.id}-${index}`}
-              type="button"
-              drag="x"
-              dragConstraints={{ left: 0, right: 0 }}
-              dragElastic={0.22}
-              onDragStart={onDragStart}
-              onDragEnd={onDragEnd}
-              onClick={() => {
-                if (dragging.current) return;
-                if (isCenter) onOpen(product);
-                else go(index);
-              }}
-              className="featured-slide absolute left-1/2 top-1/2 cursor-grab active:cursor-grabbing"
-              style={{ zIndex: isCenter ? 3 : 2 - Math.abs(offset), touchAction: 'pan-y' }}
-              animate={{
-                x: `calc(-50% + ${offset * 118}px)`,
-                scale: isCenter ? 1 : 0.8,
-                opacity: isCenter ? 1 : 0.5,
-                y: isCenter && !reduceMotion
-                  ? ['calc(-50% - 4px)', 'calc(-50% + 4px)', 'calc(-50% - 4px)']
-                  : '-50%',
-              }}
-              transition={{
-                x: { type: 'spring', stiffness: 260, damping: 28 },
-                scale: { type: 'spring', stiffness: 260, damping: 28 },
-                opacity: { duration: 0.25 },
-                y: isCenter && !reduceMotion
-                  ? { duration: 3.2, repeat: Infinity, ease: 'easeInOut' }
-                  : { duration: 0.25 },
-              }}
-            >
-              <span className={`featured-glow ${isCenter ? 'opacity-100' : 'opacity-0'}`} />
-              {img ? (
-                <img src={img} alt={name} className="w-full h-full object-cover rounded-2xl pointer-events-none" />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center text-5xl rounded-2xl bg-[var(--app-card)]">🍣</div>
-              )}
-              {isCenter && (
-                <div className="absolute bottom-0 inset-x-0 p-3 text-center bg-gradient-to-t from-black/80 to-transparent rounded-b-2xl">
-                  <p className="text-sm font-medium text-white truncate">{name}</p>
-                  <p className="text-accent text-lg font-display">{product.price}</p>
-                </div>
-              )}
-            </motion.button>
-          );
-        })}
+      <div
+        className="flex flex-row items-center justify-center overflow-x-hidden w-full relative h-[220px] select-none"
+        dir="ltr"
+        style={{ touchAction: 'pan-y' }}
+      >
+        <motion.div
+          className="flex flex-row items-center justify-center relative"
+          drag="x"
+          dragConstraints={{ left: 0, right: 0 }}
+          dragElastic={0.18}
+          onDragStart={onDragStart}
+          onDragEnd={onDragEnd}
+          style={{ touchAction: 'pan-y' }}
+        >
+          {visible.map(({ product, index, offset }) => {
+            const isCenter = offset === 0;
+            const name = getProductName(product, lang);
+            const img = pickProductImage(product);
+            return (
+              <motion.button
+                key={`${product.id}-${index}`}
+                type="button"
+                onClick={() => {
+                  if (dragging.current) return;
+                  if (isCenter) onOpen(product);
+                  else go(index);
+                }}
+                className={`featured-slide shrink-0 ${isCenter ? 'featured-slide-active' : ''}`}
+                style={{
+                  zIndex: isCenter ? 3 : 2 - Math.abs(offset),
+                  touchAction: 'pan-y',
+                }}
+                animate={{
+                  scale: isCenter ? 1 : 0.75,
+                  opacity: isCenter ? 1 : 0.5,
+                  marginInline: isCenter ? '0.25rem' : '-2.75rem',
+                }}
+                transition={{
+                  type: 'spring',
+                  stiffness: 320,
+                  damping: 30,
+                  mass: 0.8,
+                }}
+              >
+                <span className={`featured-glow ${isCenter ? 'opacity-100' : 'opacity-0'}`} />
+                {img ? (
+                  <img src={img} alt={name} className="w-full h-full object-cover rounded-2xl pointer-events-none" draggable={false} />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center text-5xl rounded-2xl bg-[var(--app-card)]">🍣</div>
+                )}
+                {isCenter && (
+                  <div className="absolute bottom-0 inset-x-0 p-3 text-center bg-gradient-to-t from-black/80 to-transparent rounded-b-2xl pointer-events-none">
+                    <p className="text-sm font-medium text-white truncate">{name}</p>
+                    <p className="text-accent text-lg font-display">{product.price}</p>
+                  </div>
+                )}
+              </motion.button>
+            );
+          })}
+        </motion.div>
       </div>
       <div className="flex justify-center gap-1.5 mt-3">
         {items.map((_, i) => (

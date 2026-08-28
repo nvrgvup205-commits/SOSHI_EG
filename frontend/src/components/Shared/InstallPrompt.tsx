@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
-import { Download, X, Share, PlusSquare } from 'lucide-react';
+import { Download, Share, X } from 'lucide-react';
 import { useLanguage } from '../../hooks/useLanguage';
 import { useAuth } from '../../hooks/useAuth';
 import { t } from '../../utils/i18n';
@@ -27,24 +27,26 @@ function isStaffPath(path: string) {
 }
 
 export default function InstallPrompt() {
-  const { lang, hasChosen } = useLanguage();
+  const { lang } = useLanguage();
   const { type, loading } = useAuth();
   const location = useLocation();
   const [deferred, setDeferred] = useState<BeforeInstallPromptEvent | null>(null);
   const [visible, setVisible] = useState(false);
-  const [ios, setIos] = useState(false);
+  const [iosHint, setIosHint] = useState(false);
+  const ios = isIOS();
 
   useEffect(() => {
     if (isStandalone()) return;
     if (type) return;
     if (loading) return;
     if (isStaffPath(location.pathname)) return;
+    if (location.pathname !== '/login') return;
     if (localStorage.getItem(DISMISS_KEY) === '1') return;
 
     const onPrompt = (e: Event) => {
       e.preventDefault();
       setDeferred(e as BeforeInstallPromptEvent);
-      window.setTimeout(() => setVisible(true), 600);
+      setVisible(true);
     };
 
     window.addEventListener('beforeinstallprompt', onPrompt);
@@ -53,10 +55,7 @@ export default function InstallPrompt() {
       localStorage.setItem(DISMISS_KEY, '1');
     });
 
-    const timer = window.setTimeout(() => {
-      if (isIOS()) setIos(true);
-      else setVisible(true);
-    }, 800);
+    const timer = window.setTimeout(() => setVisible(true), 800);
 
     return () => {
       window.removeEventListener('beforeinstallprompt', onPrompt);
@@ -67,7 +66,7 @@ export default function InstallPrompt() {
   const dismiss = () => {
     localStorage.setItem(DISMISS_KEY, '1');
     setVisible(false);
-    setIos(false);
+    setIosHint(false);
   };
 
   const install = async () => {
@@ -81,58 +80,50 @@ export default function InstallPrompt() {
     setDeferred(null);
   };
 
+  const handleBarClick = () => {
+    if (ios) {
+      setIosHint((v) => !v);
+      return;
+    }
+    if (deferred) void install();
+  };
+
   if (isStandalone() || type || loading || isStaffPath(location.pathname)) return null;
-  if (hasChosen && location.pathname !== '/login') return null;
-  if (!visible && !ios) return null;
+  if (location.pathname !== '/login') return null;
+  if (!visible) return null;
 
   return (
-    <div className="fixed bottom-4 inset-x-4 z-[100] md:inset-x-auto md:end-6 md:bottom-6 md:max-w-sm animate-fade-up">
-      <div className="card p-5 border border-accent/30 shadow-2xl shadow-accent/10 relative overflow-hidden">
-        <span className="logo-halo-glow !inset-auto !-top-8 !-start-8 !w-28 !h-28" aria-hidden />
+    <>
+      {iosHint && (
+        <div
+          className="fixed bottom-12 inset-x-4 z-[60] max-w-sm mx-auto p-3 rounded-xl bg-[#0d2b22]/98 border border-amber-500/30 text-xs text-fg/90 leading-relaxed shadow-xl animate-fade-up"
+          role="tooltip"
+        >
+          <Share className="w-3.5 h-3.5 inline me-1 text-accent" />
+          {t('pwa.ios', lang)}
+        </div>
+      )}
+
+      <div className="fixed bottom-0 inset-x-0 z-50 bg-[#04120e]/95 backdrop-blur-md border-t border-amber-500/20 py-2.5 px-4 flex items-center justify-between gap-3 safe-area-bottom">
+        <button
+          type="button"
+          onClick={handleBarClick}
+          className="flex items-center gap-2.5 flex-1 min-w-0 text-start"
+        >
+          <BrandMark size="sm" className="shrink-0 scale-75 origin-center" />
+          <span className="text-xs text-fg/90 truncate">{t('pwa.body', lang)}</span>
+          {!ios && deferred && <Download className="w-4 h-4 text-accent shrink-0" aria-hidden />}
+          {ios && <Share className="w-4 h-4 text-accent shrink-0" aria-hidden />}
+        </button>
         <button
           type="button"
           onClick={dismiss}
-          className="absolute top-3 end-3 z-10 p-1.5 rounded-full text-fg/70 hover:text-fg hover:bg-black/10"
+          className="p-1.5 rounded-full text-fg/60 hover:text-fg hover:bg-white/10 shrink-0"
           aria-label={t('pwa.close', lang)}
         >
           <X className="w-4 h-4" />
         </button>
-
-        <div className="flex items-start gap-4 relative z-10">
-          <BrandMark size="sm" />
-          <div className="flex-1 pe-6">
-            <p className="text-fg font-medium text-sm mb-1">{t('pwa.title', lang)}</p>
-            <p className="text-muted text-xs leading-relaxed">
-              {ios ? t('pwa.ios', lang) : t('pwa.body', lang)}
-            </p>
-            {ios && (
-              <p className="text-accent text-xs mt-2 flex items-center gap-1.5">
-                <Share className="w-3.5 h-3.5" />
-                <PlusSquare className="w-3.5 h-3.5" />
-                {t('pwa.ios', lang)}
-              </p>
-            )}
-          </div>
-        </div>
-
-        <div className="flex gap-2 mt-4 relative z-10">
-          {!ios && deferred && (
-            <button type="button" onClick={() => void install()} className="btn-luxury-filled text-xs flex-1 py-2.5">
-              <Download className="w-3.5 h-3.5" />
-              {t('pwa.install', lang)}
-            </button>
-          )}
-          {ios && (
-            <button type="button" onClick={dismiss} className="btn-luxury-filled text-xs flex-1 py-2.5">
-              <Share className="w-3.5 h-3.5" />
-              {t('pwa.install', lang)}
-            </button>
-          )}
-          <button type="button" onClick={dismiss} className="btn-luxury text-xs py-2.5 px-4">
-            {t('pwa.dismiss', lang)}
-          </button>
-        </div>
       </div>
-    </div>
+    </>
   );
 }

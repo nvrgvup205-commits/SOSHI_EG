@@ -1,5 +1,25 @@
 const FALLBACK_API = 'https://soshi-eg-api.nvrgvup205.workers.dev';
 
+const NO_CACHE = 'no-cache, no-store, must-revalidate';
+
+function isHtmlAsset(pathname: string, contentType: string | null) {
+  if (contentType?.includes('text/html')) return true;
+  if (pathname === '/' || pathname.endsWith('.html')) return true;
+  return !pathname.includes('.') && !pathname.startsWith('/api/');
+}
+
+function withNoCacheHeaders(response: Response): Response {
+  const headers = new Headers(response.headers);
+  headers.set('Cache-Control', NO_CACHE);
+  headers.set('Pragma', 'no-cache');
+  headers.set('Expires', '0');
+  return new Response(response.body, {
+    status: response.status,
+    statusText: response.statusText,
+    headers,
+  });
+}
+
 export default {
   async fetch(request: Request, env: {
     ASSETS: { fetch: (request: Request) => Promise<Response> };
@@ -34,6 +54,11 @@ export default {
       out.set('Access-Control-Allow-Origin', url.origin);
       return new Response(res.body, { status: res.status, statusText: res.statusText, headers: out });
     }
-    return env.ASSETS.fetch(request);
+
+    const response = await env.ASSETS.fetch(request);
+    if (isHtmlAsset(url.pathname, response.headers.get('content-type'))) {
+      return withNoCacheHeaders(response);
+    }
+    return response;
   },
 };

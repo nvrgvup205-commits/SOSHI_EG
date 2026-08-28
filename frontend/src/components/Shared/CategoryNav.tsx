@@ -18,8 +18,8 @@ export default function CategoryNav({ categories, activeSlug, onSelect }: Props)
   if (!categories.length) return null;
 
   return (
-    <nav className="category-nav">
-      <div className="flex gap-2 overflow-x-auto scrollbar-hide px-4 py-2">
+    <nav className="category-nav border-b border-[var(--app-line)]">
+      <div className="flex items-center gap-2 overflow-x-auto whitespace-nowrap scrollbar-hide px-4 py-2">
         {categories.map((cat) => (
           <button
             key={cat.id}
