@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/png" href="/pwa-192.png" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/manifest.webmanifest" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#04120e" />
     <meta name="description" content="Finest sushi on Egypt's North Coast - Sushi Shop Egypt" />
@@ -12,12 +13,10 @@
     <meta name="apple-mobile-web-app-title" content="Sushi Shop Egypt" />
     <meta name="mobile-web-app-capable" content="yes" />
     <title>Sushi Shop Egypt</title>
-  </head>
-  <body>
-    <div id="root"></div>
     <script>
       (function () {
         window.deferredPrompt = null;
+        window.__pwaCaptureInit = true;
         window.addEventListener('beforeinstallprompt', function (e) {
           e.preventDefault();
           window.deferredPrompt = e;
@@ -28,6 +27,9 @@
         });
       })();
     </script>
+  </head>
+  <body>
+    <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

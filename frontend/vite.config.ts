@@ -12,6 +12,7 @@ export default defineConfig({
       injectRegister: false,
       includeAssets: ['logo.png', 'logo-light.png', 'favicon.svg', 'apple-touch-icon.png', 'pwa-192.png', 'pwa-512.png'],
       manifest: {
+        id: '/',
         name: 'SUSHI SHOP EGYPT',
         short_name: 'Sushi Shop',
         description: 'Finest sushi on Egypt\'s North Coast',

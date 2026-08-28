@@ -10,6 +10,7 @@ import BrandMark from '../Shared/BrandMark';
 import LogoHalo from '../Shared/LogoHalo';
 import ThemeToggle from '../Shared/ThemeToggle';
 import LanguageSwitcher from '../Shared/LanguageSwitcher';
+import PwaInstallButton from '../Shared/PwaInstallButton';
 
 export default function CustomerLogin() {
   const { loginCustomer, registerCustomer, type } = useAuth();
@@ -80,9 +81,9 @@ export default function CustomerLogin() {
   };
 
   return (
-    <div className="splash-screen h-dvh max-h-dvh overflow-hidden flex flex-col py-4 px-6 pb-20">
+    <div className="splash-screen h-dvh max-h-dvh overflow-hidden flex flex-col px-6 pt-4 pb-4">
       <div className="ambient-glow fixed inset-0 pointer-events-none" />
-      <div className="relative z-10 flex flex-col h-full w-full max-w-md mx-auto gap-2 overflow-hidden">
+      <div className="relative z-10 flex flex-col flex-1 min-h-0 w-full max-w-md mx-auto gap-2">
         <div className="flex items-center justify-between shrink-0" dir="ltr">
           <ThemeToggle compact />
           <LanguageSwitcher dark />
@@ -117,7 +118,7 @@ export default function CustomerLogin() {
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="glass-card auth-form-card p-3 flex flex-col gap-2 shrink-0 w-full">
+        <form onSubmit={handleSubmit} className="glass-card auth-form-card p-3 flex flex-col gap-2 w-full">
           <AnimatePresence mode="wait">
             <motion.div
               key={mode}
@@ -183,6 +184,10 @@ export default function CustomerLogin() {
             </>
           )}
         </form>
+
+        <div className="mt-auto shrink-0">
+          <PwaInstallButton variant="inline" />
+        </div>
       </div>
     </div>
   );

@@ -26,7 +26,6 @@ import CouponsPage from './components/Admin/CouponsPage';
 import ReportsPage from './components/Admin/ReportsPage';
 import ChatInbox from './components/Admin/ChatInbox';
 import StaffPortal from './pages/StaffPortal';
-import InstallPrompt from './components/Shared/InstallPrompt';
 import LanguageGate from './components/Shared/LanguageGate';
 import SplashScreen from './components/Shared/SplashScreen';
 import BottomNav from './components/Shared/BottomNav';
@@ -130,7 +129,6 @@ export default function App() {
       <LanguageProvider>
         <AuthProvider>
           <AppRoutes />
-          <InstallPrompt />
         </AuthProvider>
       </LanguageProvider>
     </ThemeProvider>

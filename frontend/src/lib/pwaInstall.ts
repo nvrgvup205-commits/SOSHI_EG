@@ -18,8 +18,28 @@ function notify() {
   subscribers.forEach((cb) => cb());
 }
 
+export function isIOS() {
+  return /iPad|iPhone|iPod/.test(navigator.userAgent)
+    && !(window as unknown as { MSStream?: unknown }).MSStream;
+}
+
+export function isAndroid() {
+  return /Android/i.test(navigator.userAgent);
+}
+
+export function isMobileInstallTarget() {
+  return isIOS() || isAndroid();
+}
+
+export function isStandalone() {
+  return window.matchMedia('(display-mode: standalone)').matches
+    || (navigator as unknown as { standalone?: boolean }).standalone === true;
+}
+
 export function getDeferredPrompt(): BeforeInstallPromptEvent | null {
-  return window.deferredPrompt ?? null;
+  const prompt = window.deferredPrompt;
+  if (!prompt || typeof prompt.prompt !== 'function') return null;
+  return prompt;
 }
 
 export function clearDeferredPrompt() {
@@ -27,7 +47,7 @@ export function clearDeferredPrompt() {
   notify();
 }
 
-/** Attach as early as possible — also backed by inline script in index.html. */
+/** Attach as early as possible — also backed by inline script in index.html <head>. */
 export function initPwaInstallCapture() {
   if (typeof window === 'undefined' || window.__pwaCaptureInit) return;
   window.__pwaCaptureInit = true;
@@ -61,12 +81,19 @@ export function subscribePwaInstall(listener: () => void) {
   };
 }
 
-export async function triggerPwaInstall(): Promise<'accepted' | 'dismissed' | 'unavailable'> {
+/**
+ * Must run synchronously inside the click handler (user-gesture) — do not await before prompt().
+ */
+export function invokePwaInstallSync(): 'prompted' | 'unavailable' {
   const promptEvent = getDeferredPrompt();
   if (!promptEvent) return 'unavailable';
 
-  await promptEvent.prompt();
-  const { outcome } = await promptEvent.userChoice;
-  clearDeferredPrompt();
-  return outcome;
+  try {
+    void promptEvent.prompt();
+    void promptEvent.userChoice.then(() => clearDeferredPrompt()).catch(() => clearDeferredPrompt());
+    return 'prompted';
+  } catch {
+    clearDeferredPrompt();
+    return 'unavailable';
+  }
 }

@@ -5,6 +5,7 @@ import { t } from '../../utils/i18n';
 import BrandMark from './BrandMark';
 import FlagIcon from './FlagIcon';
 import LogoHalo from './LogoHalo';
+import PwaInstallButton from './PwaInstallButton';
 import ThemeToggle from './ThemeToggle';
 
 const langs: { code: Language; label: string }[] = [
@@ -23,15 +24,15 @@ export default function LanguageGate() {
   };
 
   return (
-    <div className="splash-screen h-dvh max-h-dvh overflow-hidden flex flex-col py-4 px-6 pb-20">
+    <div className="splash-screen h-dvh max-h-dvh overflow-hidden flex flex-col px-6 pt-4 pb-4">
       <div className="ambient-glow fixed inset-0 pointer-events-none" />
-      <div className="relative z-10 flex flex-col h-full w-full max-w-md mx-auto gap-3">
+      <div className="relative z-10 flex flex-col w-full max-w-md mx-auto gap-2 min-h-0 flex-1">
         <div className="flex justify-start shrink-0" dir="ltr">
           <ThemeToggle compact />
         </div>
 
         <div className="text-center shrink-0">
-          <LogoHalo className="mx-auto mb-3">
+          <LogoHalo className="mx-auto mb-2">
             <BrandMark size="md" />
           </LogoHalo>
           <p className="label-luxury text-[10px] mb-1">SUSHI SHOP EGYPT</p>
@@ -54,6 +55,10 @@ export default function LanguageGate() {
               </span>
             </button>
           ))}
+        </div>
+
+        <div className="mt-auto shrink-0">
+          <PwaInstallButton variant="inline" />
         </div>
       </div>
     </div>
