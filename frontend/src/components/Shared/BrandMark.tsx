@@ -24,8 +24,9 @@ export default function BrandMark({
     <span className={`brand-mark inline-flex ${className}`}>
       <img
         src={logoSrc}
-        alt="Sushi Shop Egypt"
-        className={`${sizes[size]} w-auto max-w-[min(100%,14rem)] object-contain`}
+        alt="SUSHI SHOP EGYPT"
+        className={`brand-mark-img ${sizes[size]} w-auto max-w-[min(100%,14rem)] object-contain`}
+        draggable={false}
         onError={(e) => {
           const img = e.currentTarget;
           if (!img.src.endsWith('/favicon.svg')) img.src = '/favicon.svg';

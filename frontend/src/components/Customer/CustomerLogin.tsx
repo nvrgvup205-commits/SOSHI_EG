@@ -1,11 +1,13 @@
 import { useState } from 'react';
 import { Navigate } from 'react-router-dom';
+import { AnimatePresence, motion } from 'framer-motion';
 import { Lock, Mail, MapPin, Phone, User } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
 import { useLanguage } from '../../hooks/useLanguage';
 import { t } from '../../utils/i18n';
 import { formatPhone, isValidEmail, isValidPhone } from '../../utils/validators';
 import BrandMark from '../Shared/BrandMark';
+import LogoHalo from '../Shared/LogoHalo';
 import ThemeToggle from '../Shared/ThemeToggle';
 import LanguageSwitcher from '../Shared/LanguageSwitcher';
 
@@ -76,85 +78,100 @@ export default function CustomerLogin() {
   };
 
   return (
-    <div className="splash-screen min-h-screen flex items-center justify-center px-4 py-16">
+    <div className="splash-screen min-h-screen flex items-center justify-center px-4 py-10">
       <div className="ambient-glow fixed inset-0" />
       <div className="relative z-10 w-full max-w-md">
-          <div className="flex items-center justify-between mb-6">
-            <LanguageSwitcher dark />
-            <ThemeToggle compact />
-          </div>
-          <div className="text-center mb-8">
-            <BrandMark size="lg" className="mx-auto mb-5" />
-            <p className="label-luxury mb-2">
-              {mode === 'login' ? t('login.title', lang) : t('login.register_title', lang)}
-            </p>
-            <p className="text-muted text-sm">{t('login.subtitle', lang)}</p>
-          </div>
-          <div className="flex gap-2 mb-4">
-            <button
-              type="button"
-              onClick={() => setMode('login')}
-              className={`flex-1 py-2 text-xs uppercase tracking-wider border ${mode === 'login' ? 'border-accent text-accent' : 'border-[var(--app-line)] text-muted'}`}
-            >
-              {t('login.have_account', lang)}
-            </button>
-            <button
-              type="button"
-              onClick={() => setMode('register')}
-              className={`flex-1 py-2 text-xs uppercase tracking-wider border ${mode === 'register' ? 'border-accent text-accent' : 'border-[var(--app-line)] text-muted'}`}
-            >
-              {t('login.need_account', lang)}
-            </button>
-          </div>
-          <form onSubmit={handleSubmit} className="glass-card p-8 space-y-5">
-            {mode === 'register' && (
-              <>
-                <div>
-                  <label className="field-label"><User className="w-3 h-3" />{t('login.name', lang)} *</label>
-                  <input className="input-field" required value={fullName} onChange={(e) => setFullName(e.target.value)} />
-                </div>
-                <div>
-                  <label className="field-label"><MapPin className="w-3 h-3" />{t('login.area', lang)}</label>
-                  <input className="input-field" value={area} onChange={(e) => setArea(e.target.value)} />
-                </div>
-                <div>
-                  <label className="field-label"><MapPin className="w-3 h-3" />{t('login.address', lang)} *</label>
-                  <textarea className="input-field min-h-20" required value={address} onChange={(e) => setAddress(e.target.value)} />
-                </div>
-                <div>
-                  <label className="field-label"><Phone className="w-3 h-3" />{t('login.phone', lang)} *</label>
-                  <input className="input-field" type="tel" required dir="ltr" placeholder="01xxxxxxxxx" value={phone} onChange={(e) => setPhone(e.target.value)} />
-                </div>
-                <div>
-                  <label className="field-label"><Mail className="w-3 h-3" />{t('login.email_optional', lang)}</label>
-                  <input className="input-field" type="email" dir="ltr" placeholder="name@gmail.com" value={email} onChange={(e) => setEmail(e.target.value)} />
-                </div>
-              </>
-            )}
-            {mode === 'login' && (
-              <>
-                <div>
-                  <label className="field-label"><User className="w-3 h-3" />{t('login.username', lang)}</label>
-                  <input className="input-field" dir="ltr" placeholder="1111" value={identifier} onChange={(e) => setIdentifier(e.target.value)} />
-                </div>
-                <div>
-                  <label className="field-label"><Lock className="w-3 h-3" />{t('login.password', lang)}</label>
-                  <input className="input-field" type="password" dir="ltr" placeholder="1111" value={password} onChange={(e) => setPassword(e.target.value)} />
-                </div>
-              </>
-            )}
-            {error && <p className="text-danger text-sm">{error}</p>}
-            <button type="submit" disabled={loading} className="btn-luxury-filled w-full">
-              {loading ? '...' : mode === 'login' ? t('btn.login', lang) : t('btn.register', lang)}
-            </button>
-            {mode === 'login' && (
-              <button type="button" onClick={runDemo} disabled={loading} className="btn-luxury w-full text-xs">
-                {t('login.demo_btn', lang)}
-              </button>
-            )}
-            <p className="text-muted text-xs leading-relaxed">{t('login.demo_hint', lang)}</p>
-          </form>
+        <div className="flex items-center justify-between px-1 mb-4" dir="ltr">
+          <ThemeToggle compact />
+          <LanguageSwitcher dark />
         </div>
+        <div className="text-center mb-6">
+          <LogoHalo className="mx-auto mb-4">
+            <BrandMark size="lg" />
+          </LogoHalo>
+          <p className="label-luxury mb-2">
+            {mode === 'login' ? t('login.title', lang) : t('login.register_title', lang)}
+          </p>
+          <p className="text-muted text-sm">{t('login.subtitle', lang)}</p>
+        </div>
+        <div className="auth-tabs mb-4">
+          <button
+            type="button"
+            onClick={() => setMode('login')}
+            className={`auth-tab ${mode === 'login' ? 'is-active' : ''}`}
+          >
+            {t('login.have_account', lang)}
+            {mode === 'login' && <motion.span layoutId="auth-tab" className="auth-tab-line" />}
+          </button>
+          <button
+            type="button"
+            onClick={() => setMode('register')}
+            className={`auth-tab ${mode === 'register' ? 'is-active' : ''}`}
+          >
+            {t('login.need_account', lang)}
+            {mode === 'register' && <motion.span layoutId="auth-tab" className="auth-tab-line" />}
+          </button>
+        </div>
+        <form onSubmit={handleSubmit} className="glass-card p-6 sm:p-8 space-y-4">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={mode}
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.22 }}
+              className="space-y-4"
+            >
+              {mode === 'register' && (
+                <>
+                  <div>
+                    <label className="field-label"><User className="w-3 h-3" />{t('login.name', lang)} *</label>
+                    <input className="input-field" required value={fullName} onChange={(e) => setFullName(e.target.value)} />
+                  </div>
+                  <div>
+                    <label className="field-label"><MapPin className="w-3 h-3" />{t('login.area', lang)}</label>
+                    <input className="input-field" value={area} onChange={(e) => setArea(e.target.value)} />
+                  </div>
+                  <div>
+                    <label className="field-label"><MapPin className="w-3 h-3" />{t('login.address', lang)} *</label>
+                    <textarea className="input-field min-h-20" required value={address} onChange={(e) => setAddress(e.target.value)} />
+                  </div>
+                  <div>
+                    <label className="field-label"><Phone className="w-3 h-3" />{t('login.phone', lang)} *</label>
+                    <input className="input-field" type="tel" required dir="ltr" placeholder="01xxxxxxxxx" value={phone} onChange={(e) => setPhone(e.target.value)} />
+                  </div>
+                  <div>
+                    <label className="field-label"><Mail className="w-3 h-3" />{t('login.email_optional', lang)}</label>
+                    <input className="input-field" type="email" dir="ltr" placeholder="name@gmail.com" value={email} onChange={(e) => setEmail(e.target.value)} />
+                  </div>
+                </>
+              )}
+              {mode === 'login' && (
+                <>
+                  <div>
+                    <label className="field-label"><User className="w-3 h-3" />{t('login.username', lang)}</label>
+                    <input className="input-field" dir="ltr" placeholder="1111" value={identifier} onChange={(e) => setIdentifier(e.target.value)} />
+                  </div>
+                  <div>
+                    <label className="field-label"><Lock className="w-3 h-3" />{t('login.password', lang)}</label>
+                    <input className="input-field" type="password" dir="ltr" placeholder="1111" value={password} onChange={(e) => setPassword(e.target.value)} />
+                  </div>
+                </>
+              )}
+            </motion.div>
+          </AnimatePresence>
+          {error && <p className="text-danger text-sm">{error}</p>}
+          <button type="submit" disabled={loading} className="btn-luxury-filled w-full">
+            {loading ? '...' : mode === 'login' ? t('btn.login', lang) : t('btn.register', lang)}
+          </button>
+          {mode === 'login' && (
+            <button type="button" onClick={runDemo} disabled={loading} className="btn-luxury w-full text-xs">
+              {t('login.demo_btn', lang)}
+            </button>
+          )}
+          <p className="text-muted text-xs leading-relaxed">{t('login.demo_hint', lang)}</p>
+        </form>
+      </div>
     </div>
   );
 }

@@ -7,6 +7,7 @@ import { t } from '../../utils/i18n';
 import { staffDashboardPath } from '../../utils/staffRoles';
 import type { UserRole } from '../../types';
 import BrandMark from '../Shared/BrandMark';
+import LogoHalo from '../Shared/LogoHalo';
 import ThemeToggle from '../Shared/ThemeToggle';
 import LanguageSwitcher from '../Shared/LanguageSwitcher';
 
@@ -47,9 +48,9 @@ export default function AdminLogin() {
         </div>
         <div className="text-center mb-10">
           <div className="flex justify-center mb-4">
-            <div className="logo-plate">
+            <LogoHalo>
               <BrandMark size="md" />
-            </div>
+            </LogoHalo>
           </div>
           <p className="label-luxury mb-2">{t('admin.panel', lang)}</p>
           <div className="divider-gold" />

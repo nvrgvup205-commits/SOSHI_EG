@@ -61,7 +61,7 @@ export default function FloatingChatWidget() {
               <X className="w-4 h-4" />
             </button>
           </div>
-          <ChatThread messages={messages} viewer="customer" onSend={send} compact />
+          <ChatThread messages={messages} viewer="customer" onSend={send} compact onDark />
         </div>
       )}
 

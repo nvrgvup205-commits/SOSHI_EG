@@ -49,7 +49,14 @@ export default function HomePage() {
   };
 
   return (
-    <CustomerShell showFooter>
+    <CustomerShell
+      showFooter
+      subHeader={
+        !loading && categories.length > 0 ? (
+          <CategoryNav categories={categories} activeSlug={activeCategory} onSelect={handleCategory} />
+        ) : null
+      }
+    >
       {!open && (
         <div className="px-4 pt-2">
           <div className="card p-3 text-center text-warning text-sm rounded-xl">{t('checkout.closed', lang)}</div>
@@ -58,10 +65,6 @@ export default function HomePage() {
 
       {!loading && products.length > 0 && (
         <FeaturedCarousel products={products} lang={lang} onOpen={setSelected} />
-      )}
-
-      {!loading && categories.length > 0 && (
-        <CategoryNav categories={categories} activeSlug={activeCategory} onSelect={handleCategory} />
       )}
 
       <section id="menu" className="px-3 py-4">

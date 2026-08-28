@@ -9,9 +9,10 @@ export default defineConfig({
     tailwindcss(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['logo.png', 'logo-light.png', 'favicon.svg', 'apple-touch-icon.png', 'logo/*.png'],
+      injectRegister: false,
+      includeAssets: ['logo.png', 'logo-light.png', 'favicon.svg', 'apple-touch-icon.png', 'pwa-192.png', 'pwa-512.png'],
       manifest: {
-        name: 'Sushi Shop Egypt',
+        name: 'SUSHI SHOP EGYPT',
         short_name: 'Sushi Shop',
         description: 'Finest sushi on Egypt\'s North Coast',
         theme_color: '#04120e',

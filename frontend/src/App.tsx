@@ -66,6 +66,8 @@ function AppRoutes() {
   const [showSplash, setShowSplash] = useState(() => sessionStorage.getItem('splash_seen') !== '1');
   useScrollTop();
 
+  if (!hasChosen && !staffRoute) return <LanguageGate />;
+
   if (!staffRoute && showSplash) {
     return (
       <SplashScreen
@@ -76,8 +78,6 @@ function AppRoutes() {
       />
     );
   }
-
-  if (!hasChosen && !staffRoute) return <LanguageGate />;
 
   return (
     <>

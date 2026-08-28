@@ -6,6 +6,7 @@ import { useLanguage } from '../hooks/useLanguage';
 import { useAuth } from '../hooks/useAuth';
 import { api } from '../utils/api';
 import { t } from '../utils/i18n';
+import { clearAiChat } from '../utils/aiChatStore';
 import type { Address, Coupon, DeliveryZone } from '../types';
 
 export default function CheckoutPage() {
@@ -120,6 +121,7 @@ export default function CheckoutPage() {
         notes: notes || undefined,
       });
       clearCart();
+      clearAiChat();
       navigate(`/orders/${res.order.id}`);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Order failed');
