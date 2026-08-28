@@ -30,9 +30,10 @@ import InstallPrompt from './components/Shared/InstallPrompt';
 import LanguageGate from './components/Shared/LanguageGate';
 import SplashScreen from './components/Shared/SplashScreen';
 import BottomNav from './components/Shared/BottomNav';
-import FloatingChatWidget from './components/Chat/FloatingChatWidget';
+import AIChatWidget from './components/Chat/AIChatWidget';
 import FloatingCartBar from './components/Shared/FloatingCartBar';
 import RequireCustomer from './components/Shared/RequireCustomer';
+import { useScrollTop } from './hooks/useScrollTop';
 import { isAdminRole, staffDashboardPath } from './utils/staffRoles';
 import { t } from './utils/i18n';
 import type { UserRole } from './types';
@@ -63,6 +64,7 @@ function AppRoutes() {
   const location = useLocation();
   const staffRoute = location.pathname.startsWith('/admin') || location.pathname.startsWith('/staff');
   const [showSplash, setShowSplash] = useState(() => sessionStorage.getItem('splash_seen') !== '1');
+  useScrollTop();
 
   if (!staffRoute && showSplash) {
     return (
@@ -106,7 +108,7 @@ function AppRoutes() {
       </Routes>
       <BottomNav />
       <FloatingCartBar />
-      <FloatingChatWidget />
+      <AIChatWidget />
     </>
   );
 }

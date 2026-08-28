@@ -1,12 +1,17 @@
 import Header from './Header';
 import Footer from './Footer';
 
-export default function CustomerShell({ children }: { children: React.ReactNode }) {
+interface Props {
+  children: React.ReactNode;
+  showFooter?: boolean;
+}
+
+export default function CustomerShell({ children, showFooter = false }: Props) {
   return (
-    <div className="min-h-screen app-shell pb-24">
+    <div className="min-h-screen app-shell pb-20">
       <Header />
-      {children}
-      <Footer />
+      <main>{children}</main>
+      {showFooter && <Footer />}
     </div>
   );
 }

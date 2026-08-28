@@ -19,6 +19,9 @@ export default function CheckoutPage() {
   const [zoneId, setZoneId] = useState('');
   const [newArea, setNewArea] = useState('');
   const [newAddress, setNewAddress] = useState('');
+  const [addressNotes, setAddressNotes] = useState('');
+  const [gpsCoords, setGpsCoords] = useState<{ lat: number; lng: number } | null>(null);
+  const [gpsLoading, setGpsLoading] = useState(false);
   const [couponCode, setCouponCode] = useState('');
   const [coupon, setCoupon] = useState<Coupon | null>(null);
   const [notes, setNotes] = useState('');
@@ -49,6 +52,25 @@ export default function CheckoutPage() {
     : 0;
   const grand = Math.max(0, total + deliveryFee - discount);
 
+  const captureGps = () => {
+    if (!navigator.geolocation) {
+      setError('GPS not supported');
+      return;
+    }
+    setGpsLoading(true);
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        setGpsCoords({ lat: pos.coords.latitude, lng: pos.coords.longitude });
+        setGpsLoading(false);
+      },
+      () => {
+        setError(t('checkout.gps_error', lang));
+        setGpsLoading(false);
+      },
+      { enableHighAccuracy: true, timeout: 15000 },
+    );
+  };
+
   const applyCoupon = async () => {
     setError('');
     try {
@@ -68,9 +90,14 @@ export default function CheckoutPage() {
     try {
       let finalAddressId = addressId;
       if (!finalAddressId && newAddress.trim()) {
+        const fullAddress = [
+          newAddress.trim(),
+          addressNotes.trim(),
+          gpsCoords ? `GPS: ${gpsCoords.lat.toFixed(6)}, ${gpsCoords.lng.toFixed(6)}` : '',
+        ].filter(Boolean).join(' | ');
         const created = await api.createAddress({
           area: newArea.trim() || undefined,
-          address: newAddress.trim(),
+          address: fullAddress,
           is_default: true,
         });
         finalAddressId = created.address.id;
@@ -119,8 +146,17 @@ export default function CheckoutPage() {
             </label>
           ))}
           <p className="text-muted text-xs uppercase tracking-wider pt-2">{t('checkout.new_address', lang)}</p>
+          <button type="button" onClick={captureGps} disabled={gpsLoading} className="btn-luxury w-full text-xs py-2">
+            {gpsLoading ? '...' : t('checkout.gps', lang)}
+          </button>
+          {gpsCoords && (
+            <p className="text-accent text-xs" dir="ltr">
+              {gpsCoords.lat.toFixed(5)}, {gpsCoords.lng.toFixed(5)}
+            </p>
+          )}
           <input className="input-field" placeholder={t('login.area', lang)} value={newArea} onChange={(e) => setNewArea(e.target.value)} />
           <textarea className="input-field min-h-20" placeholder={t('login.address', lang)} value={newAddress} onChange={(e) => { setNewAddress(e.target.value); setAddressId(''); }} />
+          <textarea className="input-field min-h-16" placeholder={t('checkout.address_notes', lang)} value={addressNotes} onChange={(e) => setAddressNotes(e.target.value)} />
         </section>
 
         <section className="card p-5 space-y-3">

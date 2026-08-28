@@ -1,62 +1,49 @@
-import { Play } from 'lucide-react';
+import { Plus, Play } from 'lucide-react';
 import type { Product, Language } from '../../types';
-import { getProductName, getProductDescription, t } from '../../utils/i18n';
+import { getProductName, t } from '../../utils/i18n';
 import { pickProductImage } from '../../utils/productImage';
 
 interface Props {
   product: Product;
   lang: Language;
-  delay?: number;
   onOpen: (product: Product) => void;
+  onAdd: (product: Product) => void;
 }
 
-export default function ProductCard({ product, lang, delay = 0, onOpen }: Props) {
+export default function ProductCard({ product, lang, onOpen, onAdd }: Props) {
   const name = getProductName(product, lang);
-  const desc = getProductDescription(product, lang);
   const photo = pickProductImage(product);
 
   return (
-    <button
-      type="button"
-      onClick={() => onOpen(product)}
-      className="group glass-card overflow-hidden animate-fade-up text-start w-full"
-      style={{ animationDelay: `${delay}s` }}
-    >
-      <div className="relative aspect-[4/3] bg-gradient-to-br from-secondary/30 to-primary/10 flex items-center justify-center overflow-hidden">
+    <div className="product-card-compact group">
+      <button type="button" onClick={() => onOpen(product)} className="relative w-full aspect-square rounded-xl overflow-hidden bg-[var(--app-card)]">
         {photo ? (
-          <img src={photo} alt={name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+          <img src={photo} alt={name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
         ) : (
-          <span className="text-7xl opacity-60">🍣</span>
+          <span className="flex items-center justify-center w-full h-full text-3xl opacity-50">🍣</span>
         )}
         {product.video_url && (
-          <span className="absolute inset-0 flex items-center justify-center bg-black/30 group-hover:bg-black/40 transition-colors">
-            <span className="w-14 h-14 rounded-full bg-accent/90 flex items-center justify-center shadow-lg">
-              <Play className="w-6 h-6 text-emerald-950 fill-emerald-950 ms-0.5" />
-            </span>
+          <span className="absolute inset-0 flex items-center justify-center bg-black/25">
+            <Play className="w-5 h-5 text-accent fill-accent" />
           </span>
         )}
-        {!product.video_url && (
-          <div className="absolute inset-0 bg-gradient-to-t from-ink/80 via-transparent to-transparent opacity-60" />
-        )}
-        {product.is_new && (
-          <span className="absolute top-3 start-3 text-[10px] uppercase tracking-wider bg-accent text-ink px-2 py-1">{t('banner.new_rolls', lang)}</span>
-        )}
-        {product.is_offer && !product.is_new && (
-          <span className="absolute top-3 start-3 text-[10px] uppercase tracking-wider bg-primary text-white px-2 py-1">{t('banner.offers', lang)}</span>
-        )}
-      </div>
-      <div className="p-6">
-        <h3 className="font-display text-2xl text-fg mb-2">{name}</h3>
-        {desc && <p className="text-muted text-sm mb-4 line-clamp-2 font-light">{desc}</p>}
-        <div className="flex items-center justify-between pt-4 border-t border-[var(--app-line)]">
-          <span className="text-accent font-display text-2xl">
-            {product.price} <span className="text-sm">{t('currency', lang)}</span>
-          </span>
-          <span className="text-xs uppercase tracking-[0.15em] text-muted group-hover:text-accent">
-            {t('btn.add_to_cart', lang)}
-          </span>
+      </button>
+      <div className="pt-2 px-0.5">
+        <button type="button" onClick={() => onOpen(product)} className="text-[11px] leading-tight text-fg line-clamp-2 text-start w-full min-h-[2rem]">
+          {name}
+        </button>
+        <div className="flex items-center justify-between mt-1 gap-1">
+          <span className="text-accent font-display text-sm">{product.price}</span>
+          <button
+            type="button"
+            onClick={(e) => { e.stopPropagation(); onAdd(product); }}
+            className="w-7 h-7 rounded-full bg-accent text-emerald-950 flex items-center justify-center shrink-0 hover:scale-110 transition-transform"
+            aria-label={t('btn.add_to_cart', lang)}
+          >
+            <Plus className="w-4 h-4" />
+          </button>
         </div>
       </div>
-    </button>
+    </div>
   );
 }

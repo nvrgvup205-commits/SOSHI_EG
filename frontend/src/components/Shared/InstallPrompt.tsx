@@ -66,7 +66,7 @@ export default function InstallPrompt() {
     const onPrompt = (e: Event) => {
       e.preventDefault();
       setDeferred(e as BeforeInstallPromptEvent);
-      setTimeout(() => setVisible(true), adminMode ? 1500 : 3000);
+      setTimeout(() => setVisible(true), adminMode ? 1500 : 1500);
     };
 
     window.addEventListener('beforeinstallprompt', onPrompt);
@@ -113,7 +113,7 @@ export default function InstallPrompt() {
         </button>
 
         <div className="flex items-start gap-4">
-          <img src="/pwa-192.png" alt="" className="w-14 h-14 rounded-lg shrink-0" />
+          <img src="/favicon.svg" alt="" className="w-14 h-14 shrink-0" />
           <div className="flex-1 pe-6">
             <p className="text-white font-medium text-sm mb-1">{title}</p>
             <p className="text-white/50 text-xs leading-relaxed">

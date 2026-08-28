@@ -6,16 +6,10 @@ export default function Footer() {
   const { lang } = useLanguage();
 
   return (
-    <footer className="app-footer">
-      <div className="max-w-7xl mx-auto px-6 text-center">
-        <div className="flex justify-center mb-6">
-          <div className="logo-plate">
-            <BrandMark size="md" />
-          </div>
-        </div>
-        <p className="text-muted text-sm tracking-wide">
-          © 2026 — {t('hero.subtitle', lang)}
-        </p>
+    <footer className="py-6 px-4">
+      <div className="flex items-center justify-center gap-3 text-muted text-xs">
+        <BrandMark size="sm" />
+        <span>© 2026 — {t('hero.subtitle', lang)}</span>
       </div>
     </footer>
   );

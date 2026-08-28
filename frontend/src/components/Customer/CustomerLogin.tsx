@@ -6,7 +6,6 @@ import { useLanguage } from '../../hooks/useLanguage';
 import { t } from '../../utils/i18n';
 import { formatPhone, isValidEmail, isValidPhone } from '../../utils/validators';
 import BrandMark from '../Shared/BrandMark';
-import SushiStage from '../Shared/SushiStageLazy';
 import ThemeToggle from '../Shared/ThemeToggle';
 import LanguageSwitcher from '../Shared/LanguageSwitcher';
 
@@ -77,19 +76,15 @@ export default function CustomerLogin() {
   };
 
   return (
-    <div className="splash-screen">
-      <SushiStage />
-      <div className="splash-veil" />
-      <div className="relative z-10 min-h-screen flex items-center justify-center px-4 py-16">
-        <div className="w-full max-w-md">
+    <div className="splash-screen min-h-screen flex items-center justify-center px-4 py-16">
+      <div className="ambient-glow fixed inset-0" />
+      <div className="relative z-10 w-full max-w-md">
           <div className="flex items-center justify-between mb-6">
             <LanguageSwitcher dark />
             <ThemeToggle compact />
           </div>
           <div className="text-center mb-8">
-            <div className="logo-plate mx-auto mb-5 w-max">
-              <BrandMark size="lg" />
-            </div>
+            <BrandMark size="lg" className="mx-auto mb-5" />
             <p className="label-luxury mb-2">
               {mode === 'login' ? t('login.title', lang) : t('login.register_title', lang)}
             </p>
@@ -160,7 +155,6 @@ export default function CustomerLogin() {
             <p className="text-muted text-xs leading-relaxed">{t('login.demo_hint', lang)}</p>
           </form>
         </div>
-      </div>
     </div>
   );
 }

@@ -225,6 +225,13 @@ class ApiClient {
     });
   }
 
+  aiChat(message: string, lang?: string, history?: Array<{ role: string; content: string }>) {
+    return this.request<{ reply: string }>('/api/chat/ai', {
+      method: 'POST',
+      body: JSON.stringify({ message, lang, history }),
+    });
+  }
+
   getInbox() {
     return this.request<{ conversations: Conversation[] }>('/api/chat/inbox');
   }

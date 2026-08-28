@@ -1,10 +1,10 @@
 import { useTheme } from '../../hooks/useTheme';
 
 const sizes = {
-  sm: 'h-10',
-  md: 'h-20',
-  lg: 'h-32',
-  hero: 'h-44 sm:h-56 md:h-64',
+  sm: 'h-9',
+  md: 'h-16',
+  lg: 'h-24',
+  hero: 'h-32 sm:h-40',
 } as const;
 
 export default function BrandMark({
@@ -14,7 +14,6 @@ export default function BrandMark({
 }: {
   size?: keyof typeof sizes;
   className?: string;
-  /** Force logo variant for a dark or light background instead of following theme. */
   surface?: 'dark' | 'light';
 }) {
   const { theme } = useTheme();
@@ -22,11 +21,15 @@ export default function BrandMark({
   const logoSrc = onDark ? '/logo.png' : '/logo-light.png';
 
   return (
-    <span className={`brand-mark brand-mark-${onDark ? 'dark' : 'light'} ${className}`}>
+    <span className={`brand-mark inline-flex ${className}`}>
       <img
         src={logoSrc}
         alt="Sushi Shop Egypt"
-        className={`${sizes[size]} w-auto max-w-[min(100%,22rem)] object-contain`}
+        className={`${sizes[size]} w-auto max-w-[min(100%,14rem)] object-contain`}
+        onError={(e) => {
+          const img = e.currentTarget;
+          if (!img.src.endsWith('/favicon.svg')) img.src = '/favicon.svg';
+        }}
       />
     </span>
   );

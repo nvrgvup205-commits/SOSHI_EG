@@ -11,6 +11,7 @@ import {
   type ChatMessageRow,
   type LangCode,
 } from '../lib/translate';
+import { runSushiAi } from '../lib/sushiAi';
 
 type AppEnv = {
   Bindings: Env;
@@ -145,6 +146,19 @@ chat.post('/messages', requireCustomer, async (c) => {
     return jsonResponse({ message }, 201);
   } catch (err) {
     return errorResponse(err instanceof Error ? err.message : 'Chat error', 500);
+  }
+});
+
+chat.post('/ai', requireCustomer, async (c) => {
+  const body = await c.req.json<{ message?: string; lang?: string; history?: Array<{ role: string; content: string }> }>();
+  const text = (body.message || '').trim();
+  if (!text) return errorResponse('Message required', 400);
+  const uiLang = normalizeLang(body.lang || 'ar');
+  try {
+    const reply = await runSushiAi(c.env.AI, text, uiLang, body.history || []);
+    return jsonResponse({ reply });
+  } catch (err) {
+    return errorResponse(err instanceof Error ? err.message : 'AI error', 500);
   }
 });
 
