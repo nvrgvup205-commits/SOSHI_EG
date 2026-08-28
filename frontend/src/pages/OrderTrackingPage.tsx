@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import CustomerShell from '../components/Shared/CustomerShell';
 import ChatThread from '../components/Chat/ChatThread';
 import { api } from '../utils/api';
+import { supabase } from '../utils/supabase';
 import { useLanguage } from '../hooks/useLanguage';
 import { useChatPolling } from '../hooks/useChatPolling';
 import { t } from '../utils/i18n';
@@ -18,9 +19,27 @@ export default function OrderTrackingPage() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [error, setError] = useState('');
 
-  useEffect(() => {
+  const loadOrder = useCallback(() => {
     if (!id) return;
     api.getOrder(id).then((r) => setOrder(r.order)).catch((e) => setError(e.message));
+  }, [id]);
+
+  useEffect(() => { loadOrder(); }, [loadOrder]);
+
+  useEffect(() => {
+    if (!id || !supabase) return;
+    const channel = supabase
+      .channel(`order-${id}`)
+      .on(
+        'postgres_changes',
+        { event: 'UPDATE', schema: 'soshi', table: 'orders', filter: `id=eq.${id}` },
+        (payload) => {
+          const row = payload.new as Order;
+          setOrder((prev) => (prev ? { ...prev, status: row.status } : prev));
+        },
+      )
+      .subscribe();
+    return () => { void supabase?.removeChannel(channel); };
   }, [id]);
 
   const loadChat = useCallback(
@@ -55,17 +74,33 @@ export default function OrderTrackingPage() {
           <p className="text-muted mt-2">{formatDate(order.created_at, lang)}</p>
         </div>
 
-        <div className="grid grid-cols-4 gap-2">
-          {steps.map((s, i) => (
-            <div key={s} className={`text-center py-3 border text-[10px] uppercase tracking-wider ${
-              i <= idx ? 'border-accent text-accent bg-accent/10' : 'border-[var(--app-line)] text-muted'
-            }`}>
-              {t(`status.${s}`, lang)}
-            </div>
-          ))}
+        <div className="relative">
+          <div className="absolute top-1/2 inset-x-0 h-0.5 bg-[var(--app-line)] -translate-y-1/2" />
+          <div
+            className="absolute top-1/2 start-0 h-0.5 bg-accent -translate-y-1/2 transition-all duration-700"
+            style={{ width: `${(idx / (steps.length - 1)) * 100}%` }}
+          />
+          <div className="relative grid grid-cols-4 gap-2">
+            {steps.map((s, i) => (
+              <div key={s} className="flex flex-col items-center gap-2">
+                <span className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold border-2 transition-all duration-500 ${
+                  i <= idx
+                    ? 'border-accent bg-accent text-emerald-950'
+                    : 'border-[var(--app-line)] bg-[var(--app-card)] text-muted'
+                }`}>
+                  {i + 1}
+                </span>
+                <span className={`text-[9px] sm:text-[10px] uppercase tracking-wider text-center ${
+                  i <= idx ? 'text-accent' : 'text-muted'
+                }`}>
+                  {t(`status.${s}`, lang)}
+                </span>
+              </div>
+            ))}
+          </div>
         </div>
 
-        <div className="card p-5 space-y-2">
+        <div className="card p-5 space-y-2 rounded-2xl">
           {(order.order_items || []).map((item) => (
             <div key={item.id} className="flex justify-between text-muted">
               <span>{item.quantity}× {item.product_name}{item.notes ? ` (${item.notes})` : ''}</span>

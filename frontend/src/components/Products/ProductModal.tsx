@@ -55,16 +55,18 @@ export default function ProductModal({
     <div className="fixed inset-0 z-[70] bg-black/80 flex items-end sm:items-center justify-center p-0 sm:p-6" onClick={onClose}>
       <div className="glass-card w-full max-w-2xl max-h-[92vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
         <div className="relative">
-          {yt ? (
-            <iframe
-              title={t('product.video', lang)}
-              src={`https://www.youtube.com/embed/${yt}?rel=0`}
-              className="w-full aspect-video"
-              allow="autoplay; encrypted-media"
-              allowFullScreen
-            />
-          ) : video && (video.endsWith('.mp4') || video.includes('video')) ? (
-            <video src={video} controls className="w-full aspect-video bg-black" poster={img || undefined} />
+          {video ? (
+            yt ? (
+              <iframe
+                title={t('product.video', lang)}
+                src={`https://www.youtube.com/embed/${yt}?autoplay=1&rel=0`}
+                className="w-full aspect-video"
+                allow="autoplay; encrypted-media"
+                allowFullScreen
+              />
+            ) : (
+              <video src={video} controls autoPlay className="w-full aspect-video bg-black" playsInline />
+            )
           ) : img ? (
             <img src={img} alt={name} className="w-full aspect-[4/3] object-cover" />
           ) : (

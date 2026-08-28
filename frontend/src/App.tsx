@@ -31,6 +31,7 @@ import LanguageGate from './components/Shared/LanguageGate';
 import SplashScreen from './components/Shared/SplashScreen';
 import BottomNav from './components/Shared/BottomNav';
 import FloatingChatWidget from './components/Chat/FloatingChatWidget';
+import FloatingCartBar from './components/Shared/FloatingCartBar';
 import RequireCustomer from './components/Shared/RequireCustomer';
 import { isAdminRole, staffDashboardPath } from './utils/staffRoles';
 import { t } from './utils/i18n';
@@ -104,6 +105,7 @@ function AppRoutes() {
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
       <BottomNav />
+      <FloatingCartBar />
       <FloatingChatWidget />
     </>
   );

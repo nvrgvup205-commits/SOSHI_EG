@@ -4,13 +4,14 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
-  --color-primary: #E23A1A;
-  --color-primary-light: #FF6B1A;
-  --color-primary-dark: #B01028;
-  --color-secondary: #0B2E3A;
-  --color-secondary-light: #1A5A7E;
-  --color-accent: #E0B84A;
-  --color-accent-light: #F8E08E;
+  --color-primary: #E5A93C;
+  --color-primary-light: #F0C56A;
+  --color-primary-dark: #C48A1F;
+  --color-secondary: #06231C;
+  --color-secondary-light: #0A3329;
+  --color-accent: #E5A93C;
+  --color-accent-light: #F5D78E;
+  --color-emerald: #10B981;
   --color-cream: #F3EDE3;
   --color-ink: #000000;
   --color-charcoal: #0A0A0A;
@@ -26,13 +27,13 @@
 }
 
 :root, html.dark {
-  --app-bg: #050505;
-  --app-fg: #f6f1e8;
-  --app-card: rgba(12, 12, 12, 0.9);
-  --app-muted: rgba(246, 241, 232, 0.58);
-  --app-line: rgba(255, 255, 255, 0.1);
-  --app-header: rgba(5, 5, 5, 0.78);
-  --app-veil: rgba(5, 5, 5, 0.38);
+  --app-bg: #06231C;
+  --app-fg: #F8F4EC;
+  --app-card: rgba(10, 51, 41, 0.92);
+  --app-muted: rgba(248, 244, 236, 0.62);
+  --app-line: rgba(229, 169, 60, 0.18);
+  --app-header: rgba(6, 35, 28, 0.88);
+  --app-veil: rgba(6, 35, 28, 0.45);
 }
 
 html.light {
@@ -65,8 +66,8 @@ h1, h2, h3, h4 {
 
 .app-shell {
   background:
-    radial-gradient(1200px 600px at 80% -10%, rgba(224, 184, 74, 0.12), transparent 55%),
-    radial-gradient(900px 500px at -10% 110%, rgba(42, 180, 196, 0.12), transparent 50%),
+    radial-gradient(1200px 600px at 80% -10%, rgba(229, 169, 60, 0.14), transparent 55%),
+    radial-gradient(900px 500px at -10% 110%, rgba(16, 185, 129, 0.1), transparent 50%),
     var(--app-bg);
   color: var(--app-fg);
 }
@@ -147,8 +148,45 @@ html.dark .logo-plate {
   background: var(--app-card);
   border: 1px solid var(--app-line);
   backdrop-filter: blur(22px);
-  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.25);
+  border-radius: 1rem;
+  transition: transform 0.35s ease, box-shadow 0.35s ease;
 }
+
+.glass-card:hover {
+  transform: translateY(-3px) perspective(800px) rotateX(1deg);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(229, 169, 60, 0.12);
+}
+
+.category-pill-active {
+  background: linear-gradient(135deg, rgba(229, 169, 60, 0.2), rgba(16, 185, 129, 0.12));
+  border-color: rgba(229, 169, 60, 0.55) !important;
+  color: var(--color-accent) !important;
+}
+
+.floating-cart-bar {
+  background: linear-gradient(135deg, #E5A93C 0%, #F0C56A 50%, #E5A93C 100%);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+}
+
+.chat-widget-btn {
+  background: linear-gradient(135deg, #0A3329 0%, #06231C 100%);
+  border: 1px solid rgba(229, 169, 60, 0.45);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), 0 0 20px rgba(229, 169, 60, 0.15);
+}
+
+.chat-widget-panel {
+  background: linear-gradient(180deg, #0A3329 0%, #06231C 100%);
+  border: 1px solid rgba(229, 169, 60, 0.3);
+  border-radius: 1rem;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+}
+
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar { display: none; }
 
 .theme-toggle {
   display: inline-flex;
