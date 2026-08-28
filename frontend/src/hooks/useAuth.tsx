@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
 import { api } from '../utils/api';
+import { clearAiChat } from '../utils/aiChatStore';
 import { useSessionKeepAlive } from './useSessionKeepAlive';
 import type { Customer, StaffUser } from '../types';
 
@@ -104,6 +105,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     api.setToken(null);
     setType(null);
     setUser(null);
+    clearAiChat();
   };
 
   return (

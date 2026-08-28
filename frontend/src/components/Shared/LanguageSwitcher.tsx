@@ -3,7 +3,7 @@ import type { Language } from '../../types';
 
 const langs: { code: Language; flag: string; label: string }[] = [
   { code: 'ar', flag: '🇪🇬', label: 'AR' },
-  { code: 'en', flag: '🇬🇧', label: 'EN GB' },
+  { code: 'en', flag: '🇬🇧', label: 'EN' },
   { code: 'ru', flag: '🇷🇺', label: 'RU' },
 ];
 
@@ -11,13 +11,13 @@ export default function LanguageSwitcher({ dark = false, onDark = false }: { dar
   const { lang, setLang } = useLanguage();
 
   return (
-    <div className={`flex gap-1 ${dark || onDark ? '' : 'lang-switch'}`}>
+    <div className={`flex items-center gap-0.5 ${dark || onDark ? '' : 'lang-switch'}`}>
       {langs.map((item) => (
         <button
           key={item.code}
           type="button"
           onClick={() => setLang(item.code)}
-          className={`px-2 py-1 text-[10px] font-medium tracking-wider transition-all flex items-center gap-1 ${
+          className={`px-1.5 py-1 text-[10px] font-medium tracking-wider transition-all flex items-center gap-1 ${
             lang === item.code
               ? 'text-accent border-b border-accent'
               : onDark

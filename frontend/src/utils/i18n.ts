@@ -165,6 +165,14 @@ const ar: Record<string, string> = {
   'home.featured': 'توقيع الشيف',
   'gate.pick': 'اختار لغتك للمتابعة',
   'admin.demo_hint': 'تجريبي: 1111 و 1111 — من غير إيميل',
+  'pwa.title': 'ثبّت التطبيق على جوالك',
+  'pwa.body': 'أضف سوشي شوب للوصول السريع من الشاشة الرئيسية',
+  'pwa.install': 'تثبيت التطبيق',
+  'pwa.dismiss': 'إغلاق',
+  'pwa.ios': 'اضغط مشاركة  ثم «إضافة إلى الشاشة الرئيسية»',
+  'pwa.close': 'إغلاق رسالة التثبيت',
+  'chat.close': 'إغلاق الشات',
+  'brand.name': 'SUSHI SHOP EGYPT',
 };
 
 const en: Record<string, string> = {
@@ -332,6 +340,14 @@ const en: Record<string, string> = {
   'home.featured': 'Chef signatures',
   'gate.pick': 'Choose a language to continue',
   'admin.demo_hint': 'Demo: 1111 and 1111 — no email needed',
+  'pwa.title': 'Install the app on your phone',
+  'pwa.body': 'Add Sushi Shop to your home screen for one-tap access',
+  'pwa.install': 'Install App',
+  'pwa.dismiss': 'Close',
+  'pwa.ios': 'Tap Share, then Add to Home Screen',
+  'pwa.close': 'Dismiss install prompt',
+  'chat.close': 'Close chat',
+  'brand.name': 'SUSHI SHOP EGYPT',
 };
 
 const ru: Record<string, string> = {
@@ -499,6 +515,14 @@ const ru: Record<string, string> = {
   'home.featured': 'Подпись шефа',
   'gate.pick': 'Выберите язык, чтобы продолжить',
   'admin.demo_hint': 'Демо: 1111 и 1111 — без email',
+  'pwa.title': 'Установите приложение',
+  'pwa.body': 'Добавьте Sushi Shop на главный экран',
+  'pwa.install': 'Установить',
+  'pwa.dismiss': 'Закрыть',
+  'pwa.ios': 'Нажмите «Поделиться», затем «На экран Домой»',
+  'pwa.close': 'Закрыть установку',
+  'chat.close': 'Закрыть чат',
+  'brand.name': 'SUSHI SHOP EGYPT',
 };
 
 export const translations: Record<Language, Record<string, string>> = { ar, en, ru };

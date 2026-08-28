@@ -2,6 +2,7 @@ import { useLanguage } from '../../hooks/useLanguage';
 import type { Language } from '../../types';
 import { t } from '../../utils/i18n';
 import BrandMark from './BrandMark';
+import LogoHalo from './LogoHalo';
 import ThemeToggle from './ThemeToggle';
 
 const langs: { code: Language; flag: string }[] = [
@@ -17,11 +18,13 @@ export default function LanguageGate() {
     <div className="splash-screen flex min-h-screen items-center justify-center px-6 py-16">
       <div className="ambient-glow fixed inset-0" />
       <div className="relative z-10 w-full max-w-lg text-center">
-        <div className="flex justify-end mb-6">
+        <div className="flex justify-start mb-6" dir="ltr">
           <ThemeToggle compact />
         </div>
-        <BrandMark size="lg" className="mx-auto mb-8" />
-        <p className="label-luxury mb-3">Sushi Shop Egypt</p>
+        <LogoHalo className="mx-auto mb-8">
+          <BrandMark size="lg" />
+        </LogoHalo>
+        <p className="label-luxury mb-3">SUSHI SHOP EGYPT</p>
         <h1 className="font-display text-3xl text-fg mb-2">{t('lang.title', lang)}</h1>
         <p className="text-muted mb-10">{t('gate.pick', lang)}</p>
         <div className="space-y-3">

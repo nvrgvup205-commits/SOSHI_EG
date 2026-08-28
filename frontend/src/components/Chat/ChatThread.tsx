@@ -8,11 +8,13 @@ export default function ChatThread({
   viewer,
   onSend,
   compact = false,
+  onDark = false,
 }: {
   messages: ChatMessage[];
   viewer: 'customer' | 'staff';
   onSend: (text: string) => Promise<void>;
   compact?: boolean;
+  onDark?: boolean;
 }) {
   const { lang } = useLanguage();
   const [text, setText] = useState('');
@@ -48,12 +50,16 @@ export default function ChatThread({
   return (
     <div className={`${compact ? '' : 'card'} overflow-hidden`}>
       <div className={`${compact ? 'h-64' : 'h-80'} overflow-y-auto p-4 space-y-3`}>
-        {messages.length === 0 && <p className="text-muted text-center py-10">{t('chat.empty', lang)}</p>}
+        {messages.length === 0 && <p className={`${onDark ? 'text-[#f8fafc]/70' : 'text-muted'} text-center py-10`}>{t('chat.empty', lang)}</p>}
         {messages.map((msg) => {
           const mine = viewer === 'staff' ? msg.sender_type === 'staff' : msg.sender_type === 'customer';
           return (
             <div key={msg.id} className={`max-w-[85%] ${mine ? 'ms-auto' : 'me-auto'}`}>
-              <div className={`px-4 py-2 ${mine ? 'bg-accent/20 text-fg' : 'bg-[color-mix(in_srgb,var(--app-fg)_8%,transparent)] text-fg'}`}>
+              <div className={`px-4 py-2 rounded-xl ${
+                mine
+                  ? onDark ? 'ai-bubble-user' : 'bg-accent/20 text-fg'
+                  : onDark ? 'ai-bubble-bot' : 'bg-[color-mix(in_srgb,var(--app-fg)_8%,transparent)] text-fg'
+              }`}>
                 {display(msg)}
               </div>
               {msg.is_translated && (
@@ -66,7 +72,7 @@ export default function ChatThread({
       </div>
       <form onSubmit={submit} className="flex gap-2 p-3 border-t border-[var(--app-line)]">
         <input
-          className="input-field"
+          className={onDark ? 'ai-chat-input' : 'input-field'}
           value={text}
           onChange={(e) => setText(e.target.value)}
           placeholder={t('chat.placeholder', lang)}

@@ -5,10 +5,12 @@ import { useAuth } from '../../hooks/useAuth';
 import { useLanguage } from '../../hooks/useLanguage';
 import { api } from '../../utils/api';
 import { t } from '../../utils/i18n';
+import { loadAiChat, saveAiChat, type AiMessage } from '../../utils/aiChatStore';
 
-interface AiMessage {
-  role: 'user' | 'assistant';
-  content: string;
+function greetingFor(lang: string) {
+  if (lang === 'ar') return 'مرحباً. أنا خبير السوشي في سوشي شوب مصر. تفضّل ني أم مطبوخ؟ حار أم خفيف؟';
+  if (lang === 'ru') return 'Здравствуйте. Я сомелье суши Sushi Shop Egypt. Предпочитаете сырое или горячее?';
+  return 'Welcome. I am the sushi expert at Sushi Shop Egypt. Raw or cooked? Spicy or mild?';
 }
 
 export default function AIChatWidget() {
@@ -16,7 +18,7 @@ export default function AIChatWidget() {
   const { lang } = useLanguage();
   const location = useLocation();
   const [open, setOpen] = useState(false);
-  const [messages, setMessages] = useState<AiMessage[]>([]);
+  const [messages, setMessages] = useState<AiMessage[]>(() => loadAiChat());
   const [text, setText] = useState('');
   const [sending, setSending] = useState(false);
 
@@ -26,6 +28,21 @@ export default function AIChatWidget() {
     || location.pathname.startsWith('/staff')
     || location.pathname === '/login'
     || location.pathname === '/chat';
+
+  useEffect(() => {
+    saveAiChat(messages);
+  }, [messages]);
+
+  const close = useCallback(() => setOpen(false), []);
+
+  const openChat = () => {
+    setOpen(true);
+    setMessages((prev) => (
+      prev.length === 0
+        ? [{ role: 'assistant', content: greetingFor(lang) }]
+        : prev
+    ));
+  };
 
   const send = useCallback(async (value: string) => {
     const trimmed = value.trim();
@@ -46,47 +63,62 @@ export default function AIChatWidget() {
   }, [messages, lang]);
 
   useEffect(() => {
-    if (open && messages.length === 0) {
-      const greeting = lang === 'ar'
-        ? 'مرحباً. أنا خبير السوشي في سوشي شوب مصر. تفضّل ني أم مطبوخ؟ حار أم خفيف؟'
-        : lang === 'ru'
-          ? 'Здравствуйте. Я сомелье суши Sushi Shop Egypt. Предпочитаете сырое или горячее?'
-          : 'Welcome. I am the sushi expert at Sushi Shop Egypt. Raw or cooked? Spicy or mild?';
-      setMessages([{ role: 'assistant', content: greeting }]);
-    }
-  }, [open, messages.length, lang]);
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') close();
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [open, close]);
 
   if (hidden) return null;
 
   return (
     <>
       {open && (
-        <div className="ai-chat-drawer animate-slide-in">
-          <div className="flex items-center justify-between px-4 py-3 border-b border-[rgba(229,169,60,0.2)]">
-            <span className="flex items-center gap-2 text-sm font-medium text-fg">
+        <button
+          type="button"
+          className="ai-chat-backdrop"
+          aria-label={t('chat.close', lang)}
+          onClick={close}
+        />
+      )}
+
+      {open && (
+        <div className="ai-chat-drawer animate-slide-in" role="dialog" aria-label={t('chat.ai_title', lang)}>
+          <div className="flex items-center justify-between px-4 py-3 border-b border-[rgba(229,169,60,0.25)]">
+            <span className="flex items-center gap-2 text-sm font-medium text-[#f8fafc]">
               <Bot className="w-5 h-5 text-accent" />
               {t('chat.ai_title', lang)}
             </span>
-            <button type="button" onClick={() => setOpen(false)} className="p-1 text-muted hover:text-fg">
-              <X className="w-4 h-4" />
+            <button
+              type="button"
+              onClick={close}
+              className="ai-chat-close"
+              aria-label={t('chat.close', lang)}
+            >
+              <X className="w-5 h-5" />
             </button>
           </div>
           <div className="h-64 overflow-y-auto p-3 space-y-2">
             {messages.map((m, i) => (
-              <div key={i} className={`max-w-[90%] text-sm px-3 py-2 rounded-xl ${
-                m.role === 'user' ? 'ms-auto bg-accent/20 text-fg' : 'me-auto bg-white/5 text-fg'
-              }`}>
+              <div
+                key={`${m.role}-${i}`}
+                className={`max-w-[90%] text-sm px-3 py-2 rounded-xl leading-relaxed ${
+                  m.role === 'user' ? 'ms-auto ai-bubble-user' : 'me-auto ai-bubble-bot'
+                }`}
+              >
                 {m.content}
               </div>
             ))}
-            {sending && <p className="text-muted text-xs animate-pulse">...</p>}
+            {sending && <p className="text-[#f8fafc]/70 text-xs animate-pulse">...</p>}
           </div>
           <form
             onSubmit={(e) => { e.preventDefault(); void send(text); }}
-            className="flex gap-2 p-3 border-t border-[var(--app-line)]"
+            className="flex gap-2 p-3 border-t border-[rgba(229,169,60,0.2)]"
           >
             <input
-              className="input-field text-sm py-2"
+              className="ai-chat-input"
               value={text}
               onChange={(e) => setText(e.target.value)}
               placeholder={t('chat.placeholder', lang)}
@@ -100,11 +132,12 @@ export default function AIChatWidget() {
 
       <button
         type="button"
-        onClick={() => setOpen((v) => !v)}
+        onClick={() => (open ? close() : openChat())}
         className={`ai-peek-btn ${open ? 'ai-peek-open' : ''}`}
         aria-label={t('chat.widget_label', lang)}
+        aria-expanded={open}
       >
-        <Bot className="w-6 h-6 text-accent" />
+        {open ? <X className="w-6 h-6 text-accent" /> : <Bot className="w-6 h-6 text-accent" />}
       </button>
     </>
   );

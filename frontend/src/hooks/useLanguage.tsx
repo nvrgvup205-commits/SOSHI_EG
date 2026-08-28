@@ -15,14 +15,26 @@ const LanguageContext = createContext<LanguageState | null>(null);
 const CUSTOMER_LANG_KEY = 'lang';
 const STAFF_LANG_KEY = 'staff_lang';
 const LANG_CHOSEN_KEY = 'lang_chosen';
+const LANG_COOKIE = 'soshi_lang';
 
 function isStaffRoute(pathname: string) {
   return pathname.startsWith('/admin') || pathname.startsWith('/staff');
 }
 
+function readCookieLang(): Language | null {
+  const match = document.cookie.match(/(?:^|; )soshi_lang=(ar|en|ru)/);
+  return match ? (match[1] as Language) : null;
+}
+
+function writeLangCookie(lang: Language) {
+  document.cookie = `${LANG_COOKIE}=${lang};path=/;max-age=31536000;samesite=lax`;
+}
+
 function readLang(key: string, fallback: Language): Language {
   const stored = localStorage.getItem(key) as Language | null;
   if (stored === 'ar' || stored === 'en' || stored === 'ru') return stored;
+  const cookie = readCookieLang();
+  if (cookie) return cookie;
   return fallback;
 }
 
@@ -38,7 +50,9 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   const fallback: Language = staffRoute ? 'ar' : 'ar';
 
   const [lang, setLangState] = useState<Language>(() => readLang(storageKey, fallback));
-  const [hasChosen, setHasChosen] = useState(() => localStorage.getItem(LANG_CHOSEN_KEY) === '1');
+  const [hasChosen, setHasChosen] = useState(
+    () => localStorage.getItem(LANG_CHOSEN_KEY) === '1' || Boolean(readCookieLang()),
+  );
 
   useEffect(() => {
     const next = readLang(storageKey, fallback);
@@ -49,6 +63,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   const setLang = (l: Language) => {
     setLangState(l);
     localStorage.setItem(storageKey, l);
+    writeLangCookie(l);
     applyDocumentLang(l);
   };
 
@@ -56,6 +71,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     setLangState(l);
     localStorage.setItem(CUSTOMER_LANG_KEY, l);
     localStorage.setItem(LANG_CHOSEN_KEY, '1');
+    writeLangCookie(l);
     setHasChosen(true);
     applyDocumentLang(l);
   };
